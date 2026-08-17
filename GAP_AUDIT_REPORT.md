@@ -26,7 +26,7 @@
 | Frontend routes | ~206 registered routes (public website + SPA + role-guarded) | `frontend/src/router/routes.ts` |
 | Mobile app | **None — no Flutter codebase anywhere** | glob `**/pubspec.yaml` → 0 results; no `mobile/` dir |
 | Tests | 24 backend feature test files (auth, RBAC, 2FA, SIS, parent, teacher/LMS, coding playground, robotics, competitions, finance, HR, inventory, library, certificates, analytics, AI, notifications, CMS, public website, sitemap) | `backend/tests/Feature/` |
-| Working tree | ~40 modified files, uncommitted — in-progress work adding branded PDF documents (invoices, payslips, receipts, ID cards, exports) and email branding | `git status` |
+| Working tree | **Clean** — the branded PDF/email/i18n work described in this audit is committed (`a0de8b3`); nothing uncommitted | `git status` |
 
 ---
 

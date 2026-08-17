@@ -473,15 +473,137 @@ export interface NotificationBroadcastInput {
   channels?: NotificationChannel[];
 }
 
+export interface DashboardAttendanceSummary {
+  date: string;
+  present: number;
+  late: number;
+  absent: number;
+  total: number;
+}
+
+export interface DashboardOverview {
+  total_users?: number;
+  active_users?: number;
+  total_employees?: number;
+  total_courses?: number;
+  published_courses?: number;
+  draft_courses?: number;
+  total_enrollments?: number;
+  active_enrollments?: number;
+  completed_enrollments?: number;
+  total_tasks?: number;
+  pending_tasks?: number;
+  completed_tasks?: number;
+  overdue_tasks?: number;
+  total_projects?: number;
+  active_projects?: number;
+  active_courses?: number;
+  completed_courses?: number;
+  total_students?: number;
+  total_teachers?: number;
+  active_schools?: number;
+  revenue?: number;
+  outstanding_fees?: number;
+  competition_registrations?: number;
+  completion_rate?: number;
+  average_progress?: number;
+  certificates?: number;
+  projects?: number;
+  attendance_summary?: DashboardAttendanceSummary;
+  ai_interactions_30d?: number;
+}
+
+export interface DashboardActivity {
+  type: 'user_joined' | 'enrollment' | 'task' | 'announcement';
+  message: string;
+  user: {
+    first_name: string;
+    last_name: string;
+    avatar?: string | null;
+  };
+  timestamp: string;
+}
+
+export interface DashboardUserRef {
+  first_name?: string;
+  last_name?: string;
+  name?: string;
+  avatar?: string | null;
+}
+
+export interface DashboardCourseRef {
+  id: number;
+  title: string;
+  enrollments_count?: number;
+}
+
+export interface DashboardTaskRef {
+  id: number;
+  title: string;
+  description?: string;
+  status: string;
+  priority: string;
+  due_date?: string | null;
+  created_at?: string;
+  assignee?: DashboardUserRef | null;
+  assigner?: DashboardUserRef | null;
+}
+
+export interface DashboardEnrollmentRef {
+  id: number;
+  enrolled_at: string;
+  completed_at?: string | null;
+  status?: string;
+  progress?: number;
+  user?: DashboardUserRef | null;
+  course?: DashboardCourseRef | null;
+}
+
+export interface DashboardAnnouncementRef {
+  id: number;
+  title: string;
+  is_pinned?: boolean;
+  created_at: string;
+  author?: DashboardUserRef | null;
+}
+
+export interface DashboardUpcomingEvent {
+  id: number;
+  title: string;
+  event_type?: string;
+  starts_at: string;
+  location?: string | null;
+  color?: string | null;
+}
+
+export interface DashboardMonthlyStat {
+  month: number;
+  year: number;
+  count: number;
+}
+
 export interface DashboardStats {
-  total_users: number;
-  total_courses: number;
-  total_enrollments: number;
-  total_employees: number;
-  active_projects: number;
-  pending_tasks: number;
-  completion_rate: number;
-  revenue: number;
+  overview: DashboardOverview;
+  // Admin dashboard
+  course_popularity?: DashboardCourseRef[];
+  enrollment_stats?: { monthly: DashboardMonthlyStat[] };
+  completion_stats?: { monthly: DashboardMonthlyStat[] };
+  recent_activity?: DashboardActivity[];
+  upcoming_tasks?: DashboardTaskRef[];
+  upcoming_events?: DashboardUpcomingEvent[];
+  unread_notifications?: number;
+  recent_notifications?: Notification[];
+  // Instructor dashboard
+  courses?: DashboardCourseRef[];
+  recent_enrollments?: DashboardEnrollmentRef[];
+  // Employee dashboard
+  my_tasks?: DashboardTaskRef[];
+  my_projects?: unknown[];
+  recent_announcements?: DashboardAnnouncementRef[];
+  // Student dashboard
+  active_enrollments?: DashboardEnrollmentRef[];
+  recent_completions?: DashboardEnrollmentRef[];
+  recommended_courses?: DashboardCourseRef[];
 }
 
 export interface PaginatedResponse<T> {

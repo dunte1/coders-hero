@@ -23,7 +23,7 @@ class DashboardController extends Controller
         $user = auth()->user();
 
         if ($user->hasRole('admin') || $user->hasRole('super_admin')) {
-            $data = $this->dashboardService->getAdminDashboard();
+            $data = $this->dashboardService->getAdminDashboard($user->id);
         } elseif ($user->hasRole('instructor')) {
             $data = $this->dashboardService->getInstructorDashboard($user->id);
         } elseif ($user->hasRole('employee')) {

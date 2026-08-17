@@ -13,127 +13,137 @@ import {
   LineChart,
   Line,
 } from 'recharts';
+import { BarChart3 } from 'lucide-react';
 
-const enrollmentData = [
-  { month: 'Jan', enrollments: 45 },
-  { month: 'Feb', enrollments: 62 },
-  { month: 'Mar', enrollments: 78 },
-  { month: 'Apr', enrollments: 56 },
-  { month: 'May', enrollments: 89 },
-  { month: 'Jun', enrollments: 95 },
-  { month: 'Jul', enrollments: 110 },
-  { month: 'Aug', enrollments: 125 },
-];
+export interface EnrollmentChartData {
+  month: string;
+  enrollments: number;
+}
 
-const courseStatsData = [
-  { name: 'Web Dev', value: 35, color: '#3b82f6' },
-  { name: 'Data Science', value: 25, color: '#10b981' },
-  { name: 'Mobile', value: 20, color: '#f59e0b' },
-  { name: 'DevOps', value: 15, color: '#8b5cf6' },
-  { name: 'Other', value: 5, color: '#94a3b8' },
-];
+export interface CourseStatsChartData {
+  name: string;
+  value: number;
+}
 
-const completionTrend = [
-  { week: 'W1', rate: 65 },
-  { week: 'W2', rate: 68 },
-  { week: 'W3', rate: 72 },
-  { week: 'W4', rate: 70 },
-  { week: 'W5', rate: 75 },
-  { week: 'W6', rate: 78 },
-  { week: 'W7', rate: 82 },
-  { week: 'W8', rate: 85 },
-];
+export interface CompletionChartData {
+  month: string;
+  completions: number;
+}
 
-export function EnrollmentChart() {
+const PIE_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#94a3b8'];
+
+function ChartEmpty({ label }: { label: string }) {
+  return (
+    <div className="flex h-[200px] flex-col items-center justify-center text-slate-400">
+      <BarChart3 className="mb-2 h-8 w-8" />
+      <p className="text-sm">{label}</p>
+    </div>
+  );
+}
+
+export function EnrollmentChart({ data }: { data: EnrollmentChartData[] }) {
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-base">Enrollment Trends</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={250}>
-          <BarChart data={enrollmentData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-            <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-            <YAxis tick={{ fontSize: 12 }} />
-            <Tooltip />
-            <Bar dataKey="enrollments" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        {data.length === 0 ? (
+          <ChartEmpty label="No enrollment data yet" />
+        ) : (
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+              <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
+              <Tooltip />
+              <Bar dataKey="enrollments" name="Enrollments" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </CardContent>
     </Card>
   );
 }
 
-export function CourseStatsChart() {
+export function CourseStatsChart({ data }: { data: CourseStatsChartData[] }) {
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-base">Course Distribution</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center gap-6">
-          <ResponsiveContainer width="50%" height={200}>
-            <PieChart>
-              <Pie
-                data={courseStatsData}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                innerRadius={40}
-                outerRadius={80}
-                strokeWidth={2}
-              >
-                {courseStatsData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="space-y-2 flex-1">
-            {courseStatsData.map((item) => (
-              <div key={item.name} className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2">
-                  <div
-                    className="h-3 w-3 rounded-full"
-                    style={{ backgroundColor: item.color }}
-                  />
-                  <span className="text-slate-600">{item.name}</span>
+        {data.length === 0 ? (
+          <ChartEmpty label="No course data yet" />
+        ) : (
+          <div className="flex items-center gap-6">
+            <ResponsiveContainer width="50%" height={200}>
+              <PieChart>
+                <Pie
+                  data={data}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={40}
+                  outerRadius={80}
+                  strokeWidth={2}
+                >
+                  {data.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="flex-1 min-w-0 space-y-2">
+              {data.map((item, index) => (
+                <div key={item.name} className="flex items-center justify-between gap-3 text-sm">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div
+                      className="h-3 w-3 shrink-0 rounded-full"
+                      style={{ backgroundColor: PIE_COLORS[index % PIE_COLORS.length] }}
+                    />
+                    <span className="truncate text-slate-600">{item.name}</span>
+                  </div>
+                  <span className="font-medium">{item.value}</span>
                 </div>
-                <span className="font-medium">{item.value}%</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );
 }
 
-export function CompletionChart() {
+export function CompletionChart({ data }: { data: CompletionChartData[] }) {
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-base">Completion Rate Trend</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={200}>
-          <LineChart data={completionTrend}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-            <XAxis dataKey="week" tick={{ fontSize: 12 }} />
-            <YAxis tick={{ fontSize: 12 }} domain={[60, 90]} />
-            <Tooltip />
-            <Line
-              type="monotone"
-              dataKey="rate"
-              stroke="#10b981"
-              strokeWidth={2}
-              dot={{ fill: '#10b981', strokeWidth: 2 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        {data.length === 0 ? (
+          <ChartEmpty label="No completion data yet" />
+        ) : (
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+              <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
+              <Tooltip />
+              <Line
+                type="monotone"
+                dataKey="completions"
+                name="Completions"
+                stroke="#10b981"
+                strokeWidth={2}
+                dot={{ fill: '#10b981', strokeWidth: 2 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        )}
       </CardContent>
     </Card>
   );

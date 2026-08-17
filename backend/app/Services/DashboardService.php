@@ -2,18 +2,33 @@
 
 namespace App\Services;
 
+use App\Http\Resources\NotificationResource;
+use App\Models\AiUsageLog;
 use App\Models\Announcement;
+use App\Models\Attendance;
+use App\Models\Branch;
+use App\Models\CalendarEvent;
+use App\Models\CompetitionTeam;
 use App\Models\Course;
 use App\Models\Employee;
 use App\Models\Enrollment;
+use App\Models\Fee;
+use App\Models\Notification;
+use App\Models\Payment;
 use App\Models\Project;
+use App\Models\Student;
 use App\Models\Task;
 use App\Models\User;
 
 class DashboardService
 {
-    public function getAdminDashboard(): array
+    public function getAdminDashboard(?string $userId = null): array
     {
+        $totalEnrollments = Enrollment::count();
+        $completedEnrollments = Enrollment::completed()->count();
+
+        $attendanceToday = Attendance::whereDate('attendance_date', now()->toDateString())->get();
+
         return [
             'overview' => [
                 'total_users' => User::count(),
@@ -21,14 +36,37 @@ class DashboardService
                 'total_employees' => Employee::active()->count(),
                 'total_courses' => Course::count(),
                 'published_courses' => Course::published()->count(),
-                'total_enrollments' => Enrollment::count(),
+                'total_enrollments' => $totalEnrollments,
                 'active_enrollments' => Enrollment::active()->count(),
-                'completed_enrollments' => Enrollment::completed()->count(),
+                'completed_enrollments' => $completedEnrollments,
                 'total_tasks' => Task::count(),
                 'pending_tasks' => Task::where('status', 'pending')->count(),
                 'overdue_tasks' => Task::overdue()->count(),
                 'total_projects' => Project::count(),
                 'active_projects' => Project::active()->count(),
+                // School / SIS
+                'total_students' => Student::count(),
+                'total_teachers' => User::role('teacher')->count(),
+                'active_schools' => Branch::active()->count(),
+                // Finance
+                'revenue' => round((float) Payment::sum('amount'), 2),
+                'outstanding_fees' => round((float) Fee::whereNot('status', 'paid')->sum('amount'), 2),
+                // Competitions
+                'competition_registrations' => CompetitionTeam::count(),
+                // Learning
+                'completion_rate' => $totalEnrollments > 0
+                    ? round(($completedEnrollments / $totalEnrollments) * 100, 1)
+                    : 0,
+                // Attendance
+                'attendance_summary' => [
+                    'date' => now()->toDateString(),
+                    'present' => $attendanceToday->where('status', 'present')->count(),
+                    'late' => $attendanceToday->where('status', 'late')->count(),
+                    'absent' => $attendanceToday->where('status', 'absent')->count(),
+                    'total' => $attendanceToday->count(),
+                ],
+                // AI
+                'ai_interactions_30d' => AiUsageLog::where('created_at', '>=', now()->subDays(30))->count(),
             ],
             'recent_users' => User::latest()->take(5)->with('roles')->get(),
             'recent_enrollments' => Enrollment::latest()->with(['user', 'course'])->take(5)->get(),
@@ -44,13 +82,37 @@ class DashboardService
                 ->take(5)
                 ->get(),
             'enrollment_stats' => [
-                'monthly' => Enrollment::where('enrolled_at', '>=', now()->subMonths(12))
-                    ->selectRaw('MONTH(enrolled_at) as month, YEAR(enrolled_at) as year, COUNT(*) as count')
-                    ->groupBy('year', 'month')
-                    ->orderBy('year')
-                    ->orderBy('month')
-                    ->get(),
+                'monthly' => $this->monthlyStats(
+                    Enrollment::where('enrolled_at', '>=', now()->subMonths(12))->select('enrolled_at'),
+                    'enrolled_at'
+                ),
             ],
+            'completion_stats' => [
+                'monthly' => $this->monthlyStats(
+                    Enrollment::completed()
+                        ->where('completed_at', '>=', now()->subMonths(12))
+                        ->select('completed_at'),
+                    'completed_at'
+                ),
+            ],
+            'recent_activity' => $this->buildRecentActivity(),
+            'upcoming_tasks' => Task::active()
+                ->whereNotNull('due_date')
+                ->orderBy('due_date')
+                ->take(5)
+                ->get(['id', 'title', 'due_date', 'priority', 'status']),
+            'upcoming_events' => CalendarEvent::where('starts_at', '>=', now())
+                ->orderBy('starts_at')
+                ->take(5)
+                ->get(['id', 'title', 'event_type', 'starts_at', 'location', 'color']),
+            'recent_notifications' => $userId
+                ? NotificationResource::collection(
+                    Notification::forUser($userId)->latest()->take(5)->get()
+                )
+                : collect(),
+            'unread_notifications' => $userId
+                ? Notification::forUser($userId)->unread()->count()
+                : 0,
         ];
     }
 
@@ -166,6 +228,98 @@ class DashboardService
                 ->notExpired()
                 ->take(5)
                 ->get(),
+        ];
+    }
+
+    /**
+     * Combine the latest users, enrollments, tasks and announcements into a
+     * single normalized activity feed for the admin dashboard.
+     */
+    private function buildRecentActivity(): \Illuminate\Support\Collection
+    {
+        $recentUsers = User::latest()->take(5)->get()->map(function (User $user) {
+            return [
+                'type' => 'user_joined',
+                'message' => 'joined the platform',
+                'user' => $this->activityUser($user),
+                'timestamp' => $user->created_at?->toISOString(),
+            ];
+        });
+
+        $recentEnrollments = Enrollment::latest()->with(['user', 'course'])->take(5)->get()->map(function (Enrollment $enrollment) {
+            return [
+                'type' => 'enrollment',
+                'message' => 'enrolled in ' . ($enrollment->course?->title ?? 'a course'),
+                'user' => $this->activityUser($enrollment->user),
+                'timestamp' => $enrollment->enrolled_at?->toISOString(),
+            ];
+        });
+
+        $recentTasks = Task::latest()->with(['assigner', 'assignee'])->take(5)->get()->map(function (Task $task) {
+            return [
+                'type' => 'task',
+                'message' => 'created task "' . $task->title . '"',
+                'user' => $this->activityUser($task->assigner ?? $task->assignee),
+                'timestamp' => $task->created_at?->toISOString(),
+            ];
+        });
+
+        $recentAnnouncements = Announcement::published()
+            ->latest()
+            ->with('author')
+            ->take(5)
+            ->get()
+            ->map(function (Announcement $announcement) {
+                return [
+                    'type' => 'announcement',
+                    'message' => 'posted "' . $announcement->title . '"',
+                    'user' => $this->activityUser($announcement->author),
+                    'timestamp' => $announcement->created_at?->toISOString(),
+                ];
+            });
+
+        return $recentUsers
+            ->concat($recentEnrollments)
+            ->concat($recentTasks)
+            ->concat($recentAnnouncements)
+            ->filter(fn (array $item) => $item['timestamp'] !== null)
+            ->sortByDesc('timestamp')
+            ->take(8)
+            ->values();
+    }
+
+    /**
+     * Group rows by year-month in PHP so the monthly stats work on both
+     * MySQL and SQLite (avoids DB-specific SQL functions).
+     */
+    private function monthlyStats($query, string $dateColumn): \Illuminate\Support\Collection
+    {
+        return $query->get()
+            ->groupBy(fn ($row) => $row->{$dateColumn}->format('Y-m'))
+            ->map(fn ($group, string $key) => [
+                'year' => (int) substr($key, 0, 4),
+                'month' => (int) substr($key, 5, 2),
+                'count' => $group->count(),
+            ])
+            ->values();
+    }
+
+    /**
+     * Normalize a user into the { first_name, last_name, avatar } shape the
+     * dashboard activity feed expects (User stores a single `name` column).
+     */
+    private function activityUser(?User $user): array
+    {
+        if (! $user) {
+            return ['first_name' => 'System', 'last_name' => '', 'avatar' => null];
+        }
+
+        $parts = preg_split('/\s+/', trim($user->name ?? '')) ?: [];
+
+        return [
+            'first_name' => $parts[0] ?? '',
+            'last_name' => count($parts) > 1 ? implode(' ', array_slice($parts, 1)) : '',
+            'avatar' => $user->avatar,
         ];
     }
 }
