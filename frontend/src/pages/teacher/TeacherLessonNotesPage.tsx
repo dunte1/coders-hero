@@ -52,7 +52,7 @@ export default function TeacherLessonNotesPage() {
               <div className="space-y-4">
                 <Input label="Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
                 <Textarea label="Content" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} rows={6} />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <SelectRoot value={form.class_id ? String(form.class_id) : ''} onValueChange={(v) => setForm({ ...form, class_id: v ? Number(v) : null })}>
                     <SelectTrigger label="Class"><SelectValue placeholder="Optional class" /></SelectTrigger>
                     <SelectContent>

@@ -54,6 +54,11 @@ export const studentsApi = {
 
   get: (id: number) => api.get<{ data: StudentDetail }>(`/students/${id}`).then(unwrap<StudentDetail>),
 
+  idCardPdf: async (id: number) => {
+    const res = await api.get<Blob>(`/students/${id}/id-card/pdf`, { responseType: 'blob' });
+    return res.data;
+  },
+
   create: (data: StudentInput) =>
     api.post<{ data: Student }>('/students', data).then(unwrap<Student>),
 
@@ -233,8 +238,16 @@ export const sisExports = {
     const res = await api.get<Blob>('/students/exports/students', { params, responseType: 'blob' });
     return res.data;
   },
+  studentsPdf: async (params?: SisListParams) => {
+    const res = await api.get<Blob>('/students/exports/students/pdf', { params, responseType: 'blob' });
+    return res.data;
+  },
   attendance: async (params?: SisListParams) => {
     const res = await api.get<Blob>('/students/exports/attendance', { params, responseType: 'blob' });
+    return res.data;
+  },
+  attendancePdf: async (params?: SisListParams) => {
+    const res = await api.get<Blob>('/students/exports/attendance/pdf', { params, responseType: 'blob' });
     return res.data;
   },
 };

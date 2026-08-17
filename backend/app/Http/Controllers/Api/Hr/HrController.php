@@ -8,6 +8,7 @@ use App\Http\Resources\PositionResource;
 use App\Models\Department;
 use App\Models\Position;
 use App\Services\Hr\HrService;
+use App\Services\Pdf\DocumentPdfService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,7 +20,8 @@ class HrController extends Controller
     use ApiResponse;
 
     public function __construct(
-        private HrService $hrService
+        private HrService $hrService,
+        private DocumentPdfService $pdf
     ) {}
 
     public function summary(): JsonResponse
@@ -142,6 +144,73 @@ class HrController extends Controller
             'total' => 'Total',
             'rate' => 'Attendance Rate (%)',
         ]);
+    }
+
+    public function exportEmployeesPdf(Request $request): StreamedResponse
+    {
+        $rows = $this->hrService->exportEmployees($request->only(['status', 'department_id']));
+
+        return $this->streamPdf($rows, 'employees', [
+            'employee_id' => 'Employee ID',
+            'name' => 'Full Name',
+            'email' => 'Email',
+            'phone' => 'Phone',
+            'department' => 'Department',
+            'position' => 'Position',
+            'employment_type' => 'Employment Type',
+            'hire_date' => 'Hire Date',
+            'status' => 'Status',
+            'salary' => 'Salary',
+        ], 'Staff Export');
+    }
+
+    public function exportLeavePdf(Request $request): StreamedResponse
+    {
+        $rows = $this->hrService->exportLeave($request->only(['status', 'from', 'to']));
+
+        return $this->streamPdf($rows, 'leave-requests', [
+            'employee_id' => 'Employee ID',
+            'employee' => 'Employee',
+            'leave_type' => 'Leave Type',
+            'start_date' => 'Start Date',
+            'end_date' => 'End Date',
+            'days' => 'Days',
+            'reason' => 'Reason',
+            'status' => 'Status',
+            'reviewed_at' => 'Reviewed At',
+        ], 'Leave Requests Export');
+    }
+
+    public function exportAttendancePdf(Request $request): StreamedResponse
+    {
+        $rows = $this->hrService->exportAttendance($request->only(['from', 'to']));
+
+        return $this->streamPdf($rows, 'staff-attendance', [
+            'employee_id' => 'Employee ID',
+            'employee' => 'Employee',
+            'department' => 'Department',
+            'present' => 'Present',
+            'absent' => 'Absent',
+            'late' => 'Late',
+            'half_day' => 'Half Day',
+            'leave' => 'Leave',
+            'total' => 'Total',
+            'rate' => 'Attendance Rate (%)',
+        ], 'Staff Attendance Export');
+    }
+
+    private function streamPdf(array $rows, string $prefix, array $headers, string $title): StreamedResponse
+    {
+        $table = $this->pdf->table(array_values($headers), array_map(
+            fn (array $row) => array_map(fn ($key) => $row[$key] ?? '', array_keys($headers)),
+            $rows
+        ));
+
+        return $this->pdf->download(
+            $title,
+            $table,
+            $prefix . '-' . now()->format('Y-m-d-His') . '.pdf'
+        );
     }
 
     private function streamCsv(array $rows, string $prefix, array $headers): StreamedResponse

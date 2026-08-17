@@ -66,7 +66,7 @@ export default function TeacherCalendarPage() {
               <div className="space-y-4">
                 <Input label="Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
                 <Textarea label="Description" value={form.description ?? ''} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <SelectRoot value={form.event_type ?? 'class'} onValueChange={(v) => setForm({ ...form, event_type: v as EventType })}>
                     <SelectTrigger label="Type"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -84,11 +84,11 @@ export default function TeacherCalendarPage() {
                     </SelectContent>
                   </SelectRoot>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <Input label="Starts" type="datetime-local" value={form.starts_at} onChange={(e) => setForm({ ...form, starts_at: e.target.value })} />
                   <Input label="Ends" type="datetime-local" value={form.ends_at ?? ''} onChange={(e) => setForm({ ...form, ends_at: e.target.value || null })} />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <Input label="Location" value={form.location ?? ''} onChange={(e) => setForm({ ...form, location: e.target.value })} />
                   <label className="flex items-center gap-2 pt-7 text-sm text-slate-700">
                     <input

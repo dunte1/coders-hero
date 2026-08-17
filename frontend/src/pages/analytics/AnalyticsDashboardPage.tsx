@@ -342,7 +342,7 @@ export default function AnalyticsDashboardPage() {
                     <p className="text-sm font-semibold text-slate-900">{t.name}</p>
                     <Badge variant="secondary">{t.completion}% completion</Badge>
                   </div>
-                  <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                  <div className="mt-3 grid grid-cols-2 gap-2 text-center sm:grid-cols-3">
                     <div className="rounded-lg bg-slate-50 p-2">
                       <p className="text-lg font-bold text-slate-900">{t.enrollments}</p>
                       <p className="text-xs text-slate-500">Enrollments</p>

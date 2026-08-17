@@ -73,7 +73,7 @@ export default function HrDocumentsPage() {
   };
 
   const openDownload = (docId: number) => {
-    window.open(hrApi.documentDownloadUrl(docId), '_blank');
+    hrApi.downloadDocument(docId);
   };
 
   return (

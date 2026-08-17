@@ -384,7 +384,7 @@ export default function AiAdminPage() {
             <DialogDescription>Configure the assistant's identity, prompt and model.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 max-h-[60vh] overflow-y-auto pr-1">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="as-name">Name</Label>
                 <Input id="as-name" value={assistantForm.name} onChange={(e) => setAssistantForm({ ...assistantForm, name: e.target.value })} />
@@ -407,7 +407,7 @@ export default function AiAdminPage() {
                 onChange={(e) => setAssistantForm({ ...assistantForm, system_prompt: e.target.value })}
               />
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               <div className="space-y-2">
                 <Label htmlFor="as-model">Model</Label>
                 <Input id="as-model" value={assistantForm.model} onChange={(e) => setAssistantForm({ ...assistantForm, model: e.target.value })} placeholder="default" />
@@ -448,7 +448,7 @@ export default function AiAdminPage() {
             <DialogDescription>Use {'{{ variable }}'} placeholders filled in by the user.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 max-h-[60vh] overflow-y-auto pr-1">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="tp-name">Name</Label>
                 <Input id="tp-name" value={templateForm.name} onChange={(e) => setTemplateForm({ ...templateForm, name: e.target.value })} />

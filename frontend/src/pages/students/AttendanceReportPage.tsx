@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Download } from 'lucide-react';
+import { Download, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { DataTable, type Column } from '@/components/ui/DataTable';
@@ -34,6 +34,7 @@ export default function AttendanceReportPage() {
   const [grade, setGrade] = useState('all');
   const [search, setSearch] = useState('');
   const [exporting, setExporting] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
   const debouncedSearch = useDebounce(search);
   const { data: grades } = useStudentGrades();
 
@@ -60,6 +61,23 @@ export default function AttendanceReportPage() {
       toast.error(getErrorMessage(err));
     } finally {
       setExporting(false);
+    }
+  };
+
+  const handleExportPdf = async () => {
+    setExportingPdf(true);
+    try {
+      const blob = await sisExports.attendancePdf({
+        from,
+        to,
+        search: debouncedSearch || undefined,
+        grade: grade === 'all' ? undefined : grade,
+      });
+      downloadBlob(blob, `attendance-${from}-to-${to}.pdf`);
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    } finally {
+      setExportingPdf(false);
     }
   };
 
@@ -130,10 +148,16 @@ export default function AttendanceReportPage() {
         description="Summary of attendance across a date range"
         breadcrumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Attendance' }, { label: 'Report' }]}
         actions={
-          <Button variant="outline" loading={exporting} onClick={handleExport}>
-            <Download className="mr-2 h-4 w-4" />
-            Export CSV
-          </Button>
+          <>
+            <Button variant="outline" loading={exporting} onClick={handleExport}>
+              <Download className="mr-2 h-4 w-4" />
+              Export CSV
+            </Button>
+            <Button variant="outline" loading={exportingPdf} onClick={handleExportPdf}>
+              <FileText className="mr-2 h-4 w-4" />
+              Export PDF
+            </Button>
+          </>
         }
       />
 

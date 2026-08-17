@@ -145,7 +145,7 @@ export default function BudgetsPage() {
               <Label>Category</Label>
               <Input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} placeholder="e.g. Utilities" />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <Label>Allocated Amount (KSh)</Label>
                 <Input type="number" min={0} step="0.01" value={form.allocated_amount} onChange={(e) => setForm({ ...form, allocated_amount: Number(e.target.value) })} />

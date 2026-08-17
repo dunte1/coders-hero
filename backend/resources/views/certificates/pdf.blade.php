@@ -58,12 +58,17 @@
         .qr svg { width: 90px; height: 90px; }
         .qr-code-label { font-size: 10px; color: #64748b; margin-top: 2px; }
         .verification-note { font-size: 10px; color: #94a3b8; text-align: center; margin-top: 8px; }
+        .site-logo { max-height: 56px; max-width: 160px; margin: 0 auto 6px; object-fit: contain; }
     </style>
 </head>
 <body>
     <div class="certificate">
         <div class="header">
-            <div class="badge">Coder's Hero</div>
+            @if (!empty($siteLogo))
+                <img src="{{ $siteLogo }}" alt="{{ $siteName }}" class="site-logo">
+            @else
+                <div class="badge">{{ $siteName }}</div>
+            @endif
             <div class="title">Certificate of Completion</div>
             <div class="subtitle">This certificate is proudly presented to</div>
         </div>

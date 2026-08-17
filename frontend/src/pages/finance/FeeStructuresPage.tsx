@@ -197,7 +197,7 @@ export default function FeeStructuresPage() {
               <Label>Name</Label>
               <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Tuition - Term 1" />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <Label>Fee Type</Label>
                 <SelectRoot value={form.fee_type} onValueChange={(v) => setForm({ ...form, fee_type: v as FeeType })}>
@@ -214,7 +214,7 @@ export default function FeeStructuresPage() {
                 <Input type="number" min={0} step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: Number(e.target.value) })} />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <Label>Term</Label>
                 <Input value={form.term ?? ''} onChange={(e) => setForm({ ...form, term: e.target.value || null })} placeholder="e.g. Term 1" />

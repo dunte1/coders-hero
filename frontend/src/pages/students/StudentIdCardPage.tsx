@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import QRCode from 'qrcode';
-import { Printer } from 'lucide-react';
+import { Printer, Download } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageSpinner } from '@/components/ui/Spinner';
 import { Button } from '@/components/ui/Button';
 import { useStudent } from '@/hooks/useStudents';
+import { downloadBlob, studentsApi, getErrorMessage } from '@/lib/studentsApi';
 import { formatDate, getInitials } from '@/lib/utils';
+import { toast } from 'sonner';
 
 export default function StudentIdCardPage() {
   const { id } = useParams<{ id: string }>();
@@ -15,6 +17,19 @@ export default function StudentIdCardPage() {
 
   const { data: student, isLoading } = useStudent(studentId as number);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownload = async () => {
+    setDownloading(true);
+    try {
+      const blob = await studentsApi.idCardPdf(studentId as number);
+      downloadBlob(blob, `id-card-${student?.student_id ?? 'student'}.pdf`);
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   useEffect(() => {
     if (student?.qr_code) {
@@ -56,6 +71,10 @@ export default function StudentIdCardPage() {
               <Button variant="outline" onClick={() => navigate(`/students/${studentId}`)}>
                 Back to Profile
               </Button>
+              <Button variant="outline" loading={downloading} onClick={handleDownload}>
+                <Download className="mr-2 h-4 w-4" />
+                Download PDF
+              </Button>
               <Button onClick={() => window.print()}>
                 <Printer className="mr-2 h-4 w-4" />
                 Print Card
@@ -94,7 +113,7 @@ export default function StudentIdCardPage() {
               </div>
             </div>
 
-            <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
+            <div className="mt-5 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
               <div>
                 <p className="text-xs text-slate-400">Grade</p>
                 <p className="font-medium text-slate-900">{student.grade || '—'}</p>

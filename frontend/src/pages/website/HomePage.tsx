@@ -191,7 +191,7 @@ export default function HomePage() {
 
             <div className="relative hidden lg:block">
               {data.gallery.length > 0 ? (
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <img
                     src={data.gallery[0].image_url ?? ''}
                     alt={data.gallery[0].title}
@@ -279,7 +279,7 @@ export default function HomePage() {
               title={galleryIntro?.title ?? 'Inside our classroom'}
               subtitle={galleryIntro?.subtitle}
             />
-            <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {data.gallery.slice(0, 8).map((item) => (
                 <Link
                   key={item.id}

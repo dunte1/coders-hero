@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   useHrPayroll,
@@ -11,7 +12,10 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { Wallet, PlayCircle, CheckCircle2, Ban, ChevronLeft } from 'lucide-react';
+import { Wallet, PlayCircle, CheckCircle2, Ban, ChevronLeft, Download } from 'lucide-react';
+import { hrApi } from '@/lib/hrApi';
+import { getErrorMessage } from '@/lib/studentsApi';
+import { toast } from 'sonner';
 
 const formatKsh = (v: number | string | undefined) =>
   'KSh ' + Number(v ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -38,6 +42,18 @@ export default function HrPayrollDetailPage() {
   }
 
   const payslips = payroll.payslips || [];
+  const [downloading, setDownloading] = useState<number | null>(null);
+
+  const handleDownloadPayslip = async (payslipId: number) => {
+    setDownloading(payslipId);
+    try {
+      await hrApi.payslipPdf(payslipId);
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    } finally {
+      setDownloading(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -107,6 +123,7 @@ export default function HrPayrollDetailPage() {
                   <th className="px-4 py-3">Deductions</th>
                   <th className="px-4 py-3">Net</th>
                   <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -123,6 +140,17 @@ export default function HrPayrollDetailPage() {
                     <td className="px-4 py-3 font-medium text-slate-900">{formatKsh(payslip.net_amount)}</td>
                     <td className="px-4 py-3">
                       <StatusBadge status={payslip.status} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        loading={downloading === payslip.id}
+                        onClick={() => handleDownloadPayslip(payslip.id)}
+                        title="Download payslip PDF"
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
                     </td>
                   </tr>
                 ))}

@@ -156,7 +156,7 @@ function ContactStatsCard({ data }: { data: AnalyticsData['contact_message_stats
       <CardHeader>
         <CardTitle className="text-base">Contact Messages</CardTitle>
       </CardHeader>
-      <CardContent className="grid grid-cols-2 gap-3">
+      <CardContent className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {items.map((item) => (
           <div key={item.label} className="rounded-lg border border-slate-200 p-3">
             <div className="flex items-center gap-2">

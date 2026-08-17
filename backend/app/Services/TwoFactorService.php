@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\SiteSetting;
 use App\Models\User;
 use BaconQrCode\Renderer\GDLibRenderer;
 use BaconQrCode\Writer;
@@ -11,7 +12,10 @@ use PragmaRX\Google2FA\Google2FA;
 
 class TwoFactorService
 {
-    public const APP_NAME = "Coder's Hero ERP";
+    public function appName(): string
+    {
+        return SiteSetting::siteName();
+    }
 
     public function __construct(
         private Google2FA $google2fa
@@ -24,7 +28,7 @@ class TwoFactorService
         return [
             'secret' => $secret,
             'qr_code_url' => $this->generateQRCodeDataUrl(
-                $this->google2fa->getQRCodeUrl(self::APP_NAME, '', $secret)
+                $this->google2fa->getQRCodeUrl($this->appName(), '', $secret)
             ),
         ];
     }
@@ -138,7 +142,7 @@ class TwoFactorService
 
     public function getQRCodeData(User $user, string $secret): array
     {
-        $otpUrl = $this->google2fa->getQRCodeUrl(self::APP_NAME, $user->email, $secret);
+        $otpUrl = $this->google2fa->getQRCodeUrl($this->appName(), $user->email, $secret);
 
         return [
             'qr_code_url' => $this->generateQRCodeDataUrl($otpUrl),

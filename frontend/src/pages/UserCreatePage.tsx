@@ -38,7 +38,7 @@ export default function UserCreatePage() {
       <Card>
         <CardContent className="p-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input label="First Name" error={errors.first_name?.message} {...register('first_name')} />
               <Input label="Last Name" error={errors.last_name?.message} {...register('last_name')} />
             </div>

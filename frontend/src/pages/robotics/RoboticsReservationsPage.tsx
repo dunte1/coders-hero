@@ -138,7 +138,7 @@ export default function RoboticsReservationsPage() {
                     ))}
                   </SelectContent>
                 </SelectRoot>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <Input label="Start date" type="date" value={form.start_at} onChange={(e) => setForm({ ...form, start_at: e.target.value })} />
                   <Input label="End date" type="date" value={form.end_at} onChange={(e) => setForm({ ...form, end_at: e.target.value })} />
                 </div>

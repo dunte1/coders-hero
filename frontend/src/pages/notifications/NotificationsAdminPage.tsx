@@ -190,7 +190,7 @@ export default function NotificationsAdminPage() {
                 {summaryLoading ? (
                   <PageSpinner />
                 ) : (
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {[
                       { label: 'Queued', value: d?.queued ?? 0, variant: 'secondary' as const },
                       { label: 'Sending', value: d?.sending ?? 0, variant: 'warning' as const },

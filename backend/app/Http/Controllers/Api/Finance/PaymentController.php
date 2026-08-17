@@ -8,6 +8,7 @@ use App\Services\Finance\PaymentService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PaymentController extends Controller
 {
@@ -48,6 +49,17 @@ class PaymentController extends Controller
         }
 
         return $this->successResponse($payment, 'Receipt retrieved successfully.');
+    }
+
+    public function pdf(int $id): StreamedResponse
+    {
+        $payment = Payment::with(['invoice.student', 'fee.student', 'paidBy:id,name', 'mpesaTransaction'])->find($id);
+
+        if (!$payment) {
+            abort(404, 'Payment not found.');
+        }
+
+        return $this->paymentService->receiptPdf($payment);
     }
 
     public function reverse(int $id): JsonResponse

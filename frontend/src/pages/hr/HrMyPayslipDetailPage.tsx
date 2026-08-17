@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useMyPayslip } from '@/hooks/useHr';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -6,7 +7,10 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { Wallet, ChevronLeft } from 'lucide-react';
+import { Wallet, ChevronLeft, Download } from 'lucide-react';
+import { hrApi } from '@/lib/hrApi';
+import { getErrorMessage } from '@/lib/studentsApi';
+import { toast } from 'sonner';
 
 const formatKsh = (v: number | string | undefined) =>
   'KSh ' + Number(v ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -39,6 +43,18 @@ export default function HrMyPayslipDetailPage() {
   const payslipId = Number(id);
 
   const { data: payslip, isLoading } = useMyPayslip(payslipId);
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownload = async () => {
+    setDownloading(true);
+    try {
+      await hrApi.myPayslipPdf(payslipId);
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   if (isLoading) return <PageSpinner />;
 
@@ -62,7 +78,14 @@ export default function HrMyPayslipDetailPage() {
           { label: 'Payslips', href: '/my/hr/payslips' },
           { label: payslip.payroll?.payroll_no ?? `Payslip #${payslip.id}` },
         ]}
-        actions={<StatusBadge status={payslip.status} />}
+        actions={
+          <>
+            <Button variant="outline" loading={downloading} onClick={handleDownload}>
+              <Download className="mr-1 h-4 w-4" /> Download PDF
+            </Button>
+            <StatusBadge status={payslip.status} />
+          </>
+        }
       />
 
       <div className="grid gap-4 sm:grid-cols-3">

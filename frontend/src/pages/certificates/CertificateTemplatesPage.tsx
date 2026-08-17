@@ -191,7 +191,7 @@ export default function CertificateTemplatesPage() {
           </DialogHeader>
 
           <div className="grid gap-4 max-h-[60vh] overflow-y-auto pr-1">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="tpl-name">Name</Label>
                 <Input id="tpl-name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Standard Certificate" />
@@ -227,7 +227,7 @@ export default function CertificateTemplatesPage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="tpl-sig-name">Signature Name</Label>
                 <Input id="tpl-sig-name" value={form.signature_name ?? ''} onChange={(e) => setForm({ ...form, signature_name: e.target.value })} />

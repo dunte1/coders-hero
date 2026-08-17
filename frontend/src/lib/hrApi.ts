@@ -76,11 +76,20 @@ export const hrApi = {
   exportEmployees: (params?: { status?: string; department_id?: number }) =>
     downloadFile('/hr/export/employees', params),
 
+  exportEmployeesPdf: (params?: { status?: string; department_id?: number }) =>
+    downloadFile('/hr/export/employees/pdf', params),
+
   exportLeave: (params?: { status?: string; from?: string; to?: string }) =>
     downloadFile('/hr/export/leave', params),
 
+  exportLeavePdf: (params?: { status?: string; from?: string; to?: string }) =>
+    downloadFile('/hr/export/leave/pdf', params),
+
   exportAttendance: (params?: { from?: string; to?: string }) =>
     downloadFile('/hr/export/attendance', params),
+
+  exportAttendancePdf: (params?: { from?: string; to?: string }) =>
+    downloadFile('/hr/export/attendance/pdf', params),
 
   // Employees
   employees: (params?: { page?: number; per_page?: number; search?: string }) =>
@@ -160,10 +169,11 @@ export const hrApi = {
     api.put<{ data: Payroll }>(`/hr/payrolls/${id}/mark-paid`, { payment_method: payment_method ?? 'bank_transfer' }).then(unwrap<Payroll>),
 
   cancelPayroll: (id: number) =>
-    api.put<{ data: Payroll }>(`/hr/payrolls/${id}/cancel`).then(unwrap<Payroll>),
+    api.put<{ data: Payroll }>(`/hr/payrolls/${id}/cancel`).then(unwrap<Payroll>),  payslip: (id: number) => api.get<{ data: Payslip }>(`/hr/payslips/${id}`).then(unwrap<Payslip>),
 
-  payslip: (id: number) =>
-    api.get<{ data: Payslip }>(`/hr/payslips/${id}`).then(unwrap<Payslip>),
+  payslipPdf: (id: number) => downloadFile(`/hr/payslips/${id}/pdf`),
+
+  myPayslipPdf: (id: number) => downloadFile(`/my/hr/payslips/${id}/pdf`),
 
   // Performance reviews
   reviews: (params?: { page?: number; per_page?: number; employee_id?: number; status?: string; search?: string }) =>
@@ -188,7 +198,7 @@ export const hrApi = {
   createDocument: (data: FormData) =>
     api.post<{ data: EmployeeDocument }>('/hr/documents', data).then(unwrap<EmployeeDocument>),
 
-  documentDownloadUrl: (id: number) => `/hr/documents/${id}/download`,
+  downloadDocument: (id: number) => downloadFile(`/hr/documents/${id}/download`),
 
   deleteDocument: (id: number) =>
     api.delete<{ data: null }>(`/hr/documents/${id}`).then(() => undefined),

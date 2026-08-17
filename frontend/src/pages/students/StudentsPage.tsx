@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, Eye, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Download, Eye, FileText, Pencil, Plus, Trash2 } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { Button } from '@/components/ui/Button';
@@ -28,6 +28,7 @@ export default function StudentsPage() {
   const [grade, setGrade] = useState('all');
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
   const debouncedSearch = useDebounce(search);
   const { data: grades } = useStudentGrades();
 
@@ -42,15 +43,33 @@ export default function StudentsPage() {
   const { data, isLoading } = useStudents(params);
   const deleteMutation = useDeleteStudent();
 
+  const exportParams = {
+    search: debouncedSearch || undefined,
+    status: status === 'all' ? undefined : status,
+    grade: grade === 'all' ? undefined : grade,
+  };
+
   const handleExport = async () => {
     setExporting(true);
     try {
-      const blob = await sisExports.students({ search: debouncedSearch || undefined, status: status === 'all' ? undefined : status, grade: grade === 'all' ? undefined : grade });
+      const blob = await sisExports.students(exportParams);
       downloadBlob(blob, 'students-export.csv');
     } catch (err) {
       toast.error(getErrorMessage(err));
     } finally {
       setExporting(false);
+    }
+  };
+
+  const handleExportPdf = async () => {
+    setExportingPdf(true);
+    try {
+      const blob = await sisExports.studentsPdf(exportParams);
+      downloadBlob(blob, 'students-export.pdf');
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    } finally {
+      setExportingPdf(false);
     }
   };
 
@@ -118,6 +137,10 @@ export default function StudentsPage() {
             <Button variant="outline" loading={exporting} onClick={handleExport}>
               <Download className="mr-2 h-4 w-4" />
               Export CSV
+            </Button>
+            <Button variant="outline" loading={exportingPdf} onClick={handleExportPdf}>
+              <FileText className="mr-2 h-4 w-4" />
+              Export PDF
             </Button>
             <Button onClick={() => navigate('/students/create')}>
               <Plus className="mr-2 h-4 w-4" />

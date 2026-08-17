@@ -28,6 +28,21 @@ const unwrapPage = <T>(res: { data: { data: T[]; meta: PaginationMeta } }): Page
   meta: res.data.meta,
 });
 
+async function downloadPdf(url: string): Promise<void> {
+  const res = await api.get<Blob>(url, { responseType: 'blob' });
+  const disposition = res.headers['content-disposition'] ?? '';
+  const match = disposition.match(/filename="?([^"]+)"?/);
+  const filename = match ? match[1] : url.split('/').pop() ?? 'document.pdf';
+  const blobUrl = window.URL.createObjectURL(res.data);
+  const link = document.createElement('a');
+  link.href = blobUrl;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(blobUrl);
+}
+
 export const financeApi = {
   // Summary / reports
   summary: () => api.get<{ data: FinanceSummary }>('/finance/summary').then(unwrap<FinanceSummary>),
@@ -72,6 +87,10 @@ export const financeApi = {
 
   invoice: (id: number) =>
     api.get<{ data: Invoice }>(`/finance/invoices/${id}`).then(unwrap<Invoice>),
+
+  invoicePdf: (id: number) => downloadPdf(`/finance/invoices/${id}/pdf`),
+
+  paymentPdf: (id: number) => downloadPdf(`/finance/payments/${id}/pdf`),
 
   createInvoice: (data: InvoiceInput) =>
     api.post<{ data: Invoice }>('/finance/invoices', data).then(unwrap<Invoice>),

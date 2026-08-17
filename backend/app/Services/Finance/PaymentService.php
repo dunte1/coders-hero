@@ -6,11 +6,51 @@ use App\Models\Fee;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\User;
+use App\Services\Pdf\DocumentPdfService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PaymentService
 {
+    public function __construct(
+        private DocumentPdfService $pdf
+    ) {}
+
+    /**
+     * Build a branded payment receipt PDF (shared by admin + parent portal).
+     */
+    public function receiptPdf(Payment $payment): StreamedResponse
+    {
+        $payment->loadMissing(['invoice.student', 'fee.student', 'paidBy:id,name', 'mpesaTransaction']);
+
+        $student = $payment->invoice?->student ?? $payment->fee?->student;
+        $invoiceNo = $payment->invoice?->invoice_no ?? ($payment->fee?->label ?? null);
+        $reference = $payment->mpesaTransaction?->mpesa_receipt ?? $payment->reference;
+
+        $details = $this->pdf->detailsBox([
+            'Receipt No' => $payment->receipt_no,
+            'Student' => $student ? $student->full_name . ' (' . $student->student_id . ')' : '—',
+            'Invoice' => $invoiceNo ?? '—',
+            'Amount Paid' => number_format((float) $payment->amount, 2),
+            'Method' => ucfirst(str_replace('_', ' ', $payment->method)),
+            'Reference' => $reference,
+            'Paid On' => $payment->paid_at?->format('M j, Y g:i A'),
+            'Received By' => $payment->paidBy?->name,
+        ]);
+
+        $content = '<div class="doc-section"><div class="doc-section-title">Payment Receipt</div>' . $details . '</div>'
+            . '<p class="mt-4"><span class="doc-badge">' . ucfirst($payment->method) . ' Payment</span></p>'
+            . '<p class="text-muted mt-2">This receipt confirms the payment above. Please retain it for your records.</p>';
+
+        return $this->pdf->download(
+            'Payment Receipt',
+            $content,
+            $payment->receipt_no . '.pdf',
+            ['document_no' => $payment->receipt_no]
+        );
+    }
+
     /**
      * Record a payment against an invoice. Amount must not exceed the balance.
      * The invoice status is always recomputed from recorded payments (never trusted from input).

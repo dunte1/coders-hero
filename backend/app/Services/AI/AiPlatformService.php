@@ -4,6 +4,7 @@ namespace App\Services\AI;
 
 use App\Models\AiAssistant;
 use App\Models\AiConversation;
+use App\Models\SiteSetting;
 use App\Models\AiMessage;
 use App\Models\AiPromptTemplate;
 use App\Models\AiUsageLog;
@@ -298,7 +299,7 @@ class AiPlatformService
 
     protected function buildSystemPrompt(AiAssistant $assistant, ?AiConversation $conversation): string
     {
-        $prompt = $assistant->system_prompt ?: "You are {$assistant->name}, an AI assistant in the Coder's Hero platform. Be helpful, clear and concise.";
+        $prompt = $assistant->system_prompt ?: "You are {$assistant->name}, an AI assistant in the " . SiteSetting::siteName() . " platform. Be helpful, clear and concise.";
 
         $context = $conversation?->context;
         if (! empty($context['course'])) {

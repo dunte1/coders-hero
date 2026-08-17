@@ -49,7 +49,7 @@ function RecoveryCodesDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {codes.map((code) => (
               <code
                 key={code}

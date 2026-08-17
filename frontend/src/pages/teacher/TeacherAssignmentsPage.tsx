@@ -95,7 +95,7 @@ export default function TeacherAssignmentsPage() {
               <div className="space-y-4">
                 <Input label="Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
                 <Textarea label="Description" value={form.description ?? ''} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <SelectRoot value={form.class_id ? String(form.class_id) : ''} onValueChange={(v) => setForm({ ...form, class_id: v ? Number(v) : null })}>
                     <SelectTrigger label="Class"><SelectValue placeholder="Select class" /></SelectTrigger>
                     <SelectContent>
@@ -113,7 +113,7 @@ export default function TeacherAssignmentsPage() {
                     </SelectContent>
                   </SelectRoot>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <Input label="Max Score" type="number" value={form.max_score ?? ''} onChange={(e) => setForm({ ...form, max_score: Number(e.target.value) })} />
                   <Input label="Due Date" type="datetime-local" value={form.due_at ?? ''} onChange={(e) => setForm({ ...form, due_at: e.target.value || null })} />
                 </div>

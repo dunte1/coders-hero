@@ -174,7 +174,7 @@ export default function RoboticsProjectsPage() {
                 <div>
                   <Textarea className="mt-1.5" label="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <SelectRoot value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
                     <SelectTrigger label="Category">
                       <SelectValue />

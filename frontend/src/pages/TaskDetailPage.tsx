@@ -65,7 +65,7 @@ export default function TaskDetailPage() {
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
             {task.assignee && (
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4 text-slate-400" />

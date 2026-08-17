@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\SiteSetting;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -29,12 +30,21 @@ class NotificationMail extends Mailable
 
     public function content(): Content
     {
+        $logo = SiteSetting::siteLogo();
+        if ($logo && str_starts_with($logo, '/')) {
+            $logo = url($logo);
+        }
+
         return new Content(
             markdown: 'emails.notification',
             with: [
                 'subjectLine' => $this->subjectLine,
                 'body' => $this->body,
                 'link' => $this->link,
+                'siteName' => SiteSetting::siteName(),
+                'siteLogo' => $logo,
+                'siteTagline' => SiteSetting::siteTagline(),
+                'contact' => SiteSetting::siteContact(),
             ],
         );
     }

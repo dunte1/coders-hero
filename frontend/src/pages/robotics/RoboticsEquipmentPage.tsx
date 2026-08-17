@@ -174,7 +174,7 @@ export default function RoboticsEquipmentPage() {
                 </DialogHeader>
                 <div className="grid gap-4">
                   <Input label="Name *" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. LEGO Spike Prime Kit" />
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <SelectRoot value={form.type} onValueChange={(v) => setForm({ ...form, type: v as typeof form.type })}>
                       <SelectTrigger label="Type">
                         <SelectValue />
@@ -189,12 +189,12 @@ export default function RoboticsEquipmentPage() {
                     </SelectRoot>
                     <Input label="Quantity *" type="number" min={1} value={form.quantity_total} onChange={(e) => setForm({ ...form, quantity_total: e.target.value })} />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <Input label="SKU" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} />
                     <Input label="Manufacturer" value={form.manufacturer} onChange={(e) => setForm({ ...form, manufacturer: e.target.value })} />
                   </div>
                   <Input label="Location" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="e.g. Lab A - Shelf 2" />
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <SelectRoot value={form.condition} onValueChange={(v) => setForm({ ...form, condition: v as typeof form.condition })}>
                       <SelectTrigger label="Condition">
                         <SelectValue />

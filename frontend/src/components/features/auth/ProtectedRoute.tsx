@@ -29,14 +29,21 @@ export function ProtectedRoute({ children, roles, permissions }: ProtectedRouteP
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (roles && roles.length > 0) {
-    const userRole = user?.role?.name?.toLowerCase();
+  const userRole = user?.role?.name?.toLowerCase();
+
+  // Admin and super_admin bypass role/permission checks, matching the sidebar
+  // navigation (useNavigation). Without this, routes whose `roles` list omits
+  // one of them (e.g. /users is `roles: ['admin']`) bounce the user back to
+  // /dashboard even though the menu item is visible.
+  const isBypassRole = userRole === 'admin' || userRole === 'super_admin';
+
+  if (!isBypassRole && roles && roles.length > 0) {
     if (!userRole || !roles.includes(userRole)) {
       return <Navigate to="/dashboard" replace />;
     }
   }
 
-  if (permissions && permissions.length > 0) {
+  if (!isBypassRole && permissions && permissions.length > 0) {
     const userPermissions = user?.role?.permissions?.map((p) => p.codename) || [];
     const hasAllPermissions = permissions.every((p) => userPermissions.includes(p));
     if (!hasAllPermissions) {

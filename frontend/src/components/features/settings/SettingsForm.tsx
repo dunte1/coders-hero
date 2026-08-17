@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useI18n } from '@/i18n';
 import { useSiteSettings, useUpdateSiteSettings } from '@/hooks/useSiteSettings';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card';
@@ -34,6 +35,7 @@ interface SettingsFormProps {
 }
 
 export function SettingsForm({ group, fields, title, description }: SettingsFormProps) {
+  const { t, setLanguage } = useI18n();
   const { data: settings, isLoading } = useSiteSettings();
   const updateSettings = useUpdateSiteSettings();
 
@@ -56,6 +58,14 @@ export function SettingsForm({ group, fields, title, description }: SettingsForm
       value: form[field.key] ?? field.default ?? '',
       group,
     }));
+
+    // When the default language is changed, apply it to the UI chrome
+    // immediately so the effect is visible without a reload.
+    if (group === 'localization' && form['localization.language']) {
+      const lang = form['localization.language'].toLowerCase();
+      setLanguage(lang.startsWith('kiswahili') ? 'sw' : lang.startsWith('french') ? 'fr' : 'en');
+    }
+
     updateSettings.mutate(payload, {
       onSuccess: () => setSavedAt(new Date().toLocaleTimeString()),
     });
@@ -77,7 +87,7 @@ export function SettingsForm({ group, fields, title, description }: SettingsForm
               {field.type === 'switch' ? (
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label>{field.label}</Label>
+                    <Label>{t(field.label)}</Label>
                     {field.description && <p className="mt-0.5 text-sm text-slate-500">{field.description}</p>}
                   </div>
                   <Switch
@@ -87,7 +97,7 @@ export function SettingsForm({ group, fields, title, description }: SettingsForm
                 </div>
               ) : field.type === 'select' ? (
                 <SelectRoot value={value} onValueChange={(v) => setValue(field.key, v)}>
-                  <SelectTrigger label={field.label}>
+                  <SelectTrigger label={t(field.label)}>
                     <SelectValue placeholder={field.placeholder ?? 'Select...'} />
                   </SelectTrigger>
                   <SelectContent>
@@ -100,7 +110,7 @@ export function SettingsForm({ group, fields, title, description }: SettingsForm
                 </SelectRoot>
               ) : field.type === 'textarea' ? (
                 <Textarea
-                  label={field.label}
+                  label={t(field.label)}
                   value={value}
                   placeholder={field.placeholder}
                   onChange={(e) => setValue(field.key, e.target.value)}
@@ -108,7 +118,7 @@ export function SettingsForm({ group, fields, title, description }: SettingsForm
                 />
               ) : (
                 <Input
-                  label={field.label}
+                  label={t(field.label)}
                   type={field.type === 'number' ? 'number' : field.type === 'color' ? 'color' : field.type === 'password' ? 'password' : 'text'}
                   value={field.type === 'color' && !value ? '#000000' : value}
                   placeholder={field.placeholder}
@@ -125,7 +135,7 @@ export function SettingsForm({ group, fields, title, description }: SettingsForm
       <CardFooter className="border-t border-slate-100 flex items-center justify-between">
         {savedAt ? <p className="text-xs text-emerald-600">Saved at {savedAt}</p> : <span />}
         <Button onClick={handleSave} disabled={updateSettings.isPending}>
-          {updateSettings.isPending ? 'Saving...' : 'Save Changes'}
+          {updateSettings.isPending ? t('Saving') : t('Save Changes')}
         </Button>
       </CardFooter>
     </Card>

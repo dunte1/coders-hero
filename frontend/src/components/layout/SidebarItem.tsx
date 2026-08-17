@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
+import { useI18n } from '@/i18n';
 import { cn } from '@/lib/utils';
 
 interface SidebarItemProps {
@@ -12,7 +13,9 @@ interface SidebarItemProps {
 
 export function SidebarItem({ label, href, icon: Icon, collapsed, badge }: SidebarItemProps) {
   const location = useLocation();
+  const { t } = useI18n();
   const isActive = location.pathname === href;
+  const translated = t(label);
 
   return (
     <Link
@@ -25,7 +28,7 @@ export function SidebarItem({ label, href, icon: Icon, collapsed, badge }: Sideb
         backgroundColor: isActive ? 'var(--sidebar-active)' : undefined,
         color: isActive ? 'var(--sidebar-active-text)' : 'var(--sidebar-text)',
       }}
-      title={collapsed ? label : undefined}
+      title={collapsed ? translated : undefined}
     >
       {Icon && (
         <Icon
@@ -35,7 +38,7 @@ export function SidebarItem({ label, href, icon: Icon, collapsed, badge }: Sideb
       )}
       {!collapsed && (
         <>
-          <span className="flex-1">{label}</span>
+          <span className="flex-1">{translated}</span>
           {badge !== undefined && badge > 0 && (
             <span
               className="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-medium"

@@ -199,7 +199,7 @@ export default function NotificationTemplatesAdminPage() {
             <DialogDescription>Define the subject, body and channels for this event.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 max-h-[60vh] overflow-y-auto pr-1">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="t-name">Name</Label>
                 <Input id="t-name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
@@ -215,7 +215,7 @@ export default function NotificationTemplatesAdminPage() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>Category</Label>
                 <SelectRoot value={form.category} onValueChange={(v) => setForm({ ...form, category: v as NotificationCategory })}>

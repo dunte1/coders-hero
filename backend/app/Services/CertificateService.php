@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Certificate;
 use App\Models\CertificateTemplate;
+use App\Models\SiteSetting;
 use App\Models\CertificateVerification;
 use App\Models\Enrollment;
 use App\Models\User;
@@ -261,6 +262,8 @@ class CertificateService
             'qrCode' => $this->generateQrSvg($certificate->verification_code),
             'signatureName' => $template?->signature_name ?? $certificate->digital_signature,
             'signatureTitle' => $template?->signature_title,
+            'siteName' => SiteSetting::siteName(),
+            'siteLogo' => SiteSetting::siteLogo(),
         ])->render();
 
         $pdf = Pdf::loadHTML($html);

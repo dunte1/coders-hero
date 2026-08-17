@@ -210,7 +210,7 @@ export default function HrReviewsPage() {
                 </SelectContent>
               </SelectRoot>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <Label>Review date</Label>
                 <Input
@@ -228,7 +228,7 @@ export default function HrReviewsPage() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <Label>Rating (1-5)</Label>
                 <SelectRoot

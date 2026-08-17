@@ -7,6 +7,9 @@ import {
   useExportEmployees,
   useExportLeave,
   useExportAttendance,
+  useExportEmployeesPdf,
+  useExportLeavePdf,
+  useExportAttendancePdf,
 } from '@/hooks/useHr';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageSpinner } from '@/components/ui/Spinner';
@@ -17,7 +20,7 @@ import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs';
-import { Download, BarChart3 } from 'lucide-react';
+import { Download, FileText, BarChart3 } from 'lucide-react';
 
 const formatKsh = (v: number | string | undefined) =>
   'KSh ' + Number(v ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -62,8 +65,11 @@ export default function HrReportsPage() {
   const { data: payroll, isLoading: payrollLoading } = usePayrollReport({ month: payrollMonth });
 
   const exportEmployees = useExportEmployees();
+  const exportEmployeesPdf = useExportEmployeesPdf();
   const exportLeave = useExportLeave();
+  const exportLeavePdf = useExportLeavePdf();
   const exportAttendance = useExportAttendance();
+  const exportAttendancePdf = useExportAttendancePdf();
 
   return (
     <div className="space-y-6">
@@ -88,9 +94,14 @@ export default function HrReportsPage() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-slate-500">Total employees: <span className="font-semibold text-slate-900">{headcount?.total ?? 0}</span></p>
-                <Button variant="outline" onClick={() => exportEmployees.mutate(undefined)} loading={exportEmployees.isPending}>
-                  <Download className="mr-1 h-4 w-4" /> Export Employees
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" onClick={() => exportEmployees.mutate(undefined)} loading={exportEmployees.isPending}>
+                    <Download className="mr-1 h-4 w-4" /> Export CSV
+                  </Button>
+                  <Button variant="outline" onClick={() => exportEmployeesPdf.mutate(undefined)} loading={exportEmployeesPdf.isPending}>
+                    <FileText className="mr-1 h-4 w-4" /> Export PDF
+                  </Button>
+                </div>
               </div>
               <div className="grid gap-6 lg:grid-cols-3">
                 <Card>
@@ -123,9 +134,14 @@ export default function HrReportsPage() {
               <Label>To</Label>
               <Input type="date" value={leaveTo} onChange={(e) => setLeaveTo(e.target.value)} className="w-40" />
             </div>
-            <Button variant="outline" onClick={() => exportLeave.mutate({ from: leaveFrom, to: leaveTo })} loading={exportLeave.isPending}>
-              <Download className="mr-1 h-4 w-4" /> Export Leave
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" onClick={() => exportLeave.mutate({ from: leaveFrom, to: leaveTo })} loading={exportLeave.isPending}>
+                <Download className="mr-1 h-4 w-4" /> Export CSV
+              </Button>
+              <Button variant="outline" onClick={() => exportLeavePdf.mutate({ from: leaveFrom, to: leaveTo })} loading={exportLeavePdf.isPending}>
+                <FileText className="mr-1 h-4 w-4" /> Export PDF
+              </Button>
+            </div>
           </div>
           {leaveLoading ? (
             <PageSpinner />
@@ -164,9 +180,14 @@ export default function HrReportsPage() {
               <Label>To</Label>
               <Input type="date" value={attTo} onChange={(e) => setAttTo(e.target.value)} className="w-40" />
             </div>
-            <Button variant="outline" onClick={() => exportAttendance.mutate({ from: attFrom, to: attTo })} loading={exportAttendance.isPending}>
-              <Download className="mr-1 h-4 w-4" /> Export Attendance
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" onClick={() => exportAttendance.mutate({ from: attFrom, to: attTo })} loading={exportAttendance.isPending}>
+                <Download className="mr-1 h-4 w-4" /> Export CSV
+              </Button>
+              <Button variant="outline" onClick={() => exportAttendancePdf.mutate({ from: attFrom, to: attTo })} loading={exportAttendancePdf.isPending}>
+                <FileText className="mr-1 h-4 w-4" /> Export PDF
+              </Button>
+            </div>
           </div>
           {attendanceLoading ? (
             <PageSpinner />

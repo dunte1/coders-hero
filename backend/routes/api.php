@@ -482,12 +482,15 @@ Route::get('/filters/branches', [StudentController::class, 'branches']);
 Route::get('/overview', [StudentController::class, 'overview']);
 Route::get('/exports/students', [StudentExportController::class, 'students']);
 Route::get('/exports/attendance', [StudentExportController::class, 'attendance']);
+Route::get('/exports/students/pdf', [StudentExportController::class, 'studentsPdf']);
+Route::get('/exports/attendance/pdf', [StudentExportController::class, 'attendancePdf']);
 Route::get('/', [StudentController::class, 'index']);
 Route::post('/', [StudentController::class, 'store']);
 Route::get('/{id}', [StudentController::class, 'show']);
 Route::put('/{id}', [StudentController::class, 'update']);
 Route::delete('/{id}', [StudentController::class, 'destroy']);
 Route::post('/{id}/photo', [StudentController::class, 'uploadPhoto']);
+Route::get('/{id}/id-card/pdf', [StudentController::class, 'idCardPdf']);
 Route::put('/{id}/promote', [StudentController::class, 'promote']);
 Route::put('/{id}/transfer', [StudentController::class, 'transfer']);
 Route::put('/{id}/graduate', [StudentController::class, 'graduate']);
@@ -580,6 +583,7 @@ Route::middleware('role:instructor|admin')->prefix('instructor')->group(function
         Route::get('/fees/{id}', [ParentFeeController::class, 'show']);
         Route::post('/fees/{id}/pay', [ParentPaymentController::class, 'store']);
         Route::get('/payments/{id}', [ParentPaymentController::class, 'show']);
+        Route::get('/payments/{id}/pdf', [ParentPaymentController::class, 'pdf']);
 
         Route::get('/appointments', [ParentAppointmentController::class, 'index']);
         Route::post('/appointments', [ParentAppointmentController::class, 'store']);
@@ -887,6 +891,7 @@ Route::put('/lessons/{lessonId}/video-progress', [VideoProgressController::class
         Route::post('/invoices', [InvoiceController::class, 'store']);
         Route::post('/invoices/generate', [InvoiceController::class, 'generate']);
         Route::get('/invoices/{id}', [InvoiceController::class, 'show']);
+        Route::get('/invoices/{id}/pdf', [InvoiceController::class, 'pdf']);
         Route::put('/invoices/{id}', [InvoiceController::class, 'update']);
         Route::delete('/invoices/{id}', [InvoiceController::class, 'destroy']);
         Route::put('/invoices/{id}/issue', [InvoiceController::class, 'issue']);
@@ -895,6 +900,7 @@ Route::put('/lessons/{lessonId}/video-progress', [VideoProgressController::class
 
         Route::get('/payments', [PaymentController::class, 'index']);
         Route::get('/payments/{id}', [PaymentController::class, 'show']);
+        Route::get('/payments/{id}/pdf', [PaymentController::class, 'pdf']);
         Route::put('/payments/{id}/reverse', [PaymentController::class, 'reverse']);
 
         Route::get('/expenses', [ExpenseController::class, 'index']);
@@ -926,6 +932,9 @@ Route::put('/lessons/{lessonId}/video-progress', [VideoProgressController::class
         Route::get('/export/employees', [HrController::class, 'exportEmployees']);
         Route::get('/export/leave', [HrController::class, 'exportLeave']);
         Route::get('/export/attendance', [HrController::class, 'exportAttendance']);
+        Route::get('/export/employees/pdf', [HrController::class, 'exportEmployeesPdf']);
+        Route::get('/export/leave/pdf', [HrController::class, 'exportLeavePdf']);
+        Route::get('/export/attendance/pdf', [HrController::class, 'exportAttendancePdf']);
         Route::get('/search', [HrController::class, 'search']);
 
         Route::get('/employees', [EmployeeHrController::class, 'index']);
@@ -958,6 +967,7 @@ Route::put('/lessons/{lessonId}/video-progress', [VideoProgressController::class
         Route::put('/payrolls/{id}/mark-paid', [PayrollController::class, 'markPaid']);
         Route::put('/payrolls/{id}/cancel', [PayrollController::class, 'cancel']);
         Route::get('/payslips/{id}', [PayrollController::class, 'payslip']);
+        Route::get('/payslips/{id}/pdf', [PayrollController::class, 'payslipPdf']);
 
         Route::get('/reviews', [PerformanceController::class, 'index']);
         Route::post('/reviews', [PerformanceController::class, 'store']);
@@ -985,6 +995,7 @@ Route::put('/lessons/{lessonId}/video-progress', [VideoProgressController::class
 
         Route::get('/payslips', [PayrollController::class, 'myPayslips']);
         Route::get('/payslips/{id}', [PayrollController::class, 'myPayslip']);
+        Route::get('/payslips/{id}/pdf', [PayrollController::class, 'myPayslipPdf']);
 
         Route::get('/documents', [DocumentController::class, 'myDocuments']);
         Route::post('/documents', [DocumentController::class, 'myStore']);

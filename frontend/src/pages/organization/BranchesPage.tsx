@@ -88,17 +88,17 @@ export default function BranchesPage() {
         <DialogContent className="max-w-lg">
           <DialogHeader><DialogTitle>{editing ? 'Edit Branch' : 'Add Branch'}</DialogTitle></DialogHeader>
           <div className="space-y-4 py-2">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input label="Name *" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
               <Input label="Code *" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} />
             </div>
             <Input label="Address" value={form.address ?? ''} onChange={(e) => setForm({ ...form, address: e.target.value })} />
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               <Input label="City" value={form.city ?? ''} onChange={(e) => setForm({ ...form, city: e.target.value })} />
               <Input label="State" value={form.state ?? ''} onChange={(e) => setForm({ ...form, state: e.target.value })} />
               <Input label="Country" value={form.country ?? ''} onChange={(e) => setForm({ ...form, country: e.target.value })} />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input label="Phone" value={form.phone ?? ''} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
               <Input label="Email" type="email" value={form.email ?? ''} onChange={(e) => setForm({ ...form, email: e.target.value })} />
             </div>

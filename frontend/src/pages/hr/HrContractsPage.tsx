@@ -234,7 +234,7 @@ export default function HrContractsPage() {
                 </SelectContent>
               </SelectRoot>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <Label>Contract no.</Label>
                 <Input
@@ -262,7 +262,7 @@ export default function HrContractsPage() {
                 </SelectRoot>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <Label>Start date</Label>
                 <Input
@@ -280,7 +280,7 @@ export default function HrContractsPage() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <Label>Salary (KSh)</Label>
                 <Input

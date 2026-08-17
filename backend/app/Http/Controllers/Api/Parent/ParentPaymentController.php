@@ -5,18 +5,23 @@ namespace App\Http\Controllers\Api\Parent;
 use App\Http\Controllers\Controller;
 use App\Models\Fee;
 use App\Models\Payment;
+use App\Services\Finance\PaymentService;
 use App\Services\Parents\ParentPortalService;
+use App\Services\Pdf\DocumentPdfService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ParentPaymentController extends Controller
 {
     use ApiResponse;
 
     public function __construct(
-        private ParentPortalService $portalService
+        private ParentPortalService $portalService,
+        private PaymentService $paymentService,
+        private DocumentPdfService $pdf
     ) {}
 
     public function store(Request $request, int $feeId): JsonResponse
@@ -68,5 +73,20 @@ class ParentPaymentController extends Controller
         }
 
         return $this->successResponse($payment, 'Receipt retrieved successfully.');
+    }
+
+    public function pdf(int $id): StreamedResponse
+    {
+        $payment = Payment::with(['fee.student'])->find($id);
+
+        if (!$payment) {
+            abort(404, 'Receipt not found.');
+        }
+
+        if (!$this->portalService->hasAccessToStudent($payment->fee->student_id)) {
+            abort(403, 'You do not have access to this receipt.');
+        }
+
+        return $this->paymentService->receiptPdf($payment);
     }
 }

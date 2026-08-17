@@ -1,10 +1,14 @@
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { usePayment, useReversePayment } from '@/hooks/useFinance';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageSpinner } from '@/components/ui/Spinner';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
-import { Receipt } from 'lucide-react';
+import { Download, Receipt } from 'lucide-react';
+import { financeApi } from '@/lib/financeApi';
+import { getErrorMessage } from '@/lib/studentsApi';
+import { toast } from 'sonner';
 
 const formatKsh = (v: number | string | undefined) =>
   'KSh ' + Number(v ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -14,6 +18,18 @@ export default function PaymentDetailPage() {
   const paymentId = Number(id);
   const { data: payment, isLoading } = usePayment(paymentId);
   const reversePayment = useReversePayment();
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownload = async () => {
+    setDownloading(true);
+    try {
+      await financeApi.paymentPdf(paymentId);
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   if (isLoading) return <PageSpinner />;
   if (!payment) return null;
@@ -28,9 +44,15 @@ export default function PaymentDetailPage() {
         description="Official receipt"
         breadcrumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Finance', href: '/finance' }, { label: 'Payments', href: '/finance/payments' }, { label: payment.receipt_no }]}
         actions={
-          <Button variant="destructive" onClick={() => reversePayment.mutate(paymentId)}>
-            Reverse Payment
-          </Button>
+          <>
+            <Button variant="outline" loading={downloading} onClick={handleDownload}>
+              <Download className="mr-2 h-4 w-4" />
+              Download PDF
+            </Button>
+            <Button variant="destructive" onClick={() => reversePayment.mutate(paymentId)}>
+              Reverse Payment
+            </Button>
+          </>
         }
       />
 

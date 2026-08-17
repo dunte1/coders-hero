@@ -96,7 +96,7 @@ export default function TeacherGradebookPage() {
                   </SelectContent>
                 </SelectRoot>
                 <Input label="Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="e.g. Week 5 Quiz" />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <Input label="Score" type="number" value={form.score} onChange={(e) => setForm({ ...form, score: Number(e.target.value) })} />
                   <Input label="Max Score" type="number" value={form.max_score} onChange={(e) => setForm({ ...form, max_score: Number(e.target.value) })} />
                 </div>
@@ -131,7 +131,7 @@ export default function TeacherGradebookPage() {
       </div>
 
       {summary && (
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <SummaryStat label="Students" value={summary.students.length} />
           <SummaryStat label="Average" value={summary.average ? `${summary.average}%` : '—'} />
           <SummaryStat label="Highest" value={summary.highest ?? '—'} />

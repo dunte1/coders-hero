@@ -103,7 +103,7 @@ export default function PartnerSchoolsPage() {
           <DialogHeader><DialogTitle>{editing ? 'Edit Partner School' : 'Add Partner School'}</DialogTitle></DialogHeader>
           <div className="space-y-4 py-2">
             <Input label="School Name *" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input label="Contact Person" value={form.contact_person ?? ''} onChange={(e) => setForm({ ...form, contact_person: e.target.value })} />
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-slate-700">Partnership Type</label>
@@ -115,12 +115,12 @@ export default function PartnerSchoolsPage() {
                 </SelectRoot>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input label="Contact Email" type="email" value={form.contact_email ?? ''} onChange={(e) => setForm({ ...form, contact_email: e.target.value })} />
               <Input label="Contact Phone" value={form.contact_phone ?? ''} onChange={(e) => setForm({ ...form, contact_phone: e.target.value })} />
             </div>
             <Input label="Address" value={form.address ?? ''} onChange={(e) => setForm({ ...form, address: e.target.value })} />
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               <Input label="City" value={form.city ?? ''} onChange={(e) => setForm({ ...form, city: e.target.value })} />
               <Input label="Country" value={form.country ?? ''} onChange={(e) => setForm({ ...form, country: e.target.value })} />
             </div>

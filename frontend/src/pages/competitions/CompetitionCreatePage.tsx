@@ -100,7 +100,7 @@ export default function CompetitionCreatePage() {
             <Input label="Start Date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
             <Input label="End Date" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
             <Input label="Registration Deadline" type="datetime-local" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input label="Min Team Size" type="number" min={1} value={minTeamSize} onChange={(e) => setMinTeamSize(e.target.value)} />
               <Input label="Max Team Size" type="number" min={1} value={maxTeamSize} onChange={(e) => setMaxTeamSize(e.target.value)} />
             </div>

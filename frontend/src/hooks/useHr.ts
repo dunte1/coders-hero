@@ -72,6 +72,30 @@ export function useExportAttendance() {
   });
 }
 
+export function useExportEmployeesPdf() {
+  return useMutation({
+    mutationFn: (params?: { status?: string; department_id?: number }) => hrApi.exportEmployeesPdf(params),
+    onSuccess: () => toast.success('Employees PDF exported'),
+    onError: (error: unknown) => toast.error(getErrorMessage(error)),
+  });
+}
+
+export function useExportLeavePdf() {
+  return useMutation({
+    mutationFn: (params?: { status?: string; from?: string; to?: string }) => hrApi.exportLeavePdf(params),
+    onSuccess: () => toast.success('Leave requests PDF exported'),
+    onError: (error: unknown) => toast.error(getErrorMessage(error)),
+  });
+}
+
+export function useExportAttendancePdf() {
+  return useMutation({
+    mutationFn: (params?: { from?: string; to?: string }) => hrApi.exportAttendancePdf(params),
+    onSuccess: () => toast.success('Attendance PDF exported'),
+    onError: (error: unknown) => toast.error(getErrorMessage(error)),
+  });
+}
+
 // Employees
 export function useHrEmployees(params?: { page?: number; per_page?: number; search?: string }) {
   return useQuery({ queryKey: ['hr', 'employees', params], queryFn: () => hrApi.employees(params) });

@@ -23,7 +23,10 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/Dialog';
-import { Banknote, Smartphone, FileText } from 'lucide-react';
+import { Banknote, Smartphone, FileText, Download } from 'lucide-react';
+import { financeApi } from '@/lib/financeApi';
+import { getErrorMessage } from '@/lib/studentsApi';
+import { toast } from 'sonner';
 import type { PaymentMethod } from '@/types/finance';
 
 const formatKsh = (v: number | string | undefined) =>
@@ -48,8 +51,20 @@ export default function InvoiceDetailPage() {
   const recordPayment = useRecordPayment();
   const stkPush = useStkPush();
 
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
   const [payOpen, setPayOpen] = useState(false);
   const [mpesaOpen, setMpesaOpen] = useState(false);
+
+  const handleDownloadPdf = async () => {
+    setDownloadingPdf(true);
+    try {
+      await financeApi.invoicePdf(invoiceId);
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    } finally {
+      setDownloadingPdf(false);
+    }
+  };
   const [payForm, setPayForm] = useState({ amount: 0, method: 'cash' as PaymentMethod, reference: '' });
   const [phone, setPhone] = useState('');
 
@@ -95,6 +110,9 @@ export default function InvoiceDetailPage() {
         breadcrumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Finance', href: '/finance' }, { label: 'Invoices', href: '/finance/invoices' }, { label: invoice.invoice_no }]}
         actions={
           <>
+            <Button variant="outline" loading={downloadingPdf} onClick={handleDownloadPdf}>
+              <Download className="mr-1 h-4 w-4" /> Download PDF
+            </Button>
             {invoice.status === 'draft' && (
               <Button onClick={() => issueInvoice.mutate(invoiceId)}>Issue Invoice</Button>
             )}

@@ -79,6 +79,21 @@ export const parentApi = {
 
   markAllNotificationsRead: () =>
     api.post<{ data: null }>('/parent/notifications/read-all').then(() => undefined),
+
+  receiptPdf: async (id: number) => {
+    const res = await api.get<Blob>(`/parent/payments/${id}/pdf`, { responseType: 'blob' });
+    const disposition = res.headers['content-disposition'] ?? '';
+    const match = disposition.match(/filename="?([^"]+)"?/);
+    const filename = match ? match[1] : `receipt-${id}.pdf`;
+    const blobUrl = window.URL.createObjectURL(res.data);
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(blobUrl);
+  },
 };
 
 export const chatApi = {

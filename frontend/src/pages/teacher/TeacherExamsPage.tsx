@@ -79,7 +79,7 @@ export default function TeacherExamsPage() {
               <div className="space-y-4">
                 <Input label="Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
                 <Textarea label="Description" value={form.description ?? ''} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <SelectRoot value={form.class_id ? String(form.class_id) : ''} onValueChange={(v) => setForm({ ...form, class_id: v ? Number(v) : null })}>
                     <SelectTrigger label="Class"><SelectValue placeholder="Select class" /></SelectTrigger>
                     <SelectContent>
@@ -97,11 +97,11 @@ export default function TeacherExamsPage() {
                     </SelectContent>
                   </SelectRoot>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <Input label="Scheduled" type="datetime-local" value={form.scheduled_at ?? ''} onChange={(e) => setForm({ ...form, scheduled_at: e.target.value || null })} />
                   <Input label="Duration (min)" type="number" value={form.duration_minutes ?? ''} onChange={(e) => setForm({ ...form, duration_minutes: Number(e.target.value) })} />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <Input label="Total Marks" type="number" value={form.total_marks ?? ''} onChange={(e) => setForm({ ...form, total_marks: Number(e.target.value) })} />
                   <Input label="Passing Marks" type="number" value={form.passing_marks ?? ''} onChange={(e) => setForm({ ...form, passing_marks: Number(e.target.value) })} />
                 </div>

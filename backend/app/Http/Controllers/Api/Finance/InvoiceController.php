@@ -11,10 +11,12 @@ use App\Models\Invoice;
 use App\Services\Finance\FinanceService;
 use App\Services\Finance\InvoiceService;
 use App\Services\Finance\PaymentService;
+use App\Services\Pdf\DocumentPdfService;
 use App\Traits\ApiResponse;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class InvoiceController extends Controller
 {
@@ -23,7 +25,8 @@ class InvoiceController extends Controller
     public function __construct(
         private InvoiceService $invoiceService,
         private PaymentService $paymentService,
-        private FinanceService $financeService
+        private FinanceService $financeService,
+        private DocumentPdfService $pdf
     ) {}
 
     public function index(Request $request): JsonResponse
@@ -58,6 +61,60 @@ class InvoiceController extends Controller
         }
 
         return $this->successResponse($invoice, 'Invoice retrieved successfully.');
+    }
+
+    public function pdf(int $id): StreamedResponse
+    {
+        try {
+            $invoice = $this->invoiceService->show($id);
+        } catch (ModelNotFoundException) {
+            abort(404, 'Invoice not found.');
+        }
+
+        $student = $invoice->student;
+        $amount = number_format((float) $invoice->amount, 2);
+        $paid = number_format((float) $invoice->paid_amount, 2);
+        $balance = number_format((float) $invoice->balance, 2);
+
+        $details = $this->pdf->detailsBox([
+            'Invoice No' => $invoice->invoice_no,
+            'Student' => $student ? $student->full_name . ' (' . $student->student_id . ')' : '—',
+            'Term' => $invoice->term,
+            'Description' => $invoice->description,
+            'Issued' => $invoice->issued_at?->format('M j, Y'),
+            'Due Date' => $invoice->due_date?->format('M j, Y'),
+            'Status' => ucfirst($invoice->status),
+        ]);
+
+        $itemRows = $invoice->items->map(fn ($item) => [
+            $item->description,
+            $item->qty,
+            number_format((float) $item->amount, 2),
+            number_format((float) $item->total, 2),
+        ])->all();
+
+        $items = $this->pdf->table(
+            ['Description', 'Qty', 'Unit Price', 'Total'],
+            $itemRows
+        );
+
+        $totals = '<div class="doc-box mt-2" style="max-width: 320px; margin-left: auto;">'
+            . '<table class="doc-dl">'
+            . '<tr><td>Amount</td><td class="text-right">' . $amount . '</td></tr>'
+            . '<tr><td>Paid</td><td class="text-right">' . $paid . '</td></tr>'
+            . '<tr class="doc-total"><td>Balance</td><td class="text-right">' . $balance . '</td></tr>'
+            . '</table></div>';
+
+        $content = '<div class="doc-section"><div class="doc-section-title">Invoice Details</div>' . $details . '</div>'
+            . '<div class="doc-section"><div class="doc-section-title">Items</div>' . $items . '</div>'
+            . $totals;
+
+        return $this->pdf->download(
+            'Invoice',
+            $content,
+            $invoice->invoice_no . '.pdf',
+            ['document_no' => $invoice->invoice_no]
+        );
     }
 
     public function update(UpdateInvoiceRequest $request, int $id): JsonResponse

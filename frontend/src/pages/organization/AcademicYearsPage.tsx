@@ -93,7 +93,7 @@ export default function AcademicYearsPage() {
           <DialogHeader><DialogTitle>{editing ? 'Edit Academic Year' : 'Add Academic Year'}</DialogTitle></DialogHeader>
           <div className="space-y-4 py-2">
             <Input label="Name *" placeholder="e.g. 2026/2027" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input label="Start Date *" type="date" value={form.start_date} onChange={(e) => setForm({ ...form, start_date: e.target.value })} />
               <Input label="End Date *" type="date" value={form.end_date} onChange={(e) => setForm({ ...form, end_date: e.target.value })} />
             </div>

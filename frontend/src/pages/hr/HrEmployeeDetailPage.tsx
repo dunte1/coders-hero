@@ -57,7 +57,7 @@ export default function HrEmployeeDetailPage() {
   }
 
   const openDownload = (docId: number) => {
-    window.open(hrApi.documentDownloadUrl(docId), '_blank');
+    hrApi.downloadDocument(docId);
   };
 
   return (
