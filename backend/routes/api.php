@@ -64,6 +64,7 @@ use App\Http\Controllers\Api\Students\StudentPaymentController;
 use App\Http\Controllers\Api\Students\StudentProgressController;
 use App\Http\Controllers\Api\Students\StudentReportCardController;
 use App\Http\Controllers\Api\Students\StudentTimelineController;
+use App\Http\Controllers\Api\Student\StudentAssignmentController;
 use App\Http\Controllers\Api\Parent\ChatController;
 use App\Http\Controllers\Api\Parent\ParentAppointmentController;
 use App\Http\Controllers\Api\Parent\ParentAttendanceController;
@@ -139,10 +140,14 @@ Route::prefix('public')->group(function () {
     Route::get('/gallery', [WebsiteController::class, 'gallery']);
     Route::get('/testimonials', [WebsiteController::class, 'testimonials']);
     Route::get('/faqs', [WebsiteController::class, 'faqs']);
+    Route::get('/courses', [WebsiteController::class, 'courses']);
+    Route::get('/events', [WebsiteController::class, 'events']);
+    Route::post('/admissions', [WebsiteController::class, 'submitAdmission'])->middleware('throttle:5,1');
     Route::get('/blog', [WebsiteController::class, 'blog']);
     Route::get('/blog/{slug}', [WebsiteController::class, 'blogShow']);
     Route::get('/blog/{slug}/related', [WebsiteController::class, 'blogRelated']);
     Route::post('/contact', [WebsiteController::class, 'contact'])->middleware('throttle:10,1');
+    Route::get('/partner-schools', [WebsiteController::class, 'partnerSchools']);
     Route::post('/chat', [WebsiteController::class, 'chat'])->middleware('throttle:20,1');
     Route::post('/analytics/page-view', [WebsiteController::class, 'pageView'])->middleware('throttle:60,1');
     Route::post('/certificates/verify', [CertificateController::class, 'verify'])->middleware('throttle:30,1');
@@ -258,7 +263,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/quizzes/{id}/statistics', [QuizController::class, 'statistics']);
     Route::get('/courses/{courseId}/quizzes', [QuizController::class, 'byCourse']);
 
-    Route::middleware('role:admin|super_admin')->prefix('admin')->group(function () {
+    Route::middleware('role:admin|super_admin|director|branch_manager|school_admin')->prefix('admin')->group(function () {
 
         Route::get('/users', [UserController::class, 'index']);
         Route::post('/users', [UserController::class, 'store']);
@@ -327,18 +332,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/reports/courses', [ReportController::class, 'courseReport']);
         Route::get('/reports/enrollments', [ReportController::class, 'enrollmentReport']);
         Route::get('/reports/activity', [ReportController::class, 'activityReport']);
-
-        // Analytics dashboard
-        Route::get('/analytics/filter-options', [AnalyticsDashboardController::class, 'filterOptions']);
-        Route::get('/analytics/overview', [AnalyticsDashboardController::class, 'overview']);
-        Route::get('/analytics/enrollments', [AnalyticsDashboardController::class, 'enrollments']);
-        Route::get('/analytics/revenue', [AnalyticsDashboardController::class, 'revenue']);
-        Route::get('/analytics/attendance', [AnalyticsDashboardController::class, 'attendance']);
-        Route::get('/analytics/courses', [AnalyticsDashboardController::class, 'courses']);
-        Route::get('/analytics/teachers', [AnalyticsDashboardController::class, 'teachers']);
-        Route::get('/analytics/competitions', [AnalyticsDashboardController::class, 'competitions']);
-        Route::get('/analytics/branches', [AnalyticsDashboardController::class, 'branches']);
-        Route::get('/analytics/progress', [AnalyticsDashboardController::class, 'progress']);
 
         // AI Platform administration
         Route::get('/ai/assistants', [AiAdminController::class, 'assistantsIndex']);
@@ -451,7 +444,21 @@ Route::get('/analytics/site', [AnalyticsController::class, 'site']);
         Route::delete('/system/backups', [SystemAdminController::class, 'deleteBackup']);
 });
 
-Route::middleware('role:admin|super_admin')->prefix('organization')->group(function () {
+// Analytics & Reports - accessible to admins, directors, branch managers, school admins, and accountants
+Route::middleware('role:admin|super_admin|director|branch_manager|school_admin|accountant')->prefix('admin')->group(function () {
+    Route::get('/analytics/filter-options', [AnalyticsDashboardController::class, 'filterOptions']);
+    Route::get('/analytics/overview', [AnalyticsDashboardController::class, 'overview']);
+    Route::get('/analytics/enrollments', [AnalyticsDashboardController::class, 'enrollments']);
+    Route::get('/analytics/revenue', [AnalyticsDashboardController::class, 'revenue']);
+    Route::get('/analytics/attendance', [AnalyticsDashboardController::class, 'attendance']);
+    Route::get('/analytics/courses', [AnalyticsDashboardController::class, 'courses']);
+    Route::get('/analytics/teachers', [AnalyticsDashboardController::class, 'teachers']);
+    Route::get('/analytics/competitions', [AnalyticsDashboardController::class, 'competitions']);
+    Route::get('/analytics/branches', [AnalyticsDashboardController::class, 'branches']);
+    Route::get('/analytics/progress', [AnalyticsDashboardController::class, 'progress']);
+});
+
+Route::middleware('role:admin|super_admin|director|branch_manager|school_admin')->prefix('organization')->group(function () {
     Route::get('/branches', [BranchController::class, 'index']);
     Route::get('/branches/all', [BranchController::class, 'all']);
     Route::post('/branches', [BranchController::class, 'store']);
@@ -475,7 +482,7 @@ Route::middleware('role:admin|super_admin')->prefix('organization')->group(funct
     Route::put('/academic-years/{id}/set-current', [AcademicYearController::class, 'setCurrent']);
 });
 
-Route::middleware('role:admin|super_admin')->prefix('students')->group(function () {
+Route::middleware('role:admin|super_admin|director|branch_manager|school_admin')->prefix('students')->group(function () {
 
 Route::get('/filters/grades', [StudentController::class, 'grades']);
 Route::get('/filters/branches', [StudentController::class, 'branches']);
@@ -490,6 +497,7 @@ Route::get('/{id}', [StudentController::class, 'show']);
 Route::put('/{id}', [StudentController::class, 'update']);
 Route::delete('/{id}', [StudentController::class, 'destroy']);
 Route::post('/{id}/photo', [StudentController::class, 'uploadPhoto']);
+Route::post('/{id}/id-card/photo', [StudentController::class, 'uploadIdCardPhoto']);
 Route::get('/{id}/id-card/pdf', [StudentController::class, 'idCardPdf']);
 Route::put('/{id}/promote', [StudentController::class, 'promote']);
 Route::put('/{id}/transfer', [StudentController::class, 'transfer']);
@@ -508,7 +516,7 @@ Route::post('/{id}/timeline', [StudentTimelineController::class, 'store']);
 Route::delete('/timeline/{entryId}', [StudentTimelineController::class, 'destroy']);
 });
 
-Route::middleware('role:admin|super_admin')->prefix('guardians')->group(function () {
+Route::middleware('role:admin|super_admin|director|branch_manager|school_admin')->prefix('guardians')->group(function () {
 
 Route::get('/', [GuardianController::class, 'index']);
 Route::post('/', [GuardianController::class, 'store']);
@@ -518,7 +526,7 @@ Route::put('/{id}', [GuardianController::class, 'update']);
 Route::delete('/{id}', [GuardianController::class, 'destroy']);
 });
 
-Route::middleware('role:admin|super_admin')->prefix('admissions')->group(function () {
+Route::middleware('role:admin|super_admin|director|branch_manager|school_admin')->prefix('admissions')->group(function () {
 
 Route::get('/', [AdmissionController::class, 'index']);
 Route::post('/', [AdmissionController::class, 'store']);
@@ -529,7 +537,7 @@ Route::put('/{id}/admit', [AdmissionController::class, 'admit']);
 Route::put('/{id}/reject', [AdmissionController::class, 'reject']);
 });
 
-Route::middleware('role:admin|super_admin')->prefix('attendance')->group(function () {
+Route::middleware('role:admin|super_admin|director|branch_manager|school_admin')->prefix('attendance')->group(function () {
 
 Route::get('/', [AttendanceController::class, 'index']);
 Route::get('/report', [AttendanceController::class, 'report']);
@@ -537,6 +545,14 @@ Route::post('/', [AttendanceController::class, 'store']);
 Route::post('/bulk', [AttendanceController::class, 'bulkStore']);
 Route::put('/{id}', [AttendanceController::class, 'update']);
 Route::delete('/{id}', [AttendanceController::class, 'destroy']);
+});
+
+// Student assignment submission routes
+Route::middleware('role:student')->prefix('student/assignments')->group(function () {
+    Route::get('/', [StudentAssignmentController::class, 'index']);
+    Route::get('/my-submissions', [StudentAssignmentController::class, 'mySubmissions']);
+    Route::get('/{id}', [StudentAssignmentController::class, 'show']);
+    Route::post('/{id}/submit', [StudentAssignmentController::class, 'submit']);
 });
 
 Route::middleware('role:instructor|admin')->prefix('instructor')->group(function () {
@@ -606,7 +622,7 @@ Route::middleware('role:instructor|admin')->prefix('instructor')->group(function
     });
 
     // Admin academic management
-    Route::middleware('role:admin|super_admin')->prefix('students')->group(function () {
+    Route::middleware('role:admin|super_admin|director|branch_manager|school_admin')->prefix('students')->group(function () {
 
         Route::get('/{id}/report-cards', [StudentReportCardController::class, 'index']);
         Route::post('/{id}/report-cards', [StudentReportCardController::class, 'store']);
@@ -629,7 +645,7 @@ Route::middleware('role:instructor|admin')->prefix('instructor')->group(function
     });
 
     // Admin appointments
-    Route::middleware('role:admin|super_admin')->prefix('appointments')->group(function () {
+    Route::middleware('role:admin|super_admin|director|branch_manager|school_admin')->prefix('appointments')->group(function () {
 
         Route::get('/', [AppointmentAdminController::class, 'index']);
         Route::put('/{id}', [AppointmentAdminController::class, 'update']);
@@ -637,7 +653,7 @@ Route::middleware('role:instructor|admin')->prefix('instructor')->group(function
     });
 
     // Teacher Portal
-    Route::middleware('role:teacher|instructor|admin|super_admin')->prefix('teacher')->group(function () {
+    Route::middleware('role:teacher|instructor|admin|super_admin|director|branch_manager|school_admin')->prefix('teacher')->group(function () {
 
         Route::get('/dashboard', [TeacherDashboardController::class, 'summary']);
 
@@ -873,7 +889,7 @@ Route::put('/lessons/{lessonId}/video-progress', [VideoProgressController::class
     Route::get('/my-outstanding', [FinanceReportController::class, 'myOutstanding']);
     Route::post('/mpesa/stk-push', [MpesaController::class, 'stkPush']);
 
-    Route::middleware('role:admin|super_admin')->prefix('finance')->group(function () {
+    Route::middleware('role:admin|super_admin|accountant')->prefix('finance')->group(function () {
 
         Route::get('/summary', [FinanceReportController::class, 'summary']);
         Route::get('/collections', [FinanceReportController::class, 'collections']);
@@ -939,6 +955,7 @@ Route::put('/lessons/{lessonId}/video-progress', [VideoProgressController::class
 
         Route::get('/employees', [EmployeeHrController::class, 'index']);
         Route::get('/employees/{id}', [EmployeeHrController::class, 'show']);
+        Route::get('/employees/{id}/id-card/pdf', [EmployeeHrController::class, 'idCardPdf']);
         Route::put('/employees/{id}', [EmployeeHrController::class, 'update']);
 
         Route::get('/contracts', [ContractController::class, 'index']);

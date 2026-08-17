@@ -307,6 +307,63 @@ class PermissionSeeder extends Seeder
             'view_dashboard', 'view_announcements', 'view_reports',
         ]);
 
+        // Accountant: finance-focused permissions
+        $accountant = Role::where('name', 'accountant')->first();
+        $accountant?->syncPermissions([
+            'view_finance', 'manage_fee_structures', 'manage_invoices', 'record_payments',
+            'manage_expenses', 'manage_budgets', 'manage_mpesa',
+            'view_dashboard', 'view_announcements', 'view_reports',
+            'use_ai_assistants',
+            'view_notifications', 'manage_notification_preferences',
+        ]);
+
+        // Director: broad oversight permissions
+        $director = Role::where('name', 'director')->first();
+        $director?->syncPermissions([
+            'view_dashboard', 'view_admin_dashboard',
+            'view_courses', 'view_enrollments',
+            'view_users', 'view_employees',
+            'view_competitions', 'view_competition_leaderboard', 'view_competition_results',
+            'view_finance', 'view_reports', 'view_analytics',
+            'view_robotics_lab',
+            'view_library',
+            'view_certificates', 'view_competitions',
+            'view_notifications', 'manage_notification_preferences',
+        ]);
+
+        // Branch Manager: branch-scoped oversight
+        $branchManager = Role::where('name', 'branch_manager')->first();
+        $branchManager?->syncPermissions([
+            'view_dashboard', 'view_admin_dashboard',
+            'view_courses', 'view_enrollments',
+            'view_users', 'view_employees',
+            'view_competitions', 'view_competition_leaderboard', 'view_competition_results',
+            'view_finance', 'view_reports', 'view_analytics',
+            'view_robotics_lab',
+            'view_library',
+            'view_certificates',
+            'view_notifications', 'manage_notification_preferences',
+        ]);
+
+        // School Admin: school-level operational access
+        $schoolAdmin = Role::where('name', 'school_admin')->first();
+        $schoolAdmin?->syncPermissions([
+            'view_dashboard', 'view_admin_dashboard',
+            'view_courses', 'create_courses', 'update_courses', 'publish_courses',
+            'view_enrollments', 'create_enrollments',
+            'view_users', 'create_users', 'update_users',
+            'view_employees',
+            'view_competitions', 'create_competitions', 'update_competitions',
+            'manage_competition_criteria', 'manage_competition_judges', 'manage_competition_teams',
+            'view_competition_leaderboard', 'view_competition_results',
+            'view_finance', 'view_reports', 'view_analytics',
+            'view_robotics_lab', 'view_robotics_equipment',
+            'view_library',
+            'view_certificates',
+            'view_notifications', 'manage_notification_preferences',
+            'use_ai_assistants',
+        ]);
+
         // Certificate management permissions for admin-adjacent roles.
         $instructor?->syncPermissions(array_merge($instructor?->getPermissionNames()->all() ?? [], [
             'view_certificates', 'issue_certificates',

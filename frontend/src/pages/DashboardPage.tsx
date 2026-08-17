@@ -12,8 +12,9 @@ import {
   CompletionChart,
 } from '@/components/features/dashboard/Charts';
 import { NotificationList } from '@/components/features/notifications/NotificationList';
-import { Card, CardContent } from '@/components/ui/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { PageSpinner } from '@/components/ui/Spinner';
+import { Bot, MessageSquare, Coins, Users, TrendingUp } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import type { DashboardActivity, DashboardStats, DashboardUserRef } from '@/types';
 
@@ -160,6 +161,51 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {hasAdminData && stats.overview?.ai_insights && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Bot className="h-5 w-5 text-indigo-500" />
+              AI Platform Insights (30 days)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+              <div className="text-center">
+                <MessageSquare className="h-5 w-5 mx-auto mb-1 text-slate-400" />
+                <p className="text-2xl font-bold text-slate-900">{stats.overview.ai_insights.total_interactions_30d}</p>
+                <p className="text-xs text-slate-500">Interactions</p>
+              </div>
+              <div className="text-center">
+                <TrendingUp className="h-5 w-5 mx-auto mb-1 text-slate-400" />
+                <p className="text-2xl font-bold text-slate-900">{stats.overview.ai_insights.total_tokens_30d.toLocaleString()}</p>
+                <p className="text-xs text-slate-500">Tokens Used</p>
+              </div>
+              <div className="text-center">
+                <Coins className="h-5 w-5 mx-auto mb-1 text-slate-400" />
+                <p className="text-2xl font-bold text-slate-900">${stats.overview.ai_insights.total_cost_30d.toFixed(2)}</p>
+                <p className="text-xs text-slate-500">Total Cost</p>
+              </div>
+              <div className="text-center">
+                <TrendingUp className="h-5 w-5 mx-auto mb-1 text-slate-400" />
+                <p className="text-2xl font-bold text-slate-900">{stats.overview.ai_insights.avg_tokens_per_interaction}</p>
+                <p className="text-xs text-slate-500">Avg Tokens/Chat</p>
+              </div>
+              <div className="text-center">
+                <Users className="h-5 w-5 mx-auto mb-1 text-slate-400" />
+                <p className="text-2xl font-bold text-slate-900">{stats.overview.ai_insights.unique_users_30d}</p>
+                <p className="text-xs text-slate-500">Active Users</p>
+              </div>
+              <div className="text-center">
+                <Bot className="h-5 w-5 mx-auto mb-1 text-slate-400" />
+                <p className="text-sm font-bold text-slate-900 truncate">{stats.overview.ai_insights.top_assistant ?? 'N/A'}</p>
+                <p className="text-xs text-slate-500">Top Assistant</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

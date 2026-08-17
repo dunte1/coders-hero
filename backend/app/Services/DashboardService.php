@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Http\Resources\NotificationResource;
+use App\Models\AiAssistant;
+use App\Models\AiConversation;
 use App\Models\AiUsageLog;
 use App\Models\Announcement;
 use App\Models\Attendance;
@@ -49,7 +51,7 @@ class DashboardService
                 'total_teachers' => User::role('teacher')->count(),
                 'active_schools' => Branch::active()->count(),
                 // Finance
-                'revenue' => round((float) Payment::sum('amount'), 2),
+                'revenue' => round((float) Payment::where('created_at', '>=', now()->startOfMonth())->sum('amount'), 2),
                 'outstanding_fees' => round((float) Fee::whereNot('status', 'paid')->sum('amount'), 2),
                 // Competitions
                 'competition_registrations' => CompetitionTeam::count(),
@@ -66,7 +68,7 @@ class DashboardService
                     'total' => $attendanceToday->count(),
                 ],
                 // AI
-                'ai_interactions_30d' => AiUsageLog::where('created_at', '>=', now()->subDays(30))->count(),
+                'ai_insights' => $this->buildAiInsights(),
             ],
             'recent_users' => User::latest()->take(5)->with('roles')->get(),
             'recent_enrollments' => Enrollment::latest()->with(['user', 'course'])->take(5)->get(),
@@ -302,6 +304,37 @@ class DashboardService
                 'count' => $group->count(),
             ])
             ->values();
+    }
+
+    private function buildAiInsights(): array
+    {
+        $now = now();
+        $thirtyDaysAgo = $now->copy()->subDays(30);
+
+        $usageLogs = AiUsageLog::where('ai_usage_logs.created_at', '>=', $thirtyDaysAgo);
+        $totalInteractions = (clone $usageLogs)->count();
+        $totalTokens = (clone $usageLogs)->sum('total_tokens');
+        $totalCost = round((float) (clone $usageLogs)->sum('cost'), 4);
+
+        $topAssistant = AiUsageLog::where('ai_usage_logs.created_at', '>=', $thirtyDaysAgo)
+            ->join('ai_assistants', 'ai_usage_logs.assistant_id', '=', 'ai_assistants.id')
+            ->selectRaw('ai_assistants.name, count(*) as usage_count')
+            ->groupBy('ai_assistants.name')
+            ->orderByDesc('usage_count')
+            ->value('name');
+
+        $activeConversations = AiConversation::where('ai_conversations.created_at', '>=', $thirtyDaysAgo)->count();
+        $uniqueUsers = AiUsageLog::where('ai_usage_logs.created_at', '>=', $thirtyDaysAgo)->distinct('user_id')->count('user_id');
+
+        return [
+            'total_interactions_30d' => $totalInteractions,
+            'total_tokens_30d' => $totalTokens,
+            'total_cost_30d' => $totalCost,
+            'avg_tokens_per_interaction' => $totalInteractions > 0 ? round($totalTokens / $totalInteractions) : 0,
+            'top_assistant' => $topAssistant,
+            'active_conversations_30d' => $activeConversations,
+            'unique_users_30d' => $uniqueUsers,
+        ];
     }
 
     /**

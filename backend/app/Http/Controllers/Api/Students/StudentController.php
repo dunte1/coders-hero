@@ -193,6 +193,28 @@ class StudentController extends Controller
         return $this->successResponse($student, 'Photo uploaded successfully.');
     }
 
+    public function uploadIdCardPhoto(Request $request, int $id): JsonResponse
+    {
+        $student = $this->studentService->getById($id);
+
+        if (!$student) {
+            return $this->notFoundResponse('Student not found.');
+        }
+
+        $this->authorize('update', $student);
+
+        $request->validate([
+            'photo' => ['required', 'image', 'max:2048'],
+        ]);
+
+        $file = $request->file('photo');
+        $path = $file->store('id-card-photos', 'public');
+
+        $student->update(['id_card_photo' => $path]);
+
+        return $this->successResponse($student->fresh(), 'ID card photo uploaded successfully.');
+    }
+
     public function promote(Request $request, int $id): JsonResponse
     {
         $student = $this->studentService->getById($id);

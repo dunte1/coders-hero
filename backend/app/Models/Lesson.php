@@ -17,6 +17,7 @@ class Lesson extends Model
 
     protected $fillable = [
         'course_id',
+        'module_id',
         'module_name',
         'title',
         'slug',
@@ -48,6 +49,11 @@ class Lesson extends Model
     public function course(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Course::class);
+    }
+
+    public function module(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(CourseModule::class, 'module_id');
     }
 
     public function quiz(): HasOne

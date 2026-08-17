@@ -28,6 +28,8 @@ class Employee extends Model
         'emergency_phone',
         'bank_name',
         'bank_account_number',
+        'id_card_photo',
+        'qr_code',
         'hire_date',
         'employment_type',
         'salary',
@@ -119,5 +121,23 @@ class Employee extends Model
     public function getTenureAttribute(): ?int
     {
         return $this->hire_date ? $this->hire_date->diffInYears(now()) : null;
+    }
+
+    public function getPhotoUrlAttribute(): ?string
+    {
+        if ($this->id_card_photo) {
+            return asset('storage/' . $this->id_card_photo);
+        }
+
+        if ($this->user && $this->user->avatar) {
+            return asset('storage/' . $this->user->avatar);
+        }
+
+        return null;
+    }
+
+    public function getFullNameAttribute(): string
+    {
+        return $this->user?->name ?? 'Unknown';
     }
 }

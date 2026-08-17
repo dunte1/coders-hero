@@ -16,6 +16,16 @@ import {
 } from 'recharts';
 import { Users, BookOpen, GraduationCap } from 'lucide-react';
 
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function toMonthlyChart(data: Record<string, unknown>[], key: string, label: string) {
+  if (!data || !Array.isArray(data)) return [];
+  return data.map((item) => ({
+    name: MONTHS[((item.month as number) - 1) % 12] ?? String(item.month),
+    [label]: item[key] ?? item.count ?? 0,
+  }));
+}
+
 export default function ReportsPage() {
   const [reportType, setReportType] = useState('users');
 
@@ -39,14 +49,26 @@ export default function ReportsPage() {
 
   const isLoading = userLoading || courseLoading || enrollmentLoading;
 
-  const chartData = [
-    { name: 'Jan', value: 45 },
-    { name: 'Feb', value: 62 },
-    { name: 'Mar', value: 78 },
-    { name: 'Apr', value: 56 },
-    { name: 'May', value: 89 },
-    { name: 'Jun', value: 95 },
-  ];
+  const userData = (userReport as Record<string, unknown>) ?? {};
+  const userChartData = toMonthlyChart(
+    (userData.monthly as Record<string, unknown>[]) ?? [],
+    'count',
+    'users'
+  );
+
+  const courseData = (courseReport as Record<string, unknown>) ?? {};
+  const courseChartData = toMonthlyChart(
+    (courseData.monthly as Record<string, unknown>[]) ?? [],
+    'count',
+    'courses'
+  );
+
+  const enrollmentData = (enrollmentReport as Record<string, unknown>) ?? {};
+  const enrollmentChartData = toMonthlyChart(
+    (enrollmentData.monthly as Record<string, unknown>[]) ?? [],
+    'count',
+    'enrollments'
+  );
 
   return (
     <div className="space-y-6">
@@ -77,14 +99,14 @@ export default function ReportsPage() {
               <CardTitle>User Growth Report</CardTitle>
             </CardHeader>
             <CardContent>
-              {userReport && typeof userReport === 'object' ? (
+              {userChartData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={chartData}>
+                  <BarChart data={userChartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="users" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
@@ -100,14 +122,14 @@ export default function ReportsPage() {
               <CardTitle>Course Performance Report</CardTitle>
             </CardHeader>
             <CardContent>
-              {courseReport && typeof courseReport === 'object' ? (
+              {courseChartData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={chartData}>
+                  <BarChart data={courseChartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="value" fill="#10b981" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="courses" fill="#10b981" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
@@ -123,14 +145,14 @@ export default function ReportsPage() {
               <CardTitle>Enrollment Report</CardTitle>
             </CardHeader>
             <CardContent>
-              {enrollmentReport && typeof enrollmentReport === 'object' ? (
+              {enrollmentChartData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={chartData}>
+                  <BarChart data={enrollmentChartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="value" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="enrollments" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (

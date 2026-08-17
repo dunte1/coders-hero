@@ -511,6 +511,15 @@ export interface DashboardOverview {
   projects?: number;
   attendance_summary?: DashboardAttendanceSummary;
   ai_interactions_30d?: number;
+  ai_insights?: {
+    total_interactions_30d: number;
+    total_tokens_30d: number;
+    total_cost_30d: number;
+    avg_tokens_per_interaction: number;
+    top_assistant: string | null;
+    active_conversations_30d: number;
+    unique_users_30d: number;
+  };
 }
 
 export interface DashboardActivity {

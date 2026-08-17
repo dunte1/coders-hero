@@ -116,6 +116,9 @@ export const lmsApi = {
   videoProgressForCourse: (courseId: number) =>
     api.get<{ data: VideoProgress[] }>(`/lms/courses/${courseId}/video-progress`).then(unwrap<VideoProgress[]>),
 
+  courseLessons: (courseId: number) =>
+    api.get<{ data: any[] }>(`/courses/${courseId}/lessons`).then(unwrap<any[]>),
+
   markLessonCompleted: (courseId: number, lessonId: number) =>
     api.post<{ data: CourseProgress }>(`/lms/courses/${courseId}/lessons/complete`, { lesson_id: lessonId }).then(unwrap<CourseProgress>),
 

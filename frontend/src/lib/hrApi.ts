@@ -98,6 +98,9 @@ export const hrApi = {
   employee: (id: number) =>
     api.get<{ data: EmployeeHr }>(`/hr/employees/${id}`).then(unwrap<EmployeeHr>),
 
+  idCardPdf: (id: number) =>
+    api.get(`/hr/employees/${id}/id-card/pdf`, { responseType: 'blob' }).then((res) => res.data as Blob),
+
   updateEmployee: (id: number, data: EmployeeHrInput) =>
     api.put<{ data: EmployeeHr }>(`/hr/employees/${id}`, data).then(unwrap<EmployeeHr>),
 

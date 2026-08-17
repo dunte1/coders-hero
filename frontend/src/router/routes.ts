@@ -24,6 +24,11 @@ export const routes: RouteConfig[] = [
     meta: { title: 'Services', public: true, layout: 'website' },
   },
   {
+    path: '/about',
+    element: React.lazy(() => import('@/pages/website/AboutPage')),
+    meta: { title: 'About Us', public: true, layout: 'website' },
+  },
+  {
     path: '/programs',
     element: React.lazy(() => import('@/pages/website/ProgramsPage')),
     meta: { title: 'Programs', public: true, layout: 'website' },
@@ -69,9 +74,29 @@ export const routes: RouteConfig[] = [
     meta: { title: 'FAQs', public: true, layout: 'website' },
   },
   {
+    path: '/events',
+    element: React.lazy(() => import('@/pages/website/EventsPage')),
+    meta: { title: 'Events', public: true, layout: 'website' },
+  },
+  {
+    path: '/courses-catalog',
+    element: React.lazy(() => import('@/pages/website/PublicCoursesPage')),
+    meta: { title: 'Courses', public: true, layout: 'website' },
+  },
+  {
+    path: '/register',
+    element: React.lazy(() => import('@/pages/website/RegistrationPage')),
+    meta: { title: 'Online Registration', public: true, layout: 'website' },
+  },
+  {
     path: '/contact',
     element: React.lazy(() => import('@/pages/website/ContactPage')),
     meta: { title: 'Contact', public: true, layout: 'website' },
+  },
+  {
+    path: '/school-partnerships',
+    element: React.lazy(() => import('@/pages/website/PartnerSchoolsPage')),
+    meta: { title: 'School Partnerships', public: true, layout: 'website' },
   },
 
   // Public auth routes
@@ -409,14 +434,14 @@ export const routes: RouteConfig[] = [
   {
     path: '/analytics',
     element: React.lazy(() => import('@/pages/analytics/AnalyticsDashboardPage')),
-    meta: { title: 'Analytics', roles: ['admin', 'super_admin', 'manager'] },
+    meta: { title: 'Analytics', roles: ['admin', 'super_admin', 'director', 'branch_manager', 'school_admin', 'accountant'] },
   },
 
   // Reports
   {
     path: '/reports',
     element: React.lazy(() => import('@/pages/ReportsPage')),
-    meta: { title: 'Reports', roles: ['admin', 'manager'] },
+    meta: { title: 'Reports', roles: ['admin', 'director', 'branch_manager', 'school_admin', 'accountant'] },
   },
 
   // Website CMS
@@ -495,95 +520,95 @@ export const routes: RouteConfig[] = [
   {
     path: '/students',
     element: React.lazy(() => import('@/pages/students/StudentsPage')),
-    meta: { title: 'Students', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Students', roles: ['admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/students/overview',
     element: React.lazy(() => import('@/pages/students/StudentsOverviewPage')),
-    meta: { title: 'Student Dashboard', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Student Dashboard', roles: ['admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/organization/overview',
     element: React.lazy(() => import('@/pages/students/StudentsOverviewPage')),
-    meta: { title: 'Organization Overview', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Organization Overview', roles: ['admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/organization/branches',
     element: React.lazy(() => import('@/pages/organization/BranchesPage')),
-    meta: { title: 'Branches', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Branches', roles: ['admin', 'super_admin', 'director', 'branch_manager'] },
   },
   {
     path: '/organization/partner-schools',
     element: React.lazy(() => import('@/pages/organization/PartnerSchoolsPage')),
-    meta: { title: 'Partner Schools', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Partner Schools', roles: ['admin', 'super_admin', 'director', 'school_admin'] },
   },
   {
     path: '/organization/academic-years',
     element: React.lazy(() => import('@/pages/organization/AcademicYearsPage')),
-    meta: { title: 'Academic Years', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Academic Years', roles: ['admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/students/create',
     element: React.lazy(() => import('@/pages/students/StudentCreatePage')),
-    meta: { title: 'New Student', roles: ['admin', 'super_admin'] },
+    meta: { title: 'New Student', roles: ['admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/students/:id',
     element: React.lazy(() => import('@/pages/students/StudentDetailPage')),
-    meta: { title: 'Student Detail', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Student Detail', roles: ['admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/students/:id/edit',
     element: React.lazy(() => import('@/pages/students/StudentEditPage')),
-    meta: { title: 'Edit Student', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Edit Student', roles: ['admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/students/:id/id-card',
     element: React.lazy(() => import('@/pages/students/StudentIdCardPage')),
-    meta: { title: 'Student ID Card', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Student ID Card', roles: ['admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
 
   {
     path: '/admissions',
     element: React.lazy(() => import('@/pages/students/AdmissionsPage')),
-    meta: { title: 'Admissions', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Admissions', roles: ['admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/admissions/new',
     element: React.lazy(() => import('@/pages/students/AdmissionFormPage')),
-    meta: { title: 'New Application', roles: ['admin', 'super_admin'] },
+    meta: { title: 'New Application', roles: ['admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/admissions/:id/edit',
     element: React.lazy(() => import('@/pages/students/AdmissionFormPage')),
-    meta: { title: 'Edit Application', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Edit Application', roles: ['admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
 
   {
     path: '/guardians',
     element: React.lazy(() => import('@/pages/students/GuardiansPage')),
-    meta: { title: 'Guardians', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Guardians', roles: ['admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/guardians/new',
     element: React.lazy(() => import('@/pages/students/GuardianFormPage')),
-    meta: { title: 'New Guardian', roles: ['admin', 'super_admin'] },
+    meta: { title: 'New Guardian', roles: ['admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/guardians/:id/edit',
     element: React.lazy(() => import('@/pages/students/GuardianFormPage')),
-    meta: { title: 'Edit Guardian', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Edit Guardian', roles: ['admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
 
   {
     path: '/attendance',
     element: React.lazy(() => import('@/pages/students/AttendancePage')),
-    meta: { title: 'Attendance', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Attendance', roles: ['admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/attendance/report',
     element: React.lazy(() => import('@/pages/students/AttendanceReportPage')),
-    meta: { title: 'Attendance Report', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Attendance Report', roles: ['admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
 
   // Parent Portal
@@ -642,67 +667,67 @@ export const routes: RouteConfig[] = [
   {
     path: '/teacher',
     element: React.lazy(() => import('@/pages/teacher/TeacherDashboardPage')),
-    meta: { title: 'Teacher Dashboard', roles: ['teacher', 'instructor', 'admin', 'super_admin'] },
+    meta: { title: 'Teacher Dashboard', roles: ['teacher', 'instructor', 'admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/teacher/classes',
     element: React.lazy(() => import('@/pages/teacher/TeacherClassesPage')),
-    meta: { title: 'Classes', roles: ['teacher', 'instructor', 'admin', 'super_admin'] },
+    meta: { title: 'Classes', roles: ['teacher', 'instructor', 'admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/teacher/classes/:id',
     element: React.lazy(() => import('@/pages/teacher/TeacherClassDetailPage')),
-    meta: { title: 'Class Detail', roles: ['teacher', 'instructor', 'admin', 'super_admin'] },
+    meta: { title: 'Class Detail', roles: ['teacher', 'instructor', 'admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/teacher/assignments',
     element: React.lazy(() => import('@/pages/teacher/TeacherAssignmentsPage')),
-    meta: { title: 'Assignments', roles: ['teacher', 'instructor', 'admin', 'super_admin'] },
+    meta: { title: 'Assignments', roles: ['teacher', 'instructor', 'admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/teacher/assignments/:id',
     element: React.lazy(() => import('@/pages/teacher/TeacherAssignmentDetailPage')),
-    meta: { title: 'Assignment Detail', roles: ['teacher', 'instructor', 'admin', 'super_admin'] },
+    meta: { title: 'Assignment Detail', roles: ['teacher', 'instructor', 'admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/teacher/exams',
     element: React.lazy(() => import('@/pages/teacher/TeacherExamsPage')),
-    meta: { title: 'Exams', roles: ['teacher', 'instructor', 'admin', 'super_admin'] },
+    meta: { title: 'Exams', roles: ['teacher', 'instructor', 'admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/teacher/exams/:id',
     element: React.lazy(() => import('@/pages/teacher/TeacherExamDetailPage')),
-    meta: { title: 'Exam Detail', roles: ['teacher', 'instructor', 'admin', 'super_admin'] },
+    meta: { title: 'Exam Detail', roles: ['teacher', 'instructor', 'admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/teacher/gradebook',
     element: React.lazy(() => import('@/pages/teacher/TeacherGradebookPage')),
-    meta: { title: 'Gradebook', roles: ['teacher', 'instructor', 'admin', 'super_admin'] },
+    meta: { title: 'Gradebook', roles: ['teacher', 'instructor', 'admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/teacher/lesson-notes',
     element: React.lazy(() => import('@/pages/teacher/TeacherLessonNotesPage')),
-    meta: { title: 'Lesson Notes', roles: ['teacher', 'instructor', 'admin', 'super_admin'] },
+    meta: { title: 'Lesson Notes', roles: ['teacher', 'instructor', 'admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/teacher/calendar',
     element: React.lazy(() => import('@/pages/teacher/TeacherCalendarPage')),
-    meta: { title: 'Calendar', roles: ['teacher', 'instructor', 'admin', 'super_admin'] },
+    meta: { title: 'Calendar', roles: ['teacher', 'instructor', 'admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/teacher/analytics',
     element: React.lazy(() => import('@/pages/teacher/TeacherAnalyticsPage')),
-    meta: { title: 'Analytics', roles: ['teacher', 'instructor', 'admin', 'super_admin'] },
+    meta: { title: 'Analytics', roles: ['teacher', 'instructor', 'admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/teacher/reports',
     element: React.lazy(() => import('@/pages/teacher/TeacherReportsPage')),
-    meta: { title: 'Reports', roles: ['teacher', 'instructor', 'admin', 'super_admin'] },
+    meta: { title: 'Reports', roles: ['teacher', 'instructor', 'admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
   {
     path: '/teacher/reports/classes/:classId/students/:studentId',
     element: React.lazy(() => import('@/pages/teacher/TeacherStudentReportPage')),
-    meta: { title: 'Student Report', roles: ['teacher', 'instructor', 'admin', 'super_admin'] },
+    meta: { title: 'Student Report', roles: ['teacher', 'instructor', 'admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
 
   // LMS (forum, coding, AI tutor, bookmarks, course player)
@@ -791,6 +816,11 @@ export const routes: RouteConfig[] = [
     path: '/hr/employees/:id/edit',
     element: React.lazy(() => import('@/pages/hr/HrEmployeeEditPage')),
     meta: { title: 'Edit Employee', roles: ['admin', 'super_admin', 'hr_officer'] },
+  },
+  {
+    path: '/hr/employees/:id/id-card',
+    element: React.lazy(() => import('@/pages/hr/StaffIdCardPage')),
+    meta: { title: 'Staff ID Card', roles: ['admin', 'super_admin', 'hr_officer'] },
   },
   {
     path: '/hr/contracts',
@@ -943,7 +973,7 @@ export const routes: RouteConfig[] = [
   {
     path: '/finance',
     element: React.lazy(() => import('@/pages/finance/FinanceOverviewPage')),
-    meta: { title: 'Finance', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Finance', roles: ['admin', 'super_admin', 'accountant'] },
   },
   {
     path: '/finance/mine',
@@ -953,57 +983,57 @@ export const routes: RouteConfig[] = [
   {
     path: '/finance/invoices',
     element: React.lazy(() => import('@/pages/finance/InvoicesPage')),
-    meta: { title: 'Invoices', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Invoices', roles: ['admin', 'super_admin', 'accountant'] },
   },
   {
     path: '/finance/invoices/new',
     element: React.lazy(() => import('@/pages/finance/InvoiceCreatePage')),
-    meta: { title: 'New Invoice', roles: ['admin', 'super_admin'] },
+    meta: { title: 'New Invoice', roles: ['admin', 'super_admin', 'accountant'] },
   },
   {
     path: '/finance/invoices/:id',
     element: React.lazy(() => import('@/pages/finance/InvoiceDetailPage')),
-    meta: { title: 'Invoice Detail', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Invoice Detail', roles: ['admin', 'super_admin', 'accountant'] },
   },
   {
     path: '/finance/payments',
     element: React.lazy(() => import('@/pages/finance/PaymentsPage')),
-    meta: { title: 'Payments', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Payments', roles: ['admin', 'super_admin', 'accountant'] },
   },
   {
     path: '/finance/payments/:id',
     element: React.lazy(() => import('@/pages/finance/PaymentDetailPage')),
-    meta: { title: 'Payment Detail', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Payment Detail', roles: ['admin', 'super_admin', 'accountant'] },
   },
   {
     path: '/finance/expenses',
     element: React.lazy(() => import('@/pages/finance/ExpensesPage')),
-    meta: { title: 'Expenses', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Expenses', roles: ['admin', 'super_admin', 'accountant'] },
   },
   {
     path: '/finance/budgets',
     element: React.lazy(() => import('@/pages/finance/BudgetsPage')),
-    meta: { title: 'Budgets', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Budgets', roles: ['admin', 'super_admin', 'accountant'] },
   },
   {
     path: '/finance/mpesa',
     element: React.lazy(() => import('@/pages/finance/MpesaTransactionsPage')),
-    meta: { title: 'M-Pesa Transactions', roles: ['admin', 'super_admin'] },
+    meta: { title: 'M-Pesa Transactions', roles: ['admin', 'super_admin', 'accountant'] },
   },
   {
     path: '/finance/outstanding',
     element: React.lazy(() => import('@/pages/finance/OutstandingPage')),
-    meta: { title: 'Outstanding Balances', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Outstanding Balances', roles: ['admin', 'super_admin', 'accountant'] },
   },
   {
     path: '/finance/transactions',
     element: React.lazy(() => import('@/pages/finance/TransactionsPage')),
-    meta: { title: 'Transactions', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Transactions', roles: ['admin', 'super_admin', 'accountant'] },
   },
   {
     path: '/finance/fee-structures',
     element: React.lazy(() => import('@/pages/finance/FeeStructuresPage')),
-    meta: { title: 'Fee Structures', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Fee Structures', roles: ['admin', 'super_admin', 'accountant'] },
   },
 
   // Academics
@@ -1011,6 +1041,18 @@ export const routes: RouteConfig[] = [
     path: '/academics/enrollments',
     element: React.lazy(() => import('@/pages/academics/AcademicsEnrollmentsPage')),
     meta: { title: 'Enrollments', roles: ['admin', 'super_admin'] },
+  },
+
+  // Student Assignments
+  {
+    path: '/student/assignments',
+    element: React.lazy(() => import('@/pages/student/StudentAssignmentsPage')),
+    meta: { title: 'My Assignments', roles: ['student'] },
+  },
+  {
+    path: '/student/assignments/:id',
+    element: React.lazy(() => import('@/pages/student/StudentAssignmentDetailPage')),
+    meta: { title: 'Assignment Detail', roles: ['student'] },
   },
 
   // Robotics Lab

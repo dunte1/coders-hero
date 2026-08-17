@@ -2,6 +2,7 @@ import api from '@/lib/axios';
 import type {
   BlogPost,
   BlogPostDetail,
+  CalendarEvent,
   ChatMessage,
   ChatResponse,
   ContactInput,
@@ -66,6 +67,27 @@ export const websiteApi = {
     list: () => api.get<{ data: Faq[] }>('/public/faqs').then(unwrap<Faq[]>),
   },
 
+  events: {
+    list: (params?: ListParams) =>
+      api
+        .get<{ data: CalendarEvent[] }>('/public/events', { params })
+        .then(unwrap<CalendarEvent[]>),
+  },
+
+  courses: {
+    list: (params?: ListParams) =>
+      api
+        .get<{ data: Course[] }>('/public/courses', { params })
+        .then(unwrap<Course[]>),
+  },
+
+  admissions: {
+    submit: (data: Record<string, unknown>) =>
+      api
+        .post<{ data: { id: number } }>('/public/admissions', data)
+        .then(unwrap<{ id: number }>),
+  },
+
   blog: {
     list: (params?: ListParams) =>
       api
@@ -80,6 +102,11 @@ export const websiteApi = {
   contact: {
     submit: (data: ContactInput) =>
       api.post<{ data: { id: number } }>('/public/contact', data).then(unwrap<{ id: number }>),
+  },
+
+  partnerSchools: {
+    list: () =>
+      api.get<{ data: PartnerSchool[] }>('/public/partner-schools').then(unwrap<PartnerSchool[]>),
   },
 
   chat: {

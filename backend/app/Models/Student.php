@@ -22,6 +22,7 @@ class Student extends Model
         'gender',
         'date_of_birth',
         'photo',
+        'id_card_photo',
         'grade',
         'branch',
         'admission_date',
@@ -168,6 +169,14 @@ class Student extends Model
             return asset('storage/' . $this->photo);
         }
         return null;
+    }
+
+    public function getIdCardPhotoUrlAttribute(): ?string
+    {
+        if ($this->id_card_photo) {
+            return asset('storage/' . $this->id_card_photo);
+        }
+        return $this->photo_url;
     }
 
     public function isActive(): bool

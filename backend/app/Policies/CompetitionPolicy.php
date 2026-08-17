@@ -26,7 +26,7 @@ class CompetitionPolicy
 
     public function view(User $user, Competition $competition): bool
     {
-        if ($user->hasAnyRole(['director', 'branch_manager', 'school_administrator', 'teacher'])) {
+        if ($user->hasAnyRole(['director', 'branch_manager', 'school_admin', 'teacher'])) {
             return true;
         }
 
@@ -39,12 +39,12 @@ class CompetitionPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasAnyRole(['director', 'branch_manager', 'school_administrator', 'teacher']);
+        return $user->hasAnyRole(['director', 'branch_manager', 'school_admin', 'teacher']);
     }
 
     public function update(User $user, Competition $competition): bool
     {
-        return $user->hasAnyRole(['director', 'branch_manager', 'school_administrator', 'teacher']);
+        return $user->hasAnyRole(['director', 'branch_manager', 'school_admin', 'teacher']);
     }
 
     public function delete(User $user, Competition $competition): bool
@@ -53,12 +53,12 @@ class CompetitionPolicy
             return false;
         }
 
-        return $user->hasAnyRole(['director', 'branch_manager', 'school_administrator', 'teacher']);
+        return $user->hasAnyRole(['director', 'branch_manager', 'school_admin', 'teacher']);
     }
 
     public function judge(User $user, Competition $competition): bool
     {
-        if ($user->hasAnyRole(['director', 'branch_manager', 'school_administrator', 'teacher'])) {
+        if ($user->hasAnyRole(['director', 'branch_manager', 'school_admin', 'teacher'])) {
             return true;
         }
 

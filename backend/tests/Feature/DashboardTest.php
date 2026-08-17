@@ -136,7 +136,7 @@ class DashboardTest extends TestCase
                         'competition_registrations',
                         'completion_rate',
                         'attendance_summary' => ['date', 'present', 'late', 'absent', 'total'],
-                        'ai_interactions_30d',
+                        'ai_insights',
                     ],
                     'recent_activity',
                     'upcoming_tasks',

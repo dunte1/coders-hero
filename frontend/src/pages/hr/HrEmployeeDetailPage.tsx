@@ -21,6 +21,7 @@ import {
   CalendarDays,
   Wallet,
   Download,
+  IdCard,
 } from 'lucide-react';
 import { hrApi } from '@/lib/hrApi';
 import { getInitials } from '@/lib/utils';
@@ -72,9 +73,14 @@ export default function HrEmployeeDetailPage() {
           { label: employee.user?.name ?? employee.employee_id },
         ]}
         actions={
-          <Button onClick={() => navigate(`/hr/employees/${employee.id}/edit`)}>
-            <Pencil className="mr-1 h-4 w-4" /> Edit
-          </Button>
+          <>
+            <Button variant="outline" onClick={() => navigate(`/hr/employees/${employee.id}/id-card`)}>
+              <IdCard className="mr-1 h-4 w-4" /> ID Card
+            </Button>
+            <Button onClick={() => navigate(`/hr/employees/${employee.id}/edit`)}>
+              <Pencil className="mr-1 h-4 w-4" /> Edit
+            </Button>
+          </>
         }
       />
 

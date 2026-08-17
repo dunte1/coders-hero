@@ -22,7 +22,7 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->hasRole('admin') || $user->hasRole('super_admin')) {
+        if ($user->hasAnyRole(['admin', 'super_admin', 'director', 'branch_manager', 'school_admin', 'accountant'])) {
             $data = $this->dashboardService->getAdminDashboard($user->id);
         } elseif ($user->hasRole('instructor')) {
             $data = $this->dashboardService->getInstructorDashboard($user->id);
@@ -41,7 +41,7 @@ class DashboardController extends Controller
 
         $stats = [];
 
-        if ($user->hasRole('admin') || $user->hasRole('super_admin')) {
+        if ($user->hasAnyRole(['admin', 'super_admin', 'director', 'branch_manager', 'school_admin', 'accountant'])) {
             $stats = $this->dashboardService->getAdminDashboard()['overview'];
         } elseif ($user->hasRole('instructor')) {
             $stats = $this->dashboardService->getInstructorDashboard($user->id)['overview'];

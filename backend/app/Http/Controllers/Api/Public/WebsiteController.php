@@ -16,8 +16,11 @@ use App\Http\Resources\ServiceResource;
 use App\Http\Resources\SiteSectionResource;
 use App\Http\Resources\TestimonialResource;
 use App\Models\BlogPost;
+use App\Models\CalendarEvent;
+use App\Models\Course;
 use App\Models\Faq;
 use App\Models\GalleryItem;
+use App\Models\PartnerSchool;
 use App\Models\Program;
 use App\Models\Service;
 use App\Models\SiteSection;
@@ -27,6 +30,7 @@ use App\Services\Website\WebsiteService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class WebsiteController extends Controller
 {
@@ -218,6 +222,92 @@ class WebsiteController extends Controller
         );
     }
 
+    public function courses(Request $request): JsonResponse
+    {
+        $query = Course::published()
+            ->with(['category', 'instructor'])
+            ->orderBy('title');
+
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        $courses = $query->take((int) $request->get('per_page', 12))
+            ->get(['id', 'title', 'slug', 'description', 'thumbnail', 'category_id', 'instructor_id', 'level', 'duration', 'price']);
+
+        return $this->successResponse($courses, 'Courses retrieved successfully.');
+    }
+
+    public function events(Request $request): JsonResponse
+    {
+        $query = CalendarEvent::query()
+            ->where('starts_at', '>=', now())
+            ->orderBy('starts_at');
+
+        if ($request->filled('type')) {
+            $query->where('event_type', $request->type);
+        }
+
+        $events = $query->take((int) $request->get('per_page', 12))
+            ->get(['id', 'title', 'description', 'event_type', 'starts_at', 'ends_at', 'all_day', 'location', 'color']);
+
+        return $this->successResponse($events, 'Events retrieved successfully.');
+    }
+
+    public function submitAdmission(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'date_of_birth' => 'required|date|before:today',
+            'gender' => 'required|in:male,female,other',
+            'grade' => 'required|string|max:50',
+            'parent_name' => 'required|string|max:255',
+            'parent_phone' => 'required|string|max:20',
+            'parent_email' => 'nullable|email|max:255',
+            'address' => 'nullable|string|max:500',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationErrorResponse($validator->errors(), 'Validation failed.');
+        }
+
+        $data = $validator->validated();
+
+        $admission = \App\Models\Admission::create([
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'],
+            'date_of_birth' => $data['date_of_birth'],
+            'gender' => $data['gender'],
+            'grade' => $data['grade'],
+            'parent_name' => $data['parent_name'],
+            'parent_phone' => $data['parent_phone'],
+            'parent_email' => $data['parent_email'] ?? null,
+            'address' => $data['address'] ?? null,
+            'notes' => $data['notes'] ?? null,
+            'status' => 'pending',
+            'source' => 'online',
+        ]);
+
+        return $this->createdResponse(
+            ['id' => $admission->id],
+            'Your application has been submitted successfully. We will review it and contact you soon.'
+        );
+    }
+
     public function contact(ContactRequest $request): JsonResponse
     {
         $message = $this->websiteService->submitContact($request->validated(), $request);
@@ -240,5 +330,15 @@ class WebsiteController extends Controller
         $this->websiteService->recordPageView($request, $request->input('path'));
 
         return $this->createdResponse(null, 'Page view recorded.');
+    }
+
+    public function partnerSchools(): JsonResponse
+    {
+        $schools = PartnerSchool::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'contact_person', 'city', 'country', 'partnership_type', 'notes']);
+
+        return $this->successResponse($schools, 'Partner schools retrieved successfully.');
     }
 }

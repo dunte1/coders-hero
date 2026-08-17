@@ -77,6 +77,16 @@ export const studentsApi = {
       .then(unwrap<Student>);
   },
 
+  uploadIdCardPhoto: (id: number, file: File) => {
+    const formData = new FormData();
+    formData.append('photo', file);
+    return api
+      .post<{ data: Student }>(`/students/${id}/id-card/photo`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      .then(unwrap<Student>);
+  },
+
   promote: (id: number, newGrade?: string) =>
     api.put<{ data: Student }>(`/students/${id}/promote`, { new_grade: newGrade }).then(unwrap<Student>),
 

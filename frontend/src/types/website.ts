@@ -176,6 +176,31 @@ export interface ChatResponse {
   matched_question?: string;
 }
 
+export interface CalendarEvent {
+  id: number;
+  title: string;
+  description: string | null;
+  event_type: string;
+  starts_at: string;
+  ends_at: string | null;
+  all_day: boolean;
+  location: string | null;
+  color: string | null;
+}
+
+export interface Course {
+  id: number;
+  title: string;
+  slug: string | null;
+  description: string | null;
+  thumbnail: string | null;
+  category_id: number | null;
+  instructor_id: number | null;
+  level: string | null;
+  duration: string | null;
+  price: number | null;
+}
+
 export function getSetting(
   settings: PublicSiteSettings | undefined,
   key: string,
@@ -183,4 +208,14 @@ export function getSetting(
 ): string {
   const [group, setting] = key.split('.');
   return settings?.[group]?.[setting] ?? fallback;
+}
+
+export interface PartnerSchool {
+  id: number;
+  name: string;
+  contact_person: string | null;
+  city: string | null;
+  country: string | null;
+  partnership_type: 'feeder' | 'sibling' | 'affiliate' | 'other';
+  notes: string | null;
 }

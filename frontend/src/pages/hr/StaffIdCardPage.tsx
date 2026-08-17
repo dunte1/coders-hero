@@ -1,31 +1,30 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import QRCode from 'qrcode';
-import { Printer, Download, Camera } from 'lucide-react';
+import { Printer, Download } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageSpinner } from '@/components/ui/Spinner';
 import { Button } from '@/components/ui/Button';
-import { useStudent } from '@/hooks/useStudents';
-import { downloadBlob, studentsApi, getErrorMessage } from '@/lib/studentsApi';
+import { useHrEmployee } from '@/hooks/useHr';
+import { hrApi } from '@/lib/hrApi';
+import { downloadBlob, getErrorMessage } from '@/lib/studentsApi';
 import { formatDate, getInitials } from '@/lib/utils';
 import { toast } from 'sonner';
 
-export default function StudentIdCardPage() {
+export default function StaffIdCardPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const studentId = id ? parseInt(id, 10) : null;
+  const employeeId = id ? parseInt(id, 10) : null;
 
-  const { data: student, isLoading, refetch } = useStudent(studentId as number);
+  const { data: employee, isLoading } = useHrEmployee(employeeId as number);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDownload = async () => {
     setDownloading(true);
     try {
-      const blob = await studentsApi.idCardPdf(studentId as number);
-      downloadBlob(blob, `id-card-${student?.student_id ?? 'student'}.pdf`);
+      const blob = await hrApi.idCardPdf(employeeId as number);
+      downloadBlob(blob, `id-card-${employee?.employee_id ?? 'staff'}.pdf`);
     } catch (err) {
       toast.error(getErrorMessage(err));
     } finally {
@@ -33,35 +32,24 @@ export default function StudentIdCardPage() {
     }
   };
 
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !studentId) return;
-    setUploading(true);
-    try {
-      await studentsApi.uploadIdCardPhoto(studentId, file);
-      toast.success('ID card photo updated');
-      refetch();
-    } catch (err) {
-      toast.error(getErrorMessage(err));
-    } finally {
-      setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
-  };
-
   useEffect(() => {
-    if (student?.qr_code) {
-      QRCode.toDataURL(student.qr_code, { width: 180, margin: 1 })
+    if (employee?.qr_code) {
+      QRCode.toDataURL(employee.qr_code, { width: 180, margin: 1 })
         .then(setQrUrl)
         .catch(() => setQrUrl(null));
     } else {
       setQrUrl(null);
     }
-  }, [student?.qr_code]);
+  }, [employee?.qr_code]);
 
-  if (!studentId) return null;
+  if (!employeeId) return null;
   if (isLoading) return <PageSpinner />;
-  if (!student) return <div className="py-12 text-center text-slate-500">Student not found</div>;
+  if (!employee) return <div className="py-12 text-center text-slate-500">Employee not found</div>;
+
+  const fullName = employee.user?.name ?? 'Unknown';
+  const employeeIdCode = employee.employee_id ?? '';
+  const departmentName = employee.department?.name ?? '—';
+  const positionName = employee.position?.name ?? '—';
 
   return (
     <div className="space-y-6">
@@ -76,29 +64,19 @@ export default function StudentIdCardPage() {
 
       <div id="print-toolbar">
         <PageHeader
-          title="Student ID Card"
-          description={`QR-scannable ID for ${student.full_name}`}
+          title="Staff ID Card"
+          description={`QR-scannable ID for ${fullName}`}
           breadcrumbs={[
             { label: 'Dashboard', href: '/dashboard' },
-            { label: 'Students', href: '/students' },
-            { label: student.full_name, href: `/students/${studentId}` },
+            { label: 'HR', href: '/hr' },
+            { label: 'Employees', href: '/hr/employees' },
+            { label: fullName, href: `/hr/employees/${employeeId}` },
             { label: 'ID Card' },
           ]}
           actions={
             <>
-              <Button variant="outline" onClick={() => navigate(`/students/${studentId}`)}>
+              <Button variant="outline" onClick={() => navigate(`/hr/employees/${employeeId}`)}>
                 Back to Profile
-              </Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handlePhotoUpload}
-              />
-              <Button variant="outline" loading={uploading} onClick={() => fileInputRef.current?.click()}>
-                <Camera className="mr-2 h-4 w-4" />
-                Change Photo
               </Button>
               <Button variant="outline" loading={downloading} onClick={handleDownload}>
                 <Download className="mr-2 h-4 w-4" />
@@ -119,10 +97,10 @@ export default function StudentIdCardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-lg font-bold">Coder&apos;s Hero</p>
-                <p className="text-xs text-brand-100">Student Identification Card</p>
+                <p className="text-xs text-brand-100">Staff Identification Card</p>
               </div>
               <div className="rounded-lg bg-white/20 px-3 py-1 text-xs font-semibold">
-                {student.status.toUpperCase()}
+                {employee.status?.toUpperCase() ?? 'ACTIVE'}
               </div>
             </div>
           </div>
@@ -130,44 +108,44 @@ export default function StudentIdCardPage() {
           <div className="p-6">
             <div className="flex items-center gap-4">
               <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-brand-50 text-xl font-medium text-brand-700">
-                {(student as any).id_card_photo_url || student.photo_url ? (
-                  <img src={(student as any).id_card_photo_url || student.photo_url} alt={student.full_name} className="h-full w-full object-cover" />
+                {employee.photo_url ? (
+                  <img src={employee.photo_url} alt={fullName} className="h-full w-full object-cover" />
                 ) : (
-                  getInitials(student.first_name, student.last_name)
+                  getInitials(fullName.split(' ')[0] ?? '', fullName.split(' ').slice(1).join(' '))
                 )}
               </div>
               <div className="min-w-0">
-                <p className="text-lg font-semibold text-slate-900">{student.full_name}</p>
-                <p className="text-sm text-slate-500">{student.student_id}</p>
+                <p className="text-lg font-semibold text-slate-900">{fullName}</p>
+                <p className="text-sm text-slate-500">{employeeIdCode}</p>
               </div>
             </div>
 
             <div className="mt-5 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
               <div>
-                <p className="text-xs text-slate-400">Grade</p>
-                <p className="font-medium text-slate-900">{student.grade || '—'}</p>
+                <p className="text-xs text-slate-400">Department</p>
+                <p className="font-medium text-slate-900">{departmentName}</p>
               </div>
               <div>
-                <p className="text-xs text-slate-400">Branch</p>
-                <p className="font-medium text-slate-900">{student.branch || '—'}</p>
+                <p className="text-xs text-slate-400">Position</p>
+                <p className="font-medium text-slate-900">{positionName}</p>
               </div>
               <div>
-                <p className="text-xs text-slate-400">Date of Birth</p>
-                <p className="font-medium text-slate-900">
-                  {student.date_of_birth ? formatDate(student.date_of_birth) : '—'}
+                <p className="text-xs text-slate-400">Employment Type</p>
+                <p className="font-medium text-slate-900 capitalize">
+                  {employee.employment_type?.replace('_', ' ') ?? '—'}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-slate-400">Valid From</p>
+                <p className="text-xs text-slate-400">Hire Date</p>
                 <p className="font-medium text-slate-900">
-                  {student.admission_date ? formatDate(student.admission_date) : '—'}
+                  {employee.hire_date ? formatDate(employee.hire_date) : '—'}
                 </p>
               </div>
             </div>
 
             <div className="mt-6 flex items-end justify-between border-t border-slate-100 pt-4">
               <div>
-                {student.qr_code && (
+                {employee.qr_code && (
                   <p className="mb-1 text-[10px] text-slate-400">Scan to verify</p>
                 )}
                 {qrUrl ? (
@@ -180,7 +158,7 @@ export default function StudentIdCardPage() {
               </div>
               <div className="text-right text-[10px] text-slate-400">
                 <p>Scan this code to verify</p>
-                <p>student identity.</p>
+                <p>staff identity.</p>
               </div>
             </div>
           </div>

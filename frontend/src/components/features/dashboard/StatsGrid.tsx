@@ -26,7 +26,7 @@ interface StatsGridProps {
 
 export function StatsGrid({ stats, userRole }: StatsGridProps) {
   const role = userRole?.toLowerCase();
-  const isAdmin = role === 'admin' || role === 'super_admin';
+  const isAdmin = role === 'admin' || role === 'super_admin' || role === 'director' || role === 'branch_manager' || role === 'school_admin';
   const isInstructor = role === 'instructor';
   const isEmployee = role === 'employee';
   const o = stats.overview ?? {};
@@ -59,7 +59,7 @@ export function StatsGrid({ stats, userRole }: StatsGridProps) {
             title="Attendance Today"
             value={`${(o.attendance_summary?.present ?? 0) + (o.attendance_summary?.late ?? 0)} present · ${o.attendance_summary?.absent ?? 0} absent`}
           />
-          <StatsCard icon={Bot} title="AI Interactions (30d)" value={o.ai_interactions_30d ?? 0} />
+          <StatsCard icon={Bot} title="AI Interactions (30d)" value={o.ai_insights?.total_interactions_30d ?? o.ai_interactions_30d ?? 0} />
           <StatsCard icon={TrendingUp} title="Completion Rate" value={`${o.completion_rate ?? 0}%`} />
           <StatsCard icon={BookOpen} title="Courses" value={o.total_courses ?? 0} />
           <StatsCard icon={CheckSquare} title="Pending Tasks" value={o.pending_tasks ?? 0} />

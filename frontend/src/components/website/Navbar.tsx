@@ -9,8 +9,11 @@ import { cn } from '@/lib/utils';
 const navLinks = [
   { label: 'Home', href: '/' },
   { label: 'Programs', href: '/programs' },
+  { label: 'Courses', href: '/courses-catalog' },
   { label: 'Robotics', href: '/robotics' },
   { label: 'Coding', href: '/coding' },
+  { label: 'Partners', href: '/school-partnerships' },
+  { label: 'Events', href: '/events' },
   { label: 'Gallery', href: '/gallery' },
   { label: 'Blog', href: '/blog' },
   { label: 'FAQs', href: '/faqs' },
@@ -78,7 +81,7 @@ export function Navbar() {
             </a>
           ) : null}
           <Link
-            to="/contact"
+            to="/register"
             className="inline-flex h-10 items-center rounded-lg bg-brand-600 px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-700"
           >
             Enroll Now

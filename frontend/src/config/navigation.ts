@@ -215,6 +215,7 @@ export const navigation: NavEntry[] = [
     roles: LEARNER_ROLES,
     children: [
       { label: 'My Courses', href: '/my-courses', icon: GraduationCap },
+      { label: 'My Assignments', href: '/student/assignments', icon: ClipboardList, roles: ['student'] },
       { label: 'Quizzes', href: '/quizzes', icon: FileText },
       { label: 'Forum', href: '/lms/forum', icon: MessageSquare },
       { label: 'Bookmarks', href: '/lms/bookmarks', icon: BookOpen },

@@ -76,6 +76,12 @@ class InventorySeeder extends Seeder
             ['name' => 'Arduino Mega 2560 Kit', 'category' => 'Arduino Kits', 'location' => 'Robotics Lab', 'serial' => 'AR-MEGA-004', 'condition' => 'new', 'status' => 'available', 'cost' => 8500, 'supplier' => 'Circuitrobo'],
             ['name' => 'LEGO Mindstorms EV3', 'category' => 'LEGO Kits', 'location' => 'Robotics Lab', 'serial' => 'LE-EV3-005', 'condition' => 'good', 'status' => 'in_maintenance', 'cost' => 45000, 'supplier' => 'LEGO Education'],
             ['name' => 'Epson EB-X51 Projector', 'category' => 'Projectors', 'location' => 'Computer Lab 1', 'serial' => 'EP-X51-006', 'condition' => 'good', 'status' => 'available', 'cost' => 68000, 'supplier' => 'Epson Kenya'],
+            // Furniture
+            ['name' => 'Student Desk - Standard', 'category' => 'Furniture', 'location' => 'Computer Lab 1', 'serial' => 'FRN-Desk-001', 'condition' => 'good', 'status' => 'available', 'cost' => 8500, 'supplier' => 'Kenya Furniture Ltd'],
+            ['name' => 'Student Chair - Stackable', 'category' => 'Furniture', 'location' => 'Computer Lab 1', 'serial' => 'FRN-Chair-002', 'condition' => 'good', 'status' => 'available', 'cost' => 4200, 'supplier' => 'Kenya Furniture Ltd'],
+            ['name' => 'Teacher Desk - Executive', 'category' => 'Furniture', 'location' => 'Main Office', 'serial' => 'FRN-TDesk-003', 'condition' => 'new', 'status' => 'available', 'cost' => 22000, 'supplier' => 'Kenya Furniture Ltd'],
+            ['name' => 'Bookshelf - 5 Tier', 'category' => 'Furniture', 'location' => 'Library', 'serial' => 'FRN-Shelf-004', 'condition' => 'good', 'status' => 'available', 'cost' => 15000, 'supplier' => 'Kenya Furniture Ltd'],
+            ['name' => 'Lab Workbench', 'category' => 'Furniture', 'location' => 'Robotics Lab', 'serial' => 'FRN-Bench-005', 'condition' => 'good', 'status' => 'available', 'cost' => 35000, 'supplier' => 'Kenya Furniture Ltd'],
         ];
 
         foreach ($assets as $index => $assetData) {
@@ -123,7 +129,14 @@ class InventorySeeder extends Seeder
             ['name' => 'Arduino Uno R3', 'sku' => 'ARDUINO-UNO', 'category' => 'Arduino Kits', 'location' => 'Robotics Lab', 'qty' => 6, 'unit' => 'pcs', 'reorder' => 8, 'cost' => 3200],
             ['name' => 'Ultrasonic Sensor HC-SR04', 'sku' => 'SNS-HCSR04', 'category' => 'Sensors', 'location' => 'Robotics Lab', 'qty' => 25, 'unit' => 'pcs', 'reorder' => 5, 'cost' => 450],
             ['name' => 'Breadboard 830 Point', 'sku' => 'BB-830', 'category' => 'Electronic Components', 'location' => 'Robotics Lab', 'qty' => 30, 'unit' => 'pcs', 'reorder' => 10, 'cost' => 300],
-            ['name' => 'Python for Kids (Book)', 'sku' => 'BK-PY-KIDS', 'category' => 'Books', 'location' => 'Library', 'qty' => 18, 'unit' => 'pcs', 'reorder' => 5, 'cost' => 1500],
+            // Books
+            ['name' => 'Python for Kids', 'sku' => 'BK-PY-KIDS', 'category' => 'Books', 'location' => 'Library', 'qty' => 18, 'unit' => 'pcs', 'reorder' => 5, 'cost' => 1500],
+            ['name' => 'Scratch Programming Playground', 'sku' => 'BK-SCRATCH', 'category' => 'Books', 'location' => 'Library', 'qty' => 12, 'unit' => 'pcs', 'reorder' => 5, 'cost' => 1800],
+            ['name' => 'HTML & CSS: Design and Build Websites', 'sku' => 'BK-HTML-CSS', 'category' => 'Books', 'location' => 'Library', 'qty' => 15, 'unit' => 'pcs', 'reorder' => 5, 'cost' => 2200],
+            ['name' => 'JavaScript for Kids', 'sku' => 'BK-JS-KIDS', 'category' => 'Books', 'location' => 'Library', 'qty' => 10, 'unit' => 'pcs', 'reorder' => 5, 'cost' => 1900],
+            ['name' => 'Arduino Workshop', 'sku' => 'BK-ARDUINO', 'category' => 'Books', 'location' => 'Library', 'qty' => 8, 'unit' => 'pcs', 'reorder' => 3, 'cost' => 2500],
+            ['name' => 'LEGO Mindstorms EV3 Discovery Book', 'sku' => 'BK-LEGO-EV3', 'category' => 'Books', 'location' => 'Library', 'qty' => 6, 'unit' => 'pcs', 'reorder' => 3, 'cost' => 2800],
+            ['name' => 'Learn to Code with Scratch', 'sku' => 'BK-SCRATCH-2', 'category' => 'Books', 'location' => 'Library', 'qty' => 14, 'unit' => 'pcs', 'reorder' => 5, 'cost' => 1200],
         ];
 
         foreach ($stockItems as $itemData) {

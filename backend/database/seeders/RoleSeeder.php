@@ -100,6 +100,12 @@ class RoleSeeder extends Seeder
                 'description' => 'Accountant who manages finance, invoices, payments and budgets.',
                 'guard_name' => 'web',
             ],
+            [
+                'name' => 'guest',
+                'display_name' => 'Guest',
+                'description' => 'Unauthenticated visitor with read-only access to public website content.',
+                'guard_name' => 'web',
+            ],
         ];
 
         foreach ($roles as $role) {
