@@ -8,14 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
+        Schema::dropIfExists('robotics_equipment_reservations');
         Schema::create('robotics_equipment_reservations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('equipment_id')->constrained('robotics_equipment')->cascadeOnDelete();
             $table->foreignId('team_id')->nullable()->constrained('robotics_teams')->nullOnDelete();
             $table->foreignUuid('reserved_by_user_id')->constrained('users')->cascadeOnDelete();
             $table->unsignedInteger('quantity')->default(1);
-            $table->timestamp('start_at');
-            $table->timestamp('end_at');
+            $table->dateTime('start_at');
+            $table->dateTime('end_at');
             $table->string('purpose')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected', 'cancelled', 'completed'])->default('pending');
             $table->foreignUuid('reviewed_by_user_id')->nullable()->constrained('users')->nullOnDelete();
