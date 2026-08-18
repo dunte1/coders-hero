@@ -21,7 +21,11 @@ export default function TaskCreatePage() {
         <div className="p-6">
           <TaskForm
             onSubmit={(data) => {
-              createTask(data, {
+              createTask({
+                ...data,
+                assignee_id: data.assignee_id ? Number(data.assignee_id) : undefined,
+                project_id: data.project_id ? Number(data.project_id) : undefined,
+              }, {
                 onSuccess: () => navigate('/tasks'),
               });
             }}
