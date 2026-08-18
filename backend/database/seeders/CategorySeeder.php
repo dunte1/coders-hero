@@ -20,6 +20,10 @@ class CategorySeeder extends Seeder
             ['name' => 'Design', 'description' => 'UI/UX design and graphic design.', 'icon' => 'palette', 'color' => '#F97316', 'is_active' => true, 'sort_order' => 8],
             ['name' => 'Business', 'description' => 'Business strategy and management.', 'icon' => 'briefcase', 'color' => '#14B8A6', 'is_active' => true, 'sort_order' => 9],
             ['name' => 'Languages', 'description' => 'Programming language fundamentals.', 'icon' => 'terminal', 'color' => '#A855F7', 'is_active' => true, 'sort_order' => 10],
+            ['name' => 'Coding', 'description' => 'Block-based and visual programming for beginners.', 'icon' => 'puzzle', 'color' => '#34D399', 'is_active' => true, 'sort_order' => 11],
+            ['name' => 'Programming', 'description' => 'General-purpose programming courses.', 'icon' => 'code', 'color' => '#60A5FA', 'is_active' => true, 'sort_order' => 12],
+            ['name' => 'AI & Data Science', 'description' => 'Artificial intelligence and advanced data science.', 'icon' => 'brain', 'color' => '#C084FC', 'is_active' => true, 'sort_order' => 13],
+            ['name' => 'Robotics', 'description' => 'Robotics engineering, competition, and hardware.', 'icon' => 'bot', 'color' => '#FB923C', 'is_active' => true, 'sort_order' => 14],
         ];
 
         foreach ($categories as $category) {
