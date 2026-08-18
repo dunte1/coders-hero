@@ -39,7 +39,7 @@ class ParentPortalSeeder extends Seeder
                 'user_id' => $parentUser->id,
                 'first_name' => 'Jane',
                 'last_name' => 'Doe',
-                'relationship' => 'mother',
+                'relationship' => 'parent',
                 'phone' => '+1-555-0401',
                 'address' => '123 Maple Street',
                 'occupation' => 'Software Engineer',
