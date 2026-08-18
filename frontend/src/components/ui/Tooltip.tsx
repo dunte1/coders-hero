@@ -14,7 +14,7 @@ const TooltipContent = forwardRef<
     ref={ref}
     sideOffset={sideOffset}
     className={cn(
-      'z-50 overflow-hidden rounded-md bg-slate-900 px-3 py-1.5 text-xs text-slate-50 animate-in fade-in-0 zoom-in-95',
+      'z-50 overflow-hidden rounded-md bg-slate-900 px-3 py-1.5 text-xs text-slate-50 transition-all duration-150 data-[state=delayed-open]:opacity-100 data-[state=closed]:opacity-0',
       className
     )}
     {...props}
