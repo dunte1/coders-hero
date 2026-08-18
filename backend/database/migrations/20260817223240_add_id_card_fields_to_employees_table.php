@@ -9,8 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('employees', function (Blueprint $table) {
-            $table->string('id_card_photo')->nullable()->after('bank_account_number');
-            $table->string('qr_code')->nullable()->unique()->after('id_card_photo');
+            $table->string('id_card_photo')->nullable();
+            $table->string('qr_code')->nullable()->unique();
         });
     }
 
