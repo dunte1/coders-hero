@@ -11,7 +11,9 @@ return new class extends Migration
         Schema::create('robotics_equipment_assignments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('equipment_id')->constrained('robotics_equipment')->cascadeOnDelete();
-            $table->morphs('assignable');
+            $table->string('assignable_type');
+            $table->unsignedBigInteger('assignable_id');
+            $table->index(['assignable_type', 'assignable_id'], 'rea_assignable_idx');
             $table->unsignedInteger('quantity')->default(1);
             $table->timestamp('assigned_at')->nullable();
             $table->timestamp('expected_return_at')->nullable();
