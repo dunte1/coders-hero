@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Enrollment;
+use App\Models\Payment;
 use App\Models\User;
 use App\Models\ActivityLog;
 use App\Traits\ApiResponse;
@@ -53,7 +54,7 @@ class ReportController extends Controller
         $publishedCourses = Course::published()->count();
         $draftCourses = Course::draft()->count();
         $archivedCourses = Course::archived()->count();
-        $totalRevenue = Enrollment::sum('progress')->count() * 0;
+        $totalRevenue = round((float) Payment::sum('amount'), 2);
 
         $coursesByCategory = Course::withCount('enrollments')
             ->with('category')
@@ -81,6 +82,7 @@ class ReportController extends Controller
                 'published' => $publishedCourses,
                 'draft' => $draftCourses,
                 'archived' => $archivedCourses,
+                'total_revenue' => $totalRevenue,
             ],
             'by_category' => $coursesByCategory,
             'by_level' => $coursesByLevel,
