@@ -1,13 +1,12 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Card, CardContent } from '@/components/ui/Card';
-import { GraduationCap } from 'lucide-react';
+import { Rocket, Eye, EyeOff, ArrowRight, Shield, BookOpen, Users } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-import { Switch } from '@/components/ui/Switch';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -20,6 +19,7 @@ export function LoginForm() {
   const { login, isLoggingIn } = useAuth();
   const location = useLocation();
   const stateEmail = (location.state as { email?: string } | null)?.email;
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -38,63 +38,123 @@ export function LoginForm() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-brand-50 to-brand-100 p-4">
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-600">
-            <GraduationCap className="h-8 w-8 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-slate-900">Welcome back</h1>
-          <p className="mt-2 text-slate-500">
-            Sign in to Coder's Hero ERP & LMS
+    <div className="flex min-h-screen">
+      {/* Left panel - Branding */}
+      <div className="hidden w-1/2 items-center justify-center bg-gradient-to-br from-brand-600 via-brand-700 to-indigo-800 lg:flex">
+        <div className="max-w-md px-8">
+          <Link to="/" className="mb-10 flex items-center gap-3">
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 text-white backdrop-blur-sm">
+              <Rocket className="h-6 w-6" />
+            </span>
+            <span className="font-display text-2xl font-bold text-white">Coder's Hero</span>
+          </Link>
+          <h2 className="font-display text-3xl font-bold text-white leading-tight">
+            Welcome to the future of education
+          </h2>
+          <p className="mt-4 text-lg text-brand-100">
+            Access your courses, track progress, and connect with instructors.
           </p>
+          <div className="mt-10 space-y-4">
+            {[
+              { icon: BookOpen, text: 'Access 50+ coding and robotics courses' },
+              { icon: Shield, text: 'Secure learning environment' },
+              { icon: Users, text: 'Join 500+ students worldwide' },
+            ].map(({ icon: Icon, text }) => (
+              <div key={text} className="flex items-center gap-3 text-brand-100">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10">
+                  <Icon className="h-4 w-4" />
+                </div>
+                <span className="text-sm">{text}</span>
+              </div>
+            ))}
+          </div>
         </div>
+      </div>
 
-        <Card>
-          <CardContent className="p-6">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <Input
-                label="Email"
-                type="email"
-                placeholder="you@example.com"
-                error={errors.email?.message}
-                {...register('email')}
-              />
+      {/* Right panel - Form */}
+      <div className="flex w-full items-center justify-center bg-white p-6 lg:w-1/2">
+        <div className="w-full max-w-md">
+          {/* Mobile logo */}
+          <div className="mb-8 text-center lg:hidden">
+            <Link to="/" className="inline-flex items-center gap-2">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 text-white">
+                <Rocket className="h-5 w-5" />
+              </span>
+              <span className="font-display text-xl font-bold text-slate-900">Coder's Hero</span>
+            </Link>
+          </div>
+
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-slate-900">Sign in to your account</h1>
+            <p className="mt-2 text-sm text-slate-500">
+              Enter your credentials to access your dashboard
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <Input
+              label="Email address"
+              type="email"
+              placeholder="you@example.com"
+              error={errors.email?.message}
+              {...register('email')}
+            />
+
+            <div className="relative">
               <Input
                 label="Password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder="Enter your password"
                 error={errors.password?.message}
                 {...register('password')}
               />
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 text-sm text-slate-600">
-                  <Switch />
-                  Remember me
-                </label>
-                <Link
-                  to="/forgot-password"
-                  className="text-sm font-medium text-brand-600 hover:text-brand-700"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-              <Button type="submit" className="w-full" loading={isLoggingIn}>
-                Sign In
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-[38px] text-slate-400 transition-colors hover:text-slate-600"
+                tabIndex={-1}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
 
-        <p className="mt-6 text-center text-sm text-slate-500">
-          Don't have an account?{' '}
-          <Link
-            to="/register"
-            className="font-medium text-brand-600 hover:text-brand-700"
-          >
-            Create one
-          </Link>
-        </p>
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 text-sm text-slate-600">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                />
+                Remember me
+              </label>
+              <Link
+                to="/forgot-password"
+                className="text-sm font-medium text-brand-600 transition-colors hover:text-brand-700"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full h-11 text-sm font-semibold shadow-sm shadow-brand-600/20 hover:shadow-md hover:shadow-brand-600/30"
+              loading={isLoggingIn}
+            >
+              Sign In
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </form>
+
+          <p className="mt-6 text-center text-sm text-slate-500">
+            Don't have an account?{' '}
+            <Link
+              to="/register"
+              className="font-semibold text-brand-600 transition-colors hover:text-brand-700"
+            >
+              Create one free
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

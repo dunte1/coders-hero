@@ -1,97 +1,105 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import { Link, useSearchParams } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 import { authApi } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
-import { PageSpinner } from '@/components/ui/Spinner';
-import { CheckCircle2, GraduationCap, MailWarning } from 'lucide-react';
-
-type VerifyState = 'verifying' | 'success' | 'error';
+import { Rocket, Mail, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react';
 
 export default function VerifyEmailPage() {
-  const { id, hash } = useParams<{ id: string; hash: string }>();
-  const navigate = useNavigate();
-  const { isAuthenticated, resendEmailVerification } = useAuth();
-  const [state, setState] = useState<VerifyState>('verifying');
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get('id');
+  const hash = searchParams.get('hash');
+  const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
+
+  const { mutate: verify } = useMutation({
+    mutationFn: () => authApi.verifyEmail(id!, hash!),
+    onSuccess: () => setStatus('success'),
+    onError: () => setStatus('error'),
+  });
+
+  const resendMutation = useMutation({
+    mutationFn: () => authApi.resendEmailVerification(),
+  });
 
   useEffect(() => {
-    if (!id || !hash) {
-      setState('error');
-      return;
+    if (id && hash) {
+      verify();
+    } else {
+      setStatus('error');
     }
-    let cancelled = false;
-    authApi
-      .verifyEmail(id, hash)
-      .then(() => {
-        if (!cancelled) setState('success');
-      })
-      .catch(() => {
-        if (!cancelled) setState('error');
-      });
-    return () => {
-      cancelled = true;
-    };
   }, [id, hash]);
-
-  const destinationLabel = isAuthenticated ? 'Go to dashboard' : 'Go to login';
-
-  const handleContinue = () => {
-    navigate(isAuthenticated ? '/dashboard' : '/login');
-  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-brand-50 to-brand-100 p-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-600">
-            <GraduationCap className="h-8 w-8 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900">Email Verification</h1>
+          <Link to="/" className="inline-flex items-center gap-2">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 text-white">
+              <Rocket className="h-5 w-5" />
+            </span>
+            <span className="font-display text-xl font-bold text-slate-900">Coder's Hero</span>
+          </Link>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-          {state === 'verifying' && (
-            <div className="space-y-4">
-              <PageSpinner />
-              <p className="text-sm text-slate-500">Verifying your email address...</p>
-            </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm text-center">
+          {status === 'verifying' && (
+            <>
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-100">
+                <Mail className="h-6 w-6 text-brand-600 animate-pulse" />
+              </div>
+              <h1 className="text-xl font-bold text-slate-900">Verifying your email...</h1>
+              <p className="mt-2 text-sm text-slate-500">Please wait a moment.</p>
+            </>
           )}
 
-          {state === 'success' && (
-            <div className="space-y-4">
-              <CheckCircle2 className="mx-auto h-14 w-14 text-emerald-500" />
-              <h2 className="text-lg font-semibold text-slate-900">Email verified!</h2>
-              <p className="text-sm text-slate-500">
-                Your email address has been successfully verified. You can now access all features
-                of the platform.
+          {status === 'success' && (
+            <>
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
+                <CheckCircle2 className="h-7 w-7 text-emerald-600" />
+              </div>
+              <h1 className="text-xl font-bold text-slate-900">Email verified!</h1>
+              <p className="mt-2 text-sm text-slate-500">
+                Your email has been verified. You can now access all features.
               </p>
-              <Button className="w-full" onClick={handleContinue}>
-                {destinationLabel}
-              </Button>
-            </div>
-          )}
-
-          {state === 'error' && (
-            <div className="space-y-4">
-              <MailWarning className="mx-auto h-14 w-14 text-amber-500" />
-              <h2 className="text-lg font-semibold text-slate-900">Verification failed</h2>
-              <p className="text-sm text-slate-500">
-                The verification link is invalid or has expired. Request a new verification email
-                to continue.
-              </p>
-              <Button
-                className="w-full"
-                onClick={() => resendEmailVerification.mutate()}
-                loading={resendEmailVerification.isPending}
+              <Link
+                to="/login"
+                className="mt-6 inline-flex h-11 items-center justify-center rounded-xl bg-brand-600 px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-700"
               >
-                Resend verification email
-              </Button>
-              <p className="text-sm text-slate-500">
-                <Link to="/login" className="font-medium text-brand-600 hover:text-brand-700">
-                  Back to login
-                </Link>
+                Continue to Sign In
+              </Link>
+            </>
+          )}
+
+          {status === 'error' && (
+            <>
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
+                <AlertCircle className="h-7 w-7 text-red-600" />
+              </div>
+              <h1 className="text-xl font-bold text-slate-900">Verification failed</h1>
+              <p className="mt-2 text-sm text-slate-500">
+                This verification link is invalid or has expired.
               </p>
-            </div>
+              <div className="mt-6 space-y-3">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  loading={resendMutation.isPending}
+                  onClick={() => resendMutation.mutate()}
+                >
+                  Resend verification email
+                </Button>
+                {resendMutation.isSuccess && (
+                  <p className="text-sm text-emerald-600">Verification email sent!</p>
+                )}
+                <Link
+                  to="/login"
+                  className="flex items-center justify-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-700"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to sign in
+                </Link>
+              </div>
+            </>
           )}
         </div>
       </div>
