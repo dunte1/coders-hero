@@ -41,7 +41,7 @@ class AuthService
         $this->emailVerificationService->sendVerificationLink($user);
 
         return [
-            'user' => $user->load('roles'),
+            'user' => $user->load('roles.permissions'),
             'token' => $token,
             'requires_email_verification' => true,
         ];
@@ -71,7 +71,7 @@ class AuthService
             $token = $user->createToken('two-factor-token', ['two-factor-pending']);
 
             return [
-                'user' => $user->load('roles'),
+                'user' => $user->load('roles.permissions'),
                 'token' => $token->plainTextToken,
                 'requires_two_factor' => true,
             ];
@@ -90,7 +90,7 @@ class AuthService
         $this->loginHistoryService->record($user, 'success');
 
         return [
-            'user' => $user->load('roles'),
+            'user' => $user->load('roles.permissions'),
             'token' => $token->plainTextToken,
             'requires_two_factor' => false,
         ];
@@ -118,7 +118,7 @@ class AuthService
         $token = $user->createToken('auth-token');
 
         return [
-            'user' => $user->load('roles'),
+            'user' => $user->load('roles.permissions'),
             'token' => $token->plainTextToken,
             'requires_two_factor' => false,
         ];
@@ -139,7 +139,7 @@ class AuthService
 
     public function getProfile(): User
     {
-        return Auth::user()->load('roles', 'employee', 'employee.department', 'employee.position');
+        return Auth::user()->load('roles.permissions', 'employee', 'employee.department', 'employee.position');
     }
 
     public function updateProfile(array $data): User
@@ -147,7 +147,7 @@ class AuthService
         $user = Auth::user();
         $user->update($data);
 
-        return $user->fresh()->load('roles');
+        return $user->fresh()->load('roles.permissions');
     }
 
     public function updateProfilePhoto(User $user, UploadedFile $photo): User
@@ -163,7 +163,7 @@ class AuthService
 
         $user->update(['avatar' => $path]);
 
-        return $user->fresh()->load('roles');
+        return $user->fresh()->load('roles.permissions');
     }
 
     public function changePassword(array $data): bool

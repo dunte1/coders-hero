@@ -21,7 +21,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
 
     public function findWithRoles(string $id): ?User
     {
-        return $this->model->with('roles', 'employee', 'employee.department', 'employee.position')->find($id);
+        return $this->model->with('roles.permissions', 'employee', 'employee.department', 'employee.position')->find($id);
     }
 
     public function syncRoles(string $userId, array $roles): bool

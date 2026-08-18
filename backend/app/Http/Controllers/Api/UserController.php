@@ -22,6 +22,8 @@ class UserController extends Controller
 
     public function index(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', \App\Models\User::class);
+
         $perPage = $request->get('per_page', 15);
         $search = $request->get('search');
 
@@ -32,6 +34,8 @@ class UserController extends Controller
 
     public function store(StoreUserRequest $request): JsonResponse
     {
+        $this->authorize('create', \App\Models\User::class);
+
         $user = $this->userService->create($request->validated());
 
         return $this->createdResponse(
@@ -48,6 +52,8 @@ class UserController extends Controller
             return $this->notFoundResponse('User not found.');
         }
 
+        $this->authorize('view', $user);
+
         return $this->successResponse(
             new UserResource($user),
             'User retrieved successfully.'
@@ -56,6 +62,14 @@ class UserController extends Controller
 
     public function update(UpdateUserRequest $request, string $id): JsonResponse
     {
+        $user = $this->userService->findById($id);
+
+        if (!$user) {
+            return $this->notFoundResponse('User not found.');
+        }
+
+        $this->authorize('update', $user);
+
         $user = $this->userService->update($id, $request->validated());
 
         return $this->successResponse(
@@ -66,6 +80,14 @@ class UserController extends Controller
 
     public function destroy(string $id): JsonResponse
     {
+        $user = $this->userService->findById($id);
+
+        if (!$user) {
+            return $this->notFoundResponse('User not found.');
+        }
+
+        $this->authorize('delete', $user);
+
         $this->userService->delete($id);
 
         return $this->noContentResponse('User deleted successfully.');
@@ -73,6 +95,19 @@ class UserController extends Controller
 
     public function assignRole(AssignRoleRequest $request, string $id): JsonResponse
     {
+        $user = $this->userService->findById($id);
+
+        if (!$user) {
+            return $this->notFoundResponse('User not found.');
+        }
+
+        $this->authorize('assignRole', $user);
+
+        // Prevent non-super_admin from assigning super_admin role
+        if ($request->role === 'super_admin' && !auth()->user()->hasRole('super_admin')) {
+            return $this->forbiddenResponse('Only super admins can assign the super_admin role.');
+        }
+
         $user = $this->userService->assignRoles($id, [$request->role]);
 
         return $this->successResponse(
@@ -85,6 +120,14 @@ class UserController extends Controller
     {
         $request->validate(['role' => 'required|string|exists:roles,name']);
 
+        $user = $this->userService->findById($id);
+
+        if (!$user) {
+            return $this->notFoundResponse('User not found.');
+        }
+
+        $this->authorize('removeRole', $user);
+
         $user = $this->userService->removeRole($id, $request->role);
 
         return $this->successResponse(
@@ -95,6 +138,14 @@ class UserController extends Controller
 
     public function toggleStatus(string $id): JsonResponse
     {
+        $user = $this->userService->findById($id);
+
+        if (!$user) {
+            return $this->notFoundResponse('User not found.');
+        }
+
+        $this->authorize('toggleStatus', $user);
+
         $user = $this->userService->toggleStatus($id);
 
         return $this->successResponse(

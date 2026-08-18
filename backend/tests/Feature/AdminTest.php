@@ -59,10 +59,10 @@ class AdminTest extends TestCase
 
     // ── System Health ─────────────────────────────────────────────────────
 
-    public function test_admin_can_check_system_health(): void
+    public function test_super_admin_can_check_system_health(): void
     {
         Sanctum::actingAs(
-            User::factory()->create()->assignRole('admin')
+            User::factory()->create()->assignRole('super_admin')
         );
 
         $this->getJson('/api/admin/system/health')
@@ -81,10 +81,10 @@ class AdminTest extends TestCase
             ]);
     }
 
-    public function test_non_admin_cannot_check_system_health(): void
+    public function test_admin_cannot_check_system_health(): void
     {
         Sanctum::actingAs(
-            User::factory()->create()->assignRole('teacher')
+            User::factory()->create()->assignRole('admin')
         );
 
         $this->getJson('/api/admin/system/health')
@@ -93,10 +93,10 @@ class AdminTest extends TestCase
 
     // ── System Logs ───────────────────────────────────────────────────────
 
-    public function test_admin_can_read_system_logs(): void
+    public function test_super_admin_can_read_system_logs(): void
     {
         Sanctum::actingAs(
-            User::factory()->create()->assignRole('admin')
+            User::factory()->create()->assignRole('super_admin')
         );
 
         $this->getJson('/api/admin/system/logs?lines=50')
@@ -107,10 +107,10 @@ class AdminTest extends TestCase
             ]);
     }
 
-    public function test_non_admin_cannot_read_system_logs(): void
+    public function test_admin_cannot_read_system_logs(): void
     {
         Sanctum::actingAs(
-            User::factory()->create()->assignRole('student')
+            User::factory()->create()->assignRole('admin')
         );
 
         $this->getJson('/api/admin/system/logs')
@@ -119,10 +119,10 @@ class AdminTest extends TestCase
 
     // ── Backups ───────────────────────────────────────────────────────────
 
-    public function test_admin_can_list_backups(): void
+    public function test_super_admin_can_list_backups(): void
     {
         Sanctum::actingAs(
-            User::factory()->create()->assignRole('admin')
+            User::factory()->create()->assignRole('super_admin')
         );
 
         $this->getJson('/api/admin/system/backups')
@@ -133,15 +133,14 @@ class AdminTest extends TestCase
             ]);
     }
 
-    public function test_non_admin_cannot_list_backups(): void
+    public function test_admin_cannot_list_backups(): void
     {
         Sanctum::actingAs(
-            User::factory()->create()->assignRole('super_admin')
+            User::factory()->create()->assignRole('admin')
         );
 
-        // super_admin should actually be allowed (admin|super_admin middleware)
         $this->getJson('/api/admin/system/backups')
-            ->assertOk();
+            ->assertStatus(403);
     }
 
     public function test_student_cannot_create_backup(): void

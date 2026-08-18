@@ -19,7 +19,6 @@ use App\Policies\StudentDocumentPolicy;
 use App\Policies\StudentPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -39,14 +38,6 @@ class AuthServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Gate::policy(User::class, UserPolicy::class);
-        Gate::policy(Role::class, RolePolicy::class);
-        Gate::policy(Permission::class, PermissionPolicy::class);
-        Gate::policy(Student::class, StudentPolicy::class);
-        Gate::policy(Guardian::class, GuardianPolicy::class);
-        Gate::policy(Admission::class, AdmissionPolicy::class);
-        Gate::policy(Attendance::class, AttendancePolicy::class);
-        Gate::policy(StudentDocument::class, StudentDocumentPolicy::class);
-        Gate::policy(Competition::class, CompetitionPolicy::class);
+        $this->registerPolicies();
     }
 }

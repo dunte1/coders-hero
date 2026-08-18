@@ -30,7 +30,6 @@ interface AuthStore {
   login: (token: string, user: User) => void;
   logout: () => void;
   setUser: (user: User) => void;
-  setUserPermissions: (permissions: string[]) => void;
   setLoading: (loading: boolean) => void;
   beginTwoFactor: (pendingToken: string) => void;
   completeTwoFactor: (user: User, token: string) => void;
@@ -81,10 +80,6 @@ export const useAuthStore = create<AuthStore>((set) => ({
   setUser: (user: User) => {
     localStorage.setItem('auth_user', JSON.stringify(user));
     set({ user });
-  },
-  setUserPermissions: (_permissions: string[]) => {
-    void _permissions;
-    // Permissions are managed through roles on the user object
   },
   setLoading: (loading: boolean) => set({ isLoading: loading }),
   beginTwoFactor: (pendingToken: string) => {

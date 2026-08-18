@@ -33,7 +33,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 px-4 lg:px-6" style={{ backgroundColor: 'var(--header-bg)', borderBottom: '1px solid var(--header-border)' }}>
+    <header className="sticky top-0 z-50 flex h-16 items-center gap-4 px-4 lg:px-6" style={{ backgroundColor: 'var(--header-bg)', borderBottom: '1px solid var(--header-border)' }}>
       <Button
         variant="ghost"
         size="icon"

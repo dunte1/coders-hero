@@ -18,6 +18,29 @@ class ChatService
         'but', 'than', 'into', 'then', 'more', 'also', 'some', 'any', 'each', 'such',
     ];
 
+    private const KEYWORD_ALIASES = [
+        'pricing' => ['cost', 'price', 'fees', 'fee', 'how much', 'charge', 'pay', 'payment', 'tuition', 'rate', 'rates', 'affordable', 'expensive', 'cheap'],
+        'cost' => ['pricing', 'price', 'fees', 'fee', 'how much', 'charge', 'pay', 'payment', 'tuition', 'rate', 'rates'],
+        'price' => ['pricing', 'cost', 'fees', 'fee', 'how much', 'charge', 'pay', 'payment', 'tuition', 'rate', 'rates'],
+        'fees' => ['pricing', 'cost', 'price', 'fee', 'how much', 'charge', 'pay', 'payment', 'tuition', 'rate', 'rates'],
+        'age' => ['ages', 'old', 'years', 'year', 'children', 'kids', 'teen', 'teens', 'young', 'adult'],
+        'ages' => ['age', 'old', 'years', 'year', 'children', 'kids', 'teen', 'teens', 'young', 'adult'],
+        'schedule' => ['time', 'times', 'when', 'hours', 'hour', 'days', 'day', 'monday', 'saturday', 'afternoon', 'evening', 'morning'],
+        'trial' => ['free', 'test', 'try', 'demo', 'sample', 'experience'],
+        'free' => ['trial', 'test', 'try', 'demo', 'sample', 'no cost', 'complimentary'],
+        'robotics' => ['robot', 'robots', 'lego', 'arduino', 'engineering', 'build', 'builds'],
+        'coding' => ['code', 'program', 'programming', 'scratch', 'python', 'javascript', 'html', 'css'],
+        'class' => ['classes', 'course', 'courses', 'lesson', 'lessons', 'session', 'sessions', 'group'],
+        'classes' => ['class', 'course', 'courses', 'lesson', 'lessons', 'session', 'sessions', 'group'],
+        'learn' => ['learning', 'teach', 'teaching', 'taught', 'education', 'study', 'studying', 'curriculum'],
+        'contact' => ['reach', 'phone', 'email', 'call', 'talk', 'speak', 'message', 'write'],
+        'safety' => ['safe', 'security', 'secure', 'background', 'checked', 'qualified', 'instructor', 'teachers'],
+        'instructor' => ['teacher', 'teachers', 'instructors', 'mentor', 'mentors', 'tutor', 'tutors', 'staff'],
+        'equipment' => ['materials', 'tools', 'kits', 'computers', 'provide', 'provided', 'supplies'],
+        'program' => ['programs', 'course', 'courses', 'track', 'tracks', 'offering', 'offerings'],
+        'programs' => ['program', 'course', 'courses', 'track', 'tracks', 'offering', 'offerings'],
+    ];
+
     public function chat(string $message, array $history = []): array
     {
         $message = trim($message);
@@ -107,15 +130,34 @@ PROMPT;
         $faqs = Faq::query()->active()->get();
         $tokens = $this->tokens($message);
 
+        // Expand user tokens with aliases
+        $expandedTokens = $tokens;
+        foreach ($tokens as $token) {
+            if (isset(self::KEYWORD_ALIASES[$token])) {
+                $expandedTokens = array_merge($expandedTokens, self::KEYWORD_ALIASES[$token]);
+            }
+        }
+        $expandedTokens = array_unique($expandedTokens);
+
         $best = null;
         $bestScore = 0;
 
         foreach ($faqs as $faq) {
             $questionTokens = $this->tokens($faq->question);
-            if ($questionTokens === []) {
+            $answerTokens = $this->tokens($faq->answer);
+            $allFaqTokens = array_unique(array_merge($questionTokens, $answerTokens));
+
+            if ($allFaqTokens === []) {
                 continue;
             }
-            $score = count(array_intersect($tokens, $questionTokens));
+
+            // Score against both question and answer tokens
+            $score = count(array_intersect($expandedTokens, $allFaqTokens));
+
+            // Bonus for matching question specifically
+            $questionScore = count(array_intersect($expandedTokens, $questionTokens));
+            $score += $questionScore * 0.5;
+
             if ($score > $bestScore) {
                 $bestScore = $score;
                 $best = $faq;

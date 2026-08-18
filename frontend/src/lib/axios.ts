@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { toast } from 'sonner';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
@@ -33,7 +34,7 @@ api.interceptors.response.use(
     }
 
     if (error.response?.status === 403) {
-      console.error('Permission denied');
+      toast.error('You do not have permission to perform this action.');
     }
 
     if (error.response?.status === 429) {

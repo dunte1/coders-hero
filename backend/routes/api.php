@@ -436,13 +436,17 @@ Route::get('/analytics/site', [AnalyticsController::class, 'site']);
         Route::get('/activity-logs', [ActivityLogController::class, 'index']);
         Route::get('/activity-logs/events', [ActivityLogController::class, 'events']);
 
+});
+
+    // System Administration - super_admin only
+    Route::middleware('role:super_admin')->prefix('admin')->group(function () {
         Route::get('/system/health', [SystemAdminController::class, 'health']);
         Route::get('/system/logs', [SystemAdminController::class, 'logs']);
         Route::get('/system/backups', [SystemAdminController::class, 'backups']);
         Route::post('/system/backups', [SystemAdminController::class, 'createBackup']);
         Route::get('/system/backups/download', [SystemAdminController::class, 'downloadBackup']);
         Route::delete('/system/backups', [SystemAdminController::class, 'deleteBackup']);
-});
+    });
 
 // Analytics & Reports - accessible to admins, directors, branch managers, school admins, and accountants
 Route::middleware('role:admin|super_admin|director|branch_manager|school_admin|accountant')->prefix('admin')->group(function () {

@@ -120,6 +120,36 @@ class PermissionSeeder extends Seeder
                 ['name' => 'view_settings', 'display_name' => 'View Settings', 'description' => 'View system settings.'],
                 ['name' => 'update_settings', 'display_name' => 'Update Settings', 'description' => 'Update system settings.'],
             ],
+            'students' => [
+                ['name' => 'view_students', 'display_name' => 'View Students', 'description' => 'View student records.'],
+                ['name' => 'create_students', 'display_name' => 'Create Students', 'description' => 'Create new student records.'],
+                ['name' => 'update_students', 'display_name' => 'Update Students', 'description' => 'Edit student records.'],
+                ['name' => 'delete_students', 'display_name' => 'Delete Students', 'description' => 'Delete student records.'],
+            ],
+            'guardians' => [
+                ['name' => 'view_guardians', 'display_name' => 'View Guardians', 'description' => 'View guardian records.'],
+                ['name' => 'create_guardians', 'display_name' => 'Create Guardians', 'description' => 'Create new guardian records.'],
+                ['name' => 'update_guardians', 'display_name' => 'Update Guardians', 'description' => 'Edit guardian records.'],
+                ['name' => 'delete_guardians', 'display_name' => 'Delete Guardians', 'description' => 'Delete guardian records.'],
+            ],
+            'admissions' => [
+                ['name' => 'view_admissions', 'display_name' => 'View Admissions', 'description' => 'View admission records.'],
+                ['name' => 'create_admissions', 'display_name' => 'Create Admissions', 'description' => 'Create new admission records.'],
+                ['name' => 'update_admissions', 'display_name' => 'Update Admissions', 'description' => 'Edit admission records.'],
+                ['name' => 'delete_admissions', 'display_name' => 'Delete Admissions', 'description' => 'Delete admission records.'],
+            ],
+            'student_documents' => [
+                ['name' => 'view_student_documents', 'display_name' => 'View Student Documents', 'description' => 'View student documents.'],
+                ['name' => 'upload_student_documents', 'display_name' => 'Upload Student Documents', 'description' => 'Upload student documents.'],
+                ['name' => 'delete_student_documents', 'display_name' => 'Delete Student Documents', 'description' => 'Delete student documents.'],
+            ],
+            'roles_management' => [
+                ['name' => 'view_roles', 'display_name' => 'View Roles', 'description' => 'View role list.'],
+                ['name' => 'create_roles', 'display_name' => 'Create Roles', 'description' => 'Create new roles.'],
+                ['name' => 'update_roles', 'display_name' => 'Update Roles', 'description' => 'Edit roles.'],
+                ['name' => 'delete_roles', 'display_name' => 'Delete Roles', 'description' => 'Delete roles.'],
+                ['name' => 'view_permissions', 'display_name' => 'View Permissions', 'description' => 'View permission list.'],
+            ],
             'finance' => [
                 ['name' => 'view_finance', 'display_name' => 'View Finance', 'description' => 'View financial reports and records.'],
                 ['name' => 'manage_fee_structures', 'display_name' => 'Manage Fee Structures', 'description' => 'Create, edit and delete fee structures.'],
@@ -361,6 +391,21 @@ class PermissionSeeder extends Seeder
             'view_library',
             'view_certificates',
             'view_notifications', 'manage_notification_preferences',
+            'use_ai_assistants',
+        ]);
+
+        // Parent: read-only access to child's progress
+        $parent = Role::where('name', 'parent')->first();
+        $parent?->syncPermissions([
+            'view_courses',
+            'view_enrollments',
+            'view_certificates',
+            'view_announcements',
+            'view_dashboard',
+            'view_notifications', 'manage_notification_preferences',
+            'view_robotics_lab', 'view_robotics_equipment',
+            'view_competitions', 'view_competition_leaderboard', 'view_competition_results',
+            'view_library', 'library_download',
             'use_ai_assistants',
         ]);
 

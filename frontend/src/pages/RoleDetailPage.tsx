@@ -6,7 +6,7 @@ import {
   useSyncRolePermissions,
   useDeleteRole,
 } from '@/hooks/useRoles';
-import { usePermissions, usePermissionGroups } from '@/hooks/usePermissions';
+import { usePermissions, usePermissionGroups } from '@/hooks/usePermissionManagement';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageSpinner } from '@/components/ui/Spinner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';

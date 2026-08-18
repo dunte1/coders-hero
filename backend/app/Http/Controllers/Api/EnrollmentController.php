@@ -73,7 +73,7 @@ class EnrollmentController extends Controller
         $status = $request->get('status');
 
         if ($status === 'completed') {
-            $enrollments = $this->enrollmentService->getMyCourses(auth()->id(), $perPage);
+            $enrollments = $this->enrollmentService->getCompletedCourses(auth()->id(), $perPage);
         } else {
             $enrollments = $this->enrollmentService->getMyCourses(auth()->id(), $perPage);
         }

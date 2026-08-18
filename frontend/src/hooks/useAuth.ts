@@ -66,8 +66,18 @@ export function useAuth() {
     queryKey: ['profile'],
     queryFn: authApi.getProfile,
     enabled: isAuthenticated,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
+
+  const refreshProfile = useCallback(async () => {
+    try {
+      const user = await authApi.getProfile();
+      setUser(user);
+      queryClient.setQueryData(['profile'], user);
+    } catch {
+      // profile fetch failed silently
+    }
+  }, [setUser, queryClient]);
 
   const sendEmailVerificationMutation = useMutation({
     mutationFn: () => authApi.sendEmailVerification(),
@@ -137,6 +147,7 @@ export function useAuth() {
     register: handleRegister,
     logout: handleLogout,
     setUser,
+    refreshProfile,
     hasRole,
     hasPermission,
     isLoggingIn: loginMutation.isPending,

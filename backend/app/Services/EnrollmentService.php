@@ -117,6 +117,11 @@ class EnrollmentService
         return $this->enrollmentRepository->getActiveEnrollments($userId, $perPage);
     }
 
+    public function getCompletedCourses(string $userId, int $perPage = 15)
+    {
+        return $this->enrollmentRepository->getCompletedEnrollments($userId, $perPage);
+    }
+
     public function getEnrollmentStats(string $userId): array
     {
         return $this->enrollmentRepository->getEnrollmentStats($userId);

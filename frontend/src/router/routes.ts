@@ -106,11 +106,6 @@ export const routes: RouteConfig[] = [
     meta: { title: 'Login', public: true },
   },
   {
-    path: '/register',
-    element: React.lazy(() => import('@/pages/RegisterPage')),
-    meta: { title: 'Register', public: true },
-  },
-  {
     path: '/verify-email',
     element: React.lazy(() => import('@/pages/VerifyEmailPage')),
     meta: { title: 'Verify Email', public: true },
@@ -190,6 +185,11 @@ export const routes: RouteConfig[] = [
   },
 
   // Tasks
+  {
+    path: '/tasks/create',
+    element: React.lazy(() => import('@/pages/TaskCreatePage')),
+    meta: { title: 'Create Task' },
+  },
   {
     path: '/tasks',
     element: React.lazy(() => import('@/pages/TasksPage')),
@@ -1163,17 +1163,17 @@ export const routes: RouteConfig[] = [
   {
     path: '/admin/system-health',
     element: React.lazy(() => import('@/pages/admin/SystemHealthPage')),
-    meta: { title: 'System Health', roles: ['admin', 'super_admin'] },
+    meta: { title: 'System Health', roles: ['super_admin'] },
   },
   {
     path: '/admin/backups',
     element: React.lazy(() => import('@/pages/admin/BackupsPage')),
-    meta: { title: 'Backups', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Backups', roles: ['super_admin'] },
   },
   {
     path: '/admin/system-logs',
     element: React.lazy(() => import('@/pages/admin/SystemLogsPage')),
-    meta: { title: 'System Logs', roles: ['admin', 'super_admin'] },
+    meta: { title: 'System Logs', roles: ['super_admin'] },
   },
 
   // 404

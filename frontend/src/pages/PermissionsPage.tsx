@@ -5,7 +5,7 @@ import {
   useCreatePermission,
   useUpdatePermission,
   useDeletePermission,
-} from '@/hooks/usePermissions';
+} from '@/hooks/usePermissionManagement';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { Button } from '@/components/ui/Button';

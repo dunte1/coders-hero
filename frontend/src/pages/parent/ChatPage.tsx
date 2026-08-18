@@ -287,12 +287,6 @@ export default function ChatPage() {
         <Card className="overflow-hidden">
           <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
             <p className="text-sm font-semibold text-slate-900">Conversations ({list.length})</p>
-            {isParent && (
-              <Button variant="ghost" size="sm" onClick={() => {}}>
-                <PenSquare className="h-4 w-4" />
-                New
-              </Button>
-            )}
           </div>
           <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 22rem)' }}>
             {list.length === 0 ? (

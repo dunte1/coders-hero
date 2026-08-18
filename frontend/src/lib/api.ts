@@ -245,10 +245,10 @@ export const usersApi = {
     api.patch<User>(`/users/${id}/`, data).then(handleResponse),
   deleteUser: (id: number) =>
     api.delete(`/users/${id}/`).then(handleResponse),
-  assignRole: (userId: number, roleId: number) =>
-    api.post(`/users/${userId}/assign-role/`, { role_id: roleId }).then(handleResponse),
-  removeRole: (userId: number) =>
-    api.delete(`/users/${userId}/remove-role/`).then(handleResponse),
+  assignRole: (userId: number, roleName: string) =>
+    api.post(`/users/${userId}/assign-role/`, { role: roleName }).then(handleResponse),
+  removeRole: (userId: number, roleName: string) =>
+    api.delete(`/users/${userId}/remove-role/`, { data: { role: roleName } }).then(handleResponse),
   toggleStatus: (userId: number) =>
     api.post(`/users/${userId}/toggle-status/`).then(handleResponse),
 };
