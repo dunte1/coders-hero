@@ -1,10 +1,17 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 
 export function useScrollReveal(options?: IntersectionObserverInit) {
   const ref = useRef<HTMLDivElement>(null);
 
-  const observe = useCallback(() => {
-    if (!ref.current) return;
+  useEffect(() => {
+    const container = ref.current;
+    if (!container) return;
+
+    // Fallback: if IntersectionObserver is not supported, reveal everything
+    if (typeof IntersectionObserver === 'undefined') {
+      container.querySelectorAll('.reveal').forEach((el) => el.classList.add('revealed'));
+      return;
+    }
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -15,19 +22,38 @@ export function useScrollReveal(options?: IntersectionObserverInit) {
           }
         });
       },
-      { threshold: 0.1, rootMargin: '0px 0px -40px 0px', ...options }
+      { threshold: 0.08, rootMargin: '0px 0px -30px 0px', ...options }
     );
 
-    const elements = ref.current.querySelectorAll('.reveal');
-    elements.forEach((el) => observer.observe(el));
+    // Observe all current .reveal elements
+    const observeAll = () => {
+      container.querySelectorAll('.reveal:not(.revealed)').forEach((el) => {
+        observer.observe(el);
+      });
+    };
 
-    return () => observer.disconnect();
+    observeAll();
+
+    // Watch for new .reveal elements added to the DOM (e.g. after API data loads)
+    const mutationObserver = new MutationObserver(() => {
+      observeAll();
+    });
+
+    mutationObserver.observe(container, { childList: true, subtree: true });
+
+    // Safety fallback: if IntersectionObserver hasn't revealed anything after 4s, force reveal
+    const safetyTimer = setTimeout(() => {
+      container.querySelectorAll('.reveal:not(.revealed)').forEach((el) => {
+        el.classList.add('revealed');
+      });
+    }, 4000);
+
+    return () => {
+      observer.disconnect();
+      mutationObserver.disconnect();
+      clearTimeout(safetyTimer);
+    };
   }, [options]);
-
-  useEffect(() => {
-    const cleanup = observe();
-    return cleanup;
-  }, [observe]);
 
   return ref;
 }

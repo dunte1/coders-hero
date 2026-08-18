@@ -48,10 +48,10 @@ export function LoginForm() {
             </span>
             <span className="font-display text-2xl font-bold text-white">Coder's Hero</span>
           </Link>
-          <h2 className="font-display text-3xl font-bold text-white leading-tight">
+          <h2 className="font-display text-3xl font-bold text-white leading-tight hero-fade-up hero-fade-up-delay-1">
             Welcome to the future of education
           </h2>
-          <p className="mt-4 text-lg text-brand-100">
+          <p className="mt-4 text-lg text-brand-100 hero-fade-up hero-fade-up-delay-2">
             Access your courses, track progress, and connect with instructors.
           </p>
           <div className="mt-10 space-y-4">
@@ -73,7 +73,7 @@ export function LoginForm() {
 
       {/* Right panel - Form */}
       <div className="flex w-full items-center justify-center bg-white p-6 lg:w-1/2">
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-md auth-entrance">
           {/* Mobile logo */}
           <div className="mb-8 text-center lg:hidden">
             <Link to="/" className="inline-flex items-center gap-2">

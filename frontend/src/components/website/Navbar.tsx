@@ -66,7 +66,7 @@ function DesktopDropdown({ group }: { group: NavGroup }) {
       <button
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          'flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150',
+          'flex items-center gap-1 rounded-lg px-3 py-2 text-[14px] font-medium transition-colors duration-150',
           open ? 'text-brand-700 bg-brand-50/50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
         )}
       >
@@ -81,7 +81,7 @@ function DesktopDropdown({ group }: { group: NavGroup }) {
 
       <div
         className={cn(
-          'absolute left-0 top-full z-50 mt-1 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl',
+          'absolute left-0 top-full z-50 mt-1 w-[240px] overflow-hidden rounded-[12px] border border-slate-200 bg-white p-1.5 shadow-xl',
           'transition-all duration-200 origin-top-left',
           open
             ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto'
@@ -92,7 +92,7 @@ function DesktopDropdown({ group }: { group: NavGroup }) {
           <NavLink
             key={item.href}
             to={item.href}
-            className="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors duration-150 hover:bg-brand-50 hover:text-brand-700"
+            className="flex h-[42px] items-center rounded-lg px-3 text-[14px] font-medium text-slate-700 transition-colors duration-150 hover:bg-brand-50 hover:text-brand-700"
             onClick={() => setOpen(false)}
           >
             {item.label}
@@ -253,9 +253,9 @@ export function Navbar() {
           : 'border-b border-transparent bg-white/80 backdrop-blur-md'
       )}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-[62px] max-w-7xl items-center justify-between gap-4 px-[18px] sm:h-[62px] sm:px-6 lg:h-[76px] lg:px-10">
         <Link to="/" className="flex items-center gap-2.5 group">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 text-white shadow-sm transition-shadow duration-200 group-hover:shadow-md group-hover:shadow-brand-500/20">
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 text-white shadow-sm transition-shadow duration-200 group-hover:shadow-md group-hover:shadow-brand-500/20 lg:h-10 lg:w-10">
             {logo ? (
               <img src={logo} alt={siteName} className="h-5 w-5 rounded object-contain" />
             ) : (
@@ -267,13 +267,13 @@ export function Navbar() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-0.5 lg:flex" role="navigation" aria-label="Main navigation">
+        <nav className="hidden items-center gap-[22px] lg:flex" role="navigation" aria-label="Main navigation">
           <NavLink
             to="/"
             end
             className={({ isActive }) =>
               cn(
-                'rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150',
+                'rounded-lg px-3 py-2 text-[14px] font-medium transition-colors duration-150',
                 isActive ? 'bg-brand-50 text-brand-700' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               )
             }
@@ -297,13 +297,13 @@ export function Navbar() {
           ) : null}
           <Link
             to="/login"
-            className="inline-flex h-10 items-center rounded-lg border border-slate-200 px-4 text-sm font-medium text-slate-700 transition-all duration-150 hover:bg-slate-50 hover:text-slate-900"
+            className="inline-flex h-[42px] items-center rounded-lg border border-slate-200 px-4 text-[14px] font-medium text-slate-700 transition-all duration-150 hover:bg-slate-50 hover:text-slate-900"
           >
             Sign In
           </Link>
           <Link
             to="/register"
-            className="inline-flex h-10 items-center rounded-lg bg-brand-600 px-5 text-sm font-semibold text-white shadow-sm shadow-brand-600/20 transition-all duration-150 hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/30"
+            className="inline-flex h-[42px] items-center rounded-lg bg-brand-600 px-5 text-[14px] font-semibold text-white shadow-sm shadow-brand-600/20 transition-all duration-150 hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/30"
           >
             Enroll Now
           </Link>
@@ -315,7 +315,7 @@ export function Navbar() {
           className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-700 transition-colors duration-150 hover:bg-slate-100 lg:hidden"
           aria-label="Open menu"
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="h-6 w-6" />
         </button>
       </div>
 

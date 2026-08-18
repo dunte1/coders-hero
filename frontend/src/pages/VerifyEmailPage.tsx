@@ -41,7 +41,7 @@ export default function VerifyEmailPage() {
           </Link>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm text-center">
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm text-center auth-entrance">
           {status === 'verifying' && (
             <>
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-100">

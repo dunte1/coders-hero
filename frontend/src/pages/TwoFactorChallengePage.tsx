@@ -15,7 +15,7 @@ export default function TwoFactorChallengePage() {
           </Link>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm auth-entrance">
           <div className="mb-6 text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-100">
               <Shield className="h-6 w-6 text-brand-600" />

@@ -71,7 +71,7 @@ export default function ResetPasswordPage() {
           </Link>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm auth-entrance">
           {validating ? (
             <div className="flex flex-col items-center py-8">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-200 border-t-brand-600" />
