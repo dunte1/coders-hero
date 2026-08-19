@@ -97,21 +97,23 @@
     transition: opacity 0.2s ease-out, transform 0.2s ease-out;
   }
 
-  /* Stagger children — covers up to 20 children */
+  /* Stagger children — paused until .stagger-active is added */
   .stagger-children > * {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(20px);
+  }
+  .stagger-children.stagger-active > * {
     animation: staggerChild 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
-  .stagger-children > *:nth-child(1) { animation-delay: 0.04s; }
-  .stagger-children > *:nth-child(2) { animation-delay: 0.08s; }
-  .stagger-children > *:nth-child(3) { animation-delay: 0.12s; }
-  .stagger-children > *:nth-child(4) { animation-delay: 0.16s; }
-  .stagger-children > *:nth-child(5) { animation-delay: 0.2s; }
-  .stagger-children > *:nth-child(6) { animation-delay: 0.24s; }
-  .stagger-children > *:nth-child(7) { animation-delay: 0.28s; }
-  .stagger-children > *:nth-child(8) { animation-delay: 0.32s; }
-  .stagger-children > *:nth-child(n+9) { animation-delay: 0.36s; }
+  .stagger-children.stagger-active > *:nth-child(1) { animation-delay: 0.05s; }
+  .stagger-children.stagger-active > *:nth-child(2) { animation-delay: 0.1s; }
+  .stagger-children.stagger-active > *:nth-child(3) { animation-delay: 0.15s; }
+  .stagger-children.stagger-active > *:nth-child(4) { animation-delay: 0.2s; }
+  .stagger-children.stagger-active > *:nth-child(5) { animation-delay: 0.25s; }
+  .stagger-children.stagger-active > *:nth-child(6) { animation-delay: 0.3s; }
+  .stagger-children.stagger-active > *:nth-child(7) { animation-delay: 0.35s; }
+  .stagger-children.stagger-active > *:nth-child(8) { animation-delay: 0.4s; }
+  .stagger-children.stagger-active > *:nth-child(n+9) { animation-delay: 0.45s; }
 
   /* Shimmer loading */
   .shimmer {
@@ -180,6 +182,7 @@
   .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
   .reveal.revealed { opacity: 1 !important; transform: none !important; }
   .stagger-children > * { opacity: 1 !important; transform: none !important; animation: none !important; }
+  .stagger-children.stagger-active > * { opacity: 1 !important; transform: none !important; animation: none !important; }
   .hero-fade-up { opacity: 1 !important; transform: none !important; animation: none !important; }
   .page-transition { animation: none !important; }
   .auth-entrance { animation: none !important; }

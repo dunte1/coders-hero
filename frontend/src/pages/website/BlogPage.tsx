@@ -5,6 +5,7 @@ import { websiteApi } from '@/lib/websiteApi';
 import { usePageMeta, formatSiteTitle } from '@/hooks/usePageMeta';
 import { useCachedSiteName } from '@/hooks/useCachedSiteSettings';
 import { usePageView } from '@/hooks/usePageView';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { PageBanner } from '@/components/website/PageBanner';
 import { BlogCard } from '@/components/website/BlogCard';
 import { Spinner } from '@/components/ui/Spinner';
@@ -45,8 +46,10 @@ export default function BlogPage() {
     setSearch(searchInput.trim());
   };
 
+  const scrollRef = useScrollReveal();
+
   return (
-    <>
+    <div ref={scrollRef}>
       <PageBanner
         badge="Blog"
         title="Tips, news & inspiration"
@@ -119,7 +122,7 @@ export default function BlogPage() {
                 No articles found{search ? ' for your search' : ' yet'}.
               </p>
             ) : (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
                 {data.data.map((post) => (
                   <BlogCard key={post.id} post={post} />
                 ))}
@@ -152,6 +155,6 @@ export default function BlogPage() {
           ) : null}
         </div>
       </section>
-    </>
+    </div>
   );
 }

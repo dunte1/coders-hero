@@ -91,12 +91,12 @@ export default function PublicCoursesPage() {
                       <p className="text-sm text-slate-600 line-clamp-3 mb-4">{course.description}</p>
                     )}
                     <div className="flex items-center gap-4 text-xs text-slate-500">
-                      {course.duration && (
+                      {course.duration_hours ? (
                         <div className="flex items-center gap-1">
                           <Clock className="h-3.5 w-3.5" />
-                          <span>{course.duration}</span>
+                          <span>{course.duration_hours}h</span>
                         </div>
-                      )}
+                      ) : null}
                       {course.level && (
                         <div className="flex items-center gap-1">
                           <BarChart className="h-3.5 w-3.5" />

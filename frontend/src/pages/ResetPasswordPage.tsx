@@ -37,8 +37,8 @@ export default function ResetPasswordPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: (data: { password: string; password_confirm: string; token: string; email: string }) =>
-      authApi.resetPassword({ password: data.password, password_confirm: data.password_confirm, token: data.token, email: data.email }),
+    mutationFn: (data: { password: string; password_confirmation: string; token: string; email: string }) =>
+      authApi.resetPassword({ password: data.password, password_confirmation: data.password_confirmation, token: data.token, email: data.email }),
     onSuccess: () => setSubmitted(true),
   });
 
@@ -53,7 +53,7 @@ export default function ResetPasswordPage() {
 
   const onSubmit = (data: Values) => {
     if (token && email) {
-      mutation.mutate({ ...data, token, email });
+      mutation.mutate({ password: data.password, password_confirmation: data.password_confirm, token, email });
     }
   };
 

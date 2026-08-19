@@ -47,7 +47,7 @@ export default function RegistrationPage() {
   const [submitted, setSubmitted] = useState(false);
 
   const mutation = useMutation({
-    mutationFn: (data: Record<string, unknown>) => websiteApi.admissions.submit(data),
+    mutationFn: (data: FormData) => websiteApi.admissions.submit(data as unknown as Record<string, unknown>),
     onSuccess: () => {
       setSubmitted(true);
       toast.success('Application submitted successfully!');

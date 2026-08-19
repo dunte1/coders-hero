@@ -17,6 +17,8 @@ import type {
   Service,
   Testimonial,
 } from '@/types/website';
+import type { Course } from '@/types';
+import type { PartnerSchool } from '@/lib/organizationApi';
 
 const unwrap = <T>(res: { data: { data: T } }): T => res.data.data;
 

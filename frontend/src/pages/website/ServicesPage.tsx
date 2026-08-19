@@ -5,6 +5,7 @@ import { websiteApi } from '@/lib/websiteApi';
 import { usePageMeta, formatSiteTitle } from '@/hooks/usePageMeta';
 import { useCachedSiteName } from '@/hooks/useCachedSiteSettings';
 import { usePageView } from '@/hooks/usePageView';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { PageBanner } from '@/components/website/PageBanner';
 import { ServiceCard } from '@/components/website/ServiceCard';
 import { Spinner } from '@/components/ui/Spinner';
@@ -19,8 +20,10 @@ export default function ServicesPage() {
     queryFn: websiteApi.services.list,
   });
 
+  const scrollRef = useScrollReveal();
+
   return (
-    <>
+    <div ref={scrollRef}>
       <PageBanner
         badge="Our services"
         title="Everything young innovators need"
@@ -37,7 +40,7 @@ export default function ServicesPage() {
               We couldn't load the services. Please try again later.
             </p>
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
               {data.map((service) => (
                 <ServiceCard key={service.id} service={service} />
               ))}
@@ -62,6 +65,6 @@ export default function ServicesPage() {
           </Link>
         </div>
       </section>
-    </>
+    </div>
   );
 }

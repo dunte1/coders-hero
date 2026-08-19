@@ -5,6 +5,7 @@ import { websiteApi, isProgramCategory } from '@/lib/websiteApi';
 import { usePageMeta, formatSiteTitle } from '@/hooks/usePageMeta';
 import { useCachedSiteName } from '@/hooks/useCachedSiteSettings';
 import { usePageView } from '@/hooks/usePageView';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { PageBanner } from '@/components/website/PageBanner';
 import { ProgramCard } from '@/components/website/ProgramCard';
 import { Spinner } from '@/components/ui/Spinner';
@@ -50,8 +51,10 @@ export default function ProgramsPage() {
     }
   };
 
+  const scrollRef = useScrollReveal();
+
   return (
-    <>
+    <div ref={scrollRef}>
       <PageBanner
         badge="Programs"
         title="Find your child's next adventure"
@@ -140,6 +143,6 @@ export default function ProgramsPage() {
           </a>
         </div>
       </section>
-    </>
+    </div>
   );
 }

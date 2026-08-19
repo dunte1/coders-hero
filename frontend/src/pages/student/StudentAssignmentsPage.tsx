@@ -59,11 +59,12 @@ export default function StudentAssignmentsPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['student-assignments', search, tab],
-    queryFn: () =>
-      studentAssignmentsApi.list({
-        search: search || undefined,
-        status: tab === 'pending' ? 'pending' : undefined,
-      }),
+    queryFn: () => {
+      const params: Record<string, string> = {};
+      if (search) params.search = search;
+      if (tab === 'pending') params.status = 'pending';
+      return studentAssignmentsApi.list(params);
+    },
   });
 
   const submitMutation = useMutation({
@@ -104,7 +105,7 @@ export default function StudentAssignmentsPage() {
       />
 
       <div className="flex items-center gap-4">
-        <SearchInput value={search} onChange={setSearch} placeholder="Search assignments..." className="w-80" />
+        <SearchInput value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search assignments..." className="w-80" />
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>

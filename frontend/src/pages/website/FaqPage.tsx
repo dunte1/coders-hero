@@ -4,6 +4,7 @@ import { websiteApi } from '@/lib/websiteApi';
 import { usePageMeta, formatSiteTitle } from '@/hooks/usePageMeta';
 import { useCachedSiteName } from '@/hooks/useCachedSiteSettings';
 import { usePageView } from '@/hooks/usePageView';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { PageBanner } from '@/components/website/PageBanner';
 import { FaqAccordion } from '@/components/website/FaqAccordion';
 import { Spinner } from '@/components/ui/Spinner';
@@ -18,8 +19,10 @@ export default function FaqPage() {
     queryFn: websiteApi.faqs.list,
   });
 
+  const scrollRef = useScrollReveal();
+
   return (
-    <>
+    <div ref={scrollRef}>
       <PageBanner
         badge="FAQs"
         title="Frequently asked questions"
@@ -58,6 +61,6 @@ export default function FaqPage() {
           </Link>
         </div>
       </section>
-    </>
+    </div>
   );
 }

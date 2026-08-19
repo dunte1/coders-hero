@@ -63,6 +63,7 @@ export interface Course {
   is_archived: boolean;
   enrollment_count: number;
   average_rating: number;
+  duration_hours?: number;
   created_at: string;
   updated_at: string;
 }

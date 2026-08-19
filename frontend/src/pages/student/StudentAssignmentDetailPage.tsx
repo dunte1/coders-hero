@@ -79,7 +79,7 @@ export default function StudentAssignmentDetailPage() {
   if (isLoading) return <PageSpinner />;
   if (!assignment) return null;
 
-  const a = assignment as AssignmentDetail;
+  const a = assignment as unknown as AssignmentDetail;
 
   return (
     <div className="space-y-6">

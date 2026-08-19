@@ -46,7 +46,6 @@ export default function LmsCoursePlayerPage() {
   const markCompleted = useMarkLessonCompleted(courseId);
 
   const { data: progress, isLoading: progressLoading } = useQuery({
-    queryKey: ['courses', courseId, 'lessons'],
     queryKey: ['courses', courseId, 'video-progress'],
     queryFn: () => lmsApi.videoProgressForCourse(courseId),
     enabled: !!courseId,

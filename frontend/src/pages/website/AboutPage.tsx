@@ -5,6 +5,7 @@ import { websiteApi } from '@/lib/websiteApi';
 import { usePageMeta, formatSiteTitle } from '@/hooks/usePageMeta';
 import { useCachedSiteName } from '@/hooks/useCachedSiteSettings';
 import { usePageView } from '@/hooks/usePageView';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { PageBanner } from '@/components/website/PageBanner';
 import { Spinner } from '@/components/ui/Spinner';
 
@@ -48,8 +49,10 @@ export default function AboutPage() {
     queryFn: websiteApi.site.get,
   });
 
+  const scrollRef = useScrollReveal();
+
   return (
-    <>
+    <div ref={scrollRef}>
       <PageBanner
         badge="About Us"
         title="Empowering young minds through technology"
@@ -59,7 +62,7 @@ export default function AboutPage() {
       <section className="bg-white py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-            <div>
+            <div className="reveal">
               <h2 className="font-display text-3xl font-bold text-slate-900">
                 Who We Are
               </h2>
@@ -80,7 +83,7 @@ export default function AboutPage() {
                 for success.
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-6 reveal reveal-delay-2">
               {stats.map((stat) => (
                 <div
                   key={stat.label}
@@ -97,20 +100,18 @@ export default function AboutPage() {
 
       <section className="bg-slate-50 py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <div className="text-center mb-12 reveal">
             <h2 className="font-display text-3xl font-bold text-slate-900">
               Our Core Values
             </h2>
             <p className="mt-3 text-slate-600 max-w-2xl mx-auto">
               The principles that guide everything we do at Coder's Hero.
             </p>
-          </div>
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          </div>          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
             {values.map((value) => (
               <div
                 key={value.title}
-                className="rounded-2xl bg-white p-6 shadow-sm border border-slate-100"
-              >
+                className="rounded-2xl bg-white p-6 shadow-sm border border-slate-100 transition-all duration-300 hover:shadow-md hover:-translate-y-1">
                 <div className="mb-4 inline-flex rounded-xl bg-brand-100 p-3 text-brand-600">
                   <value.icon className="h-6 w-6" />
                 </div>
@@ -126,7 +127,7 @@ export default function AboutPage() {
 
       <section className="bg-white py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <div className="text-center mb-12 reveal">
             <h2 className="font-display text-3xl font-bold text-slate-900">
               What We Teach
             </h2>
@@ -134,7 +135,7 @@ export default function AboutPage() {
               Comprehensive technology education covering the most in-demand skills.
             </p>
           </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
             {[
               { icon: BookOpen, title: 'Coding & Programming', description: 'From Scratch and Blockly to Python, JavaScript, and more.' },
               { icon: Cpu, title: 'Robotics & Electronics', description: 'Hands-on robotics with Arduino, LEGO kits, and custom projects.' },
@@ -185,6 +186,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }

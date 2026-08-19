@@ -3,6 +3,7 @@ import { websiteApi } from '@/lib/websiteApi';
 import { usePageMeta, formatSiteTitle } from '@/hooks/usePageMeta';
 import { useCachedSiteName } from '@/hooks/useCachedSiteSettings';
 import { usePageView } from '@/hooks/usePageView';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { PageBanner } from '@/components/website/PageBanner';
 import { TestimonialCard } from '@/components/website/TestimonialCard';
 import { Spinner } from '@/components/ui/Spinner';
@@ -17,8 +18,10 @@ export default function TestimonialsPage() {
     queryFn: websiteApi.testimonials.list,
   });
 
+  const scrollRef = useScrollReveal();
+
   return (
-    <>
+    <div ref={scrollRef}>
       <PageBanner
         badge="Testimonials"
         title="Loved by parents, loved by kids"
@@ -37,7 +40,7 @@ export default function TestimonialsPage() {
           ) : data.length === 0 ? (
             <p className="py-20 text-center text-slate-500">No testimonials yet.</p>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 stagger-children">
               {data.map((testimonial) => (
                 <TestimonialCard key={testimonial.id} testimonial={testimonial} />
               ))}
@@ -45,6 +48,6 @@ export default function TestimonialsPage() {
           )}
         </div>
       </section>
-    </>
+    </div>
   );
 }

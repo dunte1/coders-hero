@@ -5,6 +5,7 @@ import { websiteApi } from '@/lib/websiteApi';
 import { usePageMeta, formatSiteTitle } from '@/hooks/usePageMeta';
 import { useCachedSiteName } from '@/hooks/useCachedSiteSettings';
 import { usePageView } from '@/hooks/usePageView';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { PageBanner } from '@/components/website/PageBanner';
 import { Spinner } from '@/components/ui/Spinner';
 import { cn } from '@/lib/utils';
@@ -32,8 +33,10 @@ export default function GalleryPage() {
     new Set((data?.data ?? []).map((item) => item.category).filter((c): c is string => !!c))
   );
 
+  const scrollRef = useScrollReveal();
+
   return (
-    <>
+    <div ref={scrollRef}>
       <PageBanner
         badge="Gallery"
         title="Inside our classroom"
@@ -86,7 +89,7 @@ export default function GalleryPage() {
             ) : data.data.length === 0 ? (
               <p className="py-20 text-center text-slate-500">No photos in this category yet.</p>
             ) : (
-              <div className="columns-2 gap-4 space-y-4 lg:columns-3">
+              <div className="columns-2 gap-4 space-y-4 lg:columns-3 stagger-children">
                 {data.data.map((item) => (
                   <button
                     key={item.id}
@@ -165,6 +168,6 @@ export default function GalleryPage() {
           </figure>
         </div>
       ) : null}
-    </>
+    </div>
   );
 }

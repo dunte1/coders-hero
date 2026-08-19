@@ -7,6 +7,7 @@ import { websiteApi } from '@/lib/websiteApi';
 import { usePageMeta, formatSiteTitle } from '@/hooks/usePageMeta';
 import { useCachedSiteName } from '@/hooks/useCachedSiteSettings';
 import { usePageView } from '@/hooks/usePageView';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { getSetting } from '@/types/website';
 import { PageBanner } from '@/components/website/PageBanner';
 import { Button } from '@/components/ui/Button';
@@ -65,8 +66,10 @@ export default function ContactPage() {
     hours ? { icon: Clock, label: 'Opening hours', value: hours } : null,
   ].filter((item) => item !== null);
 
+  const scrollRef = useScrollReveal();
+
   return (
-    <>
+    <div ref={scrollRef}>
       <PageBanner
         badge="Contact"
         title="Let's talk about your child's future"
@@ -171,6 +174,6 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }

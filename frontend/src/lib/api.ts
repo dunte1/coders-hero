@@ -502,13 +502,13 @@ export const reportsApi = {
 // Student Assignments
 export const studentAssignmentsApi = {
   list: (params?: Record<string, string | number | boolean>) =>
-    api.get<Page<Record<string, unknown>>>('/student/assignments', { params }).then(unwrapPage),
+    api.get('/student/assignments', { params }).then(unwrapPage),
   show: (id: number) =>
-    api.get<{ data: Record<string, unknown> }>(`/student/assignments/${id}`).then(unwrap),
+    api.get(`/student/assignments/${id}`).then(unwrap),
   submit: (id: number, data: FormData) =>
-    api.post<{ data: Record<string, unknown> }>(`/student/assignments/${id}/submit`, data, {
+    api.post(`/student/assignments/${id}/submit`, data, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }).then(unwrap),
   mySubmissions: (params?: Record<string, string | number | boolean>) =>
-    api.get<Page<Record<string, unknown>>>('/student/assignments/my-submissions', { params }).then(unwrapPage),
+    api.get('/student/assignments/my-submissions', { params }).then(unwrapPage),
 };

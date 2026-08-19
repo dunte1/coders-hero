@@ -22,7 +22,8 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('log_name');
-            $table->index('subject');
+            $table->index('subject_type');
+            $table->index('subject_id');
         });
     }
 

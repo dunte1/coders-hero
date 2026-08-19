@@ -111,6 +111,8 @@ export interface EmployeeHr {
   leaves_count?: number;
   payslips_count?: number;
   documents_count?: number;
+  qr_code?: string | null;
+  photo_url?: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -16,6 +16,13 @@ import { useState } from 'react';
 import { useNotificationStats } from '@/hooks/useNotifications';
 import { getInitials } from '@/lib/utils';
 
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 17) return 'Good afternoon';
+  return 'Good evening';
+}
+
 export function Header() {
   const { user, logout } = useAuth();
   const { t } = useI18n();
@@ -25,6 +32,8 @@ export function Header() {
 
   const { data: notifStats } = useNotificationStats();
 
+  const displayName = user?.first_name || user?.email?.split('@')[0] || 'User';
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -33,7 +42,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 flex h-16 items-center gap-4 px-4 lg:px-6" style={{ backgroundColor: 'var(--header-bg)', borderBottom: '1px solid var(--header-border)' }}>
+    <header className="sticky top-0 z-50 flex h-[100px] items-center gap-4 px-4 lg:px-6" style={{ backgroundColor: 'var(--header-bg)', borderBottom: '1px solid var(--header-border)' }}>
       <Button
         variant="ghost"
         size="icon"
@@ -65,18 +74,28 @@ export function Header() {
         )}
       </div>
 
-      <form onSubmit={handleSearch} className="flex-1 max-w-md ml-auto">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <input
-            type="text"
-            placeholder={`${t('Search')}...`}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-4 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-          />
+      {/* Welcome message + Search bar */}
+      <div className="flex flex-1 items-center gap-4">
+        {/* Welcome message */}
+        <div className="hidden md:flex flex-col">
+          <p className="text-sm text-slate-500">{getGreeting()} 👋</p>
+          <p className="text-lg font-semibold text-slate-900">Welcome back, {displayName}!</p>
         </div>
-      </form>
+
+        {/* Search bar */}
+        <form onSubmit={handleSearch} className="flex-1 max-w-md ml-auto">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder={`${t('Search')}...`}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-4 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+            />
+          </div>
+        </form>
+      </div>
 
       <div className="flex items-center gap-2">
         <Button
