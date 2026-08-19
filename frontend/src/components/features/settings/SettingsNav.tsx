@@ -16,6 +16,7 @@ const items = [
   { label: 'Backup', href: '/settings/backup', icon: Save },
   { label: 'System', href: '/settings/system', icon: ActivityIcon },
   { label: 'Profile', href: '/profile', icon: UserRound },
+  { label: 'Two-Factor Auth', href: '/settings/two-factor', icon: Shield },
 ];
 
 export function SettingsNav() {

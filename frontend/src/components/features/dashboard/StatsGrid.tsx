@@ -31,7 +31,7 @@ export function StatsGrid({ stats, userRole }: StatsGridProps) {
   const [showMore, setShowMore] = useState(false);
   const role = userRole?.toLowerCase();
   const isAdmin = role === 'admin' || role === 'super_admin' || role === 'director' || role === 'branch_manager' || role === 'school_admin';
-  const isInstructor = role === 'instructor';
+  const isInstructor = role === 'instructor' || role === 'teacher';
   const isEmployee = role === 'employee';
   const o = stats.overview ?? {};
 

@@ -107,29 +107,7 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Account</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4 text-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium">Profile</p>
-                <p className="text-slate-500">Update your personal details and photo</p>
-              </div>
-              <Button variant="outline" size="sm" onClick={() => navigate('/profile')}>Edit</Button>
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium">Two-Factor Authentication</p>
-                <p className="text-slate-500">Add an extra layer of security to your account</p>
-              </div>
-              <Button variant="outline" size="sm" onClick={() => navigate('/settings/two-factor')}>Manage</Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+
     </div>
   );
 }

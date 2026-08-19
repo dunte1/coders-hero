@@ -1,5 +1,5 @@
 import api from './axios';
-import type { Page, PaginationMeta } from '@/types/cms';
+import type { PaginationMeta } from '@/types/cms';
 import type {
   User,
   UserCreate,
@@ -59,14 +59,27 @@ import type {
   ResetTokenValidation,
 } from '@/types';
 
-const handleResponse = <T>(response: { data: T }): T => response.data;
+const handleResponse = <T>(response: { data: any }): T => {
+  const body = response.data;
+  if (body && typeof body === 'object' && 'data' in body) {
+    return body.data as T;
+  }
+  return body as T;
+};
 
 const unwrap = <T>(response: { data: { data: T } }): T => response.data.data;
 
-const unwrapPage = <T>(response: { data: { data: T[]; meta: PaginationMeta } }): Page<T> => ({
-  results: response.data.data,
-  meta: response.data.meta,
-});
+const unwrapPage = <T>(response: { data: any }): PaginatedResponse<T> => {
+  const body = response.data;
+  const items = body?.data ?? [];
+  const meta = body?.meta ?? {};
+  return {
+    count: meta.total ?? items.length,
+    next: body?.links?.next ?? null,
+    previous: body?.links?.prev ?? null,
+    results: items as T[],
+  };
+};
 
 export function getErrorMessage(err: unknown): string {
   if (err && typeof err === 'object' && 'response' in err) {
@@ -182,75 +195,75 @@ export const authApi = {
     }).then(unwrapUser);
   },
   getLoginHistory: (params?: Record<string, string | number | boolean>) =>
-    api.get<PaginatedResponse<LoginHistory>>('/login-history/', { params }).then(handleResponse),
+    api.get<PaginatedResponse<LoginHistory>>('/admin/login-history/', { params }).then(unwrapPage),
   clearLoginHistory: () =>
-    api.delete('/login-history/').then(handleResponse),
+    api.delete('/admin/login-history/').then(handleResponse),
 };
 
 // Roles
 export const rolesApi = {
   getRoles: (params?: Record<string, string | number | boolean>) =>
-    api.get<PaginatedResponse<Role>>('/roles/', { params }).then(handleResponse),
+    api.get<PaginatedResponse<Role>>('/admin/roles/', { params }).then(unwrapPage),
   getRole: (id: number) =>
-    api.get<Role>(`/roles/${id}/`).then(handleResponse),
+    api.get<Role>(`/admin/roles/${id}/`).then(handleResponse),
   createRole: (data: RoleCreate) =>
-    api.post<Role>('/roles/', data).then(handleResponse),
+    api.post<Role>('/admin/roles/', data).then(handleResponse),
   updateRole: (id: number, data: RoleUpdate) =>
-    api.patch<Role>(`/roles/${id}/`, data).then(handleResponse),
+    api.put<Role>(`/admin/roles/${id}/`, data).then(handleResponse),
   deleteRole: (id: number) =>
-    api.delete(`/roles/${id}/`).then(handleResponse),
+    api.delete(`/admin/roles/${id}/`).then(handleResponse),
   syncRolePermissions: (id: number, permissions: string[]) =>
-    api.post<Role>(`/roles/${id}/permissions/`, { permissions }).then(handleResponse),
+    api.post<Role>(`/admin/roles/${id}/permissions/`, { permissions }).then(handleResponse),
   getRolePermissions: (id: number) =>
-    api.get<Permission[]>(`/roles/${id}/permissions/`).then(handleResponse),
+    api.get<Permission[]>(`/admin/roles/${id}/permissions/`).then(handleResponse),
   getRoleUsers: (id: number, params?: Record<string, string | number | boolean>) =>
-    api.get<PaginatedResponse<User>>(`/roles/${id}/users/`, { params }).then(handleResponse),
+    api.get<PaginatedResponse<User>>(`/admin/roles/${id}/users/`, { params }).then(unwrapPage),
 };
 
 // Permissions
 export const permissionsApi = {
   getPermissions: (params?: Record<string, string | number | boolean>) =>
-    api.get<PaginatedResponse<Permission>>('/permissions/', { params }).then(handleResponse),
+    api.get<PaginatedResponse<Permission>>('/admin/permissions/', { params }).then(unwrapPage),
   getPermission: (id: number) =>
-    api.get<Permission>(`/permissions/${id}/`).then(handleResponse),
+    api.get<Permission>(`/admin/permissions/${id}/`).then(handleResponse),
   getPermissionGroups: () =>
-    api.get<string[]>('/permissions/groups/').then(handleResponse),
+    api.get<string[]>('/admin/permissions/groups/').then(handleResponse),
   createPermission: (data: PermissionCreate) =>
-    api.post<Permission>('/permissions/', data).then(handleResponse),
+    api.post<Permission>('/admin/permissions/', data).then(handleResponse),
   updatePermission: (id: number, data: PermissionUpdate) =>
-    api.patch<Permission>(`/permissions/${id}/`, data).then(handleResponse),
+    api.put<Permission>(`/admin/permissions/${id}/`, data).then(handleResponse),
   deletePermission: (id: number) =>
-    api.delete(`/permissions/${id}/`).then(handleResponse),
+    api.delete(`/admin/permissions/${id}/`).then(handleResponse),
 };
 
 // Login History
 export const loginHistoryApi = {
   getAll: (params?: Record<string, string | number | boolean>) =>
-    api.get<PaginatedResponse<LoginHistory>>('/login-history/', { params }).then(handleResponse),
+    api.get<PaginatedResponse<LoginHistory>>('/admin/login-history/', { params }).then(unwrapPage),
   getOne: (id: number) =>
-    api.get<LoginHistory>(`/login-history/${id}/`).then(handleResponse),
+    api.get<LoginHistory>(`/admin/login-history/${id}/`).then(handleResponse),
   clearAll: () =>
-    api.delete('/login-history/').then(handleResponse),
+    api.delete('/admin/login-history/').then(handleResponse),
 };
 
 // Users
 export const usersApi = {
   getUsers: (params?: Record<string, string | number | boolean>) =>
-    api.get<PaginatedResponse<User>>('/users/', { params }).then(handleResponse),
+    api.get<PaginatedResponse<User>>('/admin/users/', { params }).then(unwrapPage),
   getUser: (id: number) =>
-    api.get<User>(`/users/${id}/`).then(handleResponse),
+    api.get<User>(`/admin/users/${id}/`).then(handleResponse),
   createUser: (data: UserCreate) =>
-    api.post<User>('/users/', data).then(handleResponse),
+    api.post<User>('/admin/users/', data).then(handleResponse),
   updateUser: (id: number, data: UserUpdate) =>
-    api.patch<User>(`/users/${id}/`, data).then(handleResponse),
+    api.put<User>(`/admin/users/${id}/`, data).then(handleResponse),
   deleteUser: (id: number) =>
-    api.delete(`/users/${id}/`).then(handleResponse),
+    api.delete(`/admin/users/${id}/`).then(handleResponse),
   assignRole: (userId: number, roleName: string) =>
-    api.post(`/users/${userId}/assign-role/`, { role: roleName }).then(handleResponse),
+    api.post(`/admin/users/${userId}/assign-role/`, { role: roleName }).then(handleResponse),
   removeRole: (userId: number, roleName: string) =>
-    api.delete(`/users/${userId}/remove-role/`, { data: { role: roleName } }).then(handleResponse),
+    api.delete(`/admin/users/${userId}/remove-role/`, { data: { role: roleName } }).then(handleResponse),
   toggleStatus: (userId: number) =>
-    api.post(`/users/${userId}/toggle-status/`).then(handleResponse),
+    api.post(`/admin/users/${userId}/toggle-status/`).then(handleResponse),
 };
 
 // Courses
@@ -358,41 +371,41 @@ export const projectsApi = {
 // Employees
 export const employeesApi = {
   getEmployees: (params?: Record<string, string | number | boolean>) =>
-    api.get<PaginatedResponse<Employee>>('/employees/', { params }).then(handleResponse),
+    api.get<PaginatedResponse<Employee>>('/admin/employees/', { params }).then(unwrapPage),
   getEmployee: (id: number) =>
-    api.get<Employee>(`/employees/${id}/`).then(handleResponse),
+    api.get<Employee>(`/admin/employees/${id}/`).then(handleResponse),
   createEmployee: (data: EmployeeCreate) =>
-    api.post<Employee>('/employees/', data).then(handleResponse),
+    api.post<Employee>('/admin/employees/', data).then(handleResponse),
   updateEmployee: (id: number, data: Partial<EmployeeCreate>) =>
-    api.patch<Employee>(`/employees/${id}/`, data).then(handleResponse),
+    api.put<Employee>(`/admin/employees/${id}/`, data).then(handleResponse),
   deleteEmployee: (id: number) =>
-    api.delete(`/employees/${id}/`).then(handleResponse),
+    api.delete(`/admin/employees/${id}/`).then(handleResponse),
   getDirectory: () =>
-    api.get<Employee[]>('/employees/directory/').then(handleResponse),
+    api.get<Employee[]>('/admin/employees/directory/').then(handleResponse),
 };
 
 // Departments
 export const departmentsApi = {
   getDepartments: () =>
-    api.get<Department[]>('/departments/').then(handleResponse),
+    api.get<Department[]>('/admin/departments/').then(handleResponse),
   createDepartment: (data: { name: string; description?: string }) =>
-    api.post<Department>('/departments/', data).then(handleResponse),
+    api.post<Department>('/admin/departments/', data).then(handleResponse),
   updateDepartment: (id: number, data: { name?: string; description?: string }) =>
-    api.patch<Department>(`/departments/${id}/`, data).then(handleResponse),
+    api.put<Department>(`/admin/departments/${id}/`, data).then(handleResponse),
   deleteDepartment: (id: number) =>
-    api.delete(`/departments/${id}/`).then(handleResponse),
+    api.delete(`/admin/departments/${id}/`).then(handleResponse),
 };
 
 // Positions
 export const positionsApi = {
   getPositions: (params?: Record<string, string | number | boolean>) =>
-    api.get<PaginatedResponse<Position>>('/positions/', { params }).then(handleResponse),
+    api.get<PaginatedResponse<Position>>('/admin/positions/', { params }).then(unwrapPage),
   createPosition: (data: { title: string; description?: string; department_id: number; min_salary?: number; max_salary?: number }) =>
-    api.post<Position>('/positions/', data).then(handleResponse),
+    api.post<Position>('/admin/positions/', data).then(handleResponse),
   updatePosition: (id: number, data: Partial<{ title: string; description?: string; department_id: number }>) =>
-    api.patch<Position>(`/positions/${id}/`, data).then(handleResponse),
+    api.put<Position>(`/admin/positions/${id}/`, data).then(handleResponse),
   deletePosition: (id: number) =>
-    api.delete(`/positions/${id}/`).then(handleResponse),
+    api.delete(`/admin/positions/${id}/`).then(handleResponse),
 };
 
 // Quizzes
