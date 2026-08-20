@@ -23,10 +23,10 @@ export default function EmployeeDetailPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={`${employee.user.first_name} ${employee.user.last_name}`}
+        title={employee.user.name}
         breadcrumbs={[
           { label: 'Employees', href: '/employees' },
-          { label: `${employee.user.first_name} ${employee.user.last_name}` },
+          { label: employee.user.name },
         ]}
       />
 
@@ -36,10 +36,10 @@ export default function EmployeeDetailPage() {
             <Avatar className="h-24 w-24 mb-4">
               <AvatarImage src={employee.user.avatar} />
               <AvatarFallback className="text-2xl">
-                {getInitials(employee.user.first_name, employee.user.last_name)}
+                {getInitials(employee.user.name)}
               </AvatarFallback>
             </Avatar>
-            <h2 className="text-xl font-bold">{employee.user.first_name} {employee.user.last_name}</h2>
+            <h2 className="text-xl font-bold">{employee.user.name}</h2>
             <p className="text-sm text-brand-600 font-medium">{employee.position?.title}</p>
             <StatusBadge status={employee.status} className="mt-2" />
           </CardContent>

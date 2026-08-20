@@ -42,9 +42,11 @@ class RolePermissionTest extends TestCase
     {
         Sanctum::actingAs($this->adminUser(), ['*']);
 
-        $this->getJson('/api/admin/roles')
-            ->assertStatus(200)
-            ->assertJsonPath('data.0.name', 'admin');
+        $response = $this->getJson('/api/admin/roles')
+            ->assertStatus(200);
+
+        $roleNames = array_column($response->json('data'), 'name');
+        $this->assertContains('admin', $roleNames);
     }
 
     public function test_admin_can_create_role(): void

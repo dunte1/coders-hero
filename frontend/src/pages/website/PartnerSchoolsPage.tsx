@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { Building2, Mail, Phone, MapPin, Users } from 'lucide-react';
 import { websiteApi } from '@/lib/websiteApi';
 import { usePageMeta, formatSiteTitle } from '@/hooks/usePageMeta';
@@ -74,12 +75,12 @@ export default function PartnerSchoolsPage() {
               Join our growing network of schools. We provide curriculum, training, equipment, and ongoing support
               to help your students excel in coding, robotics, and STEM.
             </p>
-            <a
-              href="/contact"
+            <Link
+              to="/contact"
               className="inline-flex items-center rounded-lg bg-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 transition-colors"
             >
               Contact Us
-            </a>
+            </Link>
           </div>
         </div>
       </section>

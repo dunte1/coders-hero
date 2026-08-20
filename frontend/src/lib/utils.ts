@@ -92,8 +92,17 @@ export function validateEmail(email: string): boolean {
   return re.test(email);
 }
 
-export function getInitials(firstName: string, lastName: string): string {
-  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+export function getInitials(nameOrFirst?: string | null, lastName?: string | null): string {
+  const name = (nameOrFirst ?? '').trim();
+  const b = (lastName ?? '').trim();
+  if (b) {
+    if (name) return `${name[0]}${b[0]}`.toUpperCase();
+    return b.slice(0, 2).toUpperCase();
+  }
+  const parts = name.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return '??';
 }
 
 export function formatFileSize(bytes: number): string {

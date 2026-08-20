@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Rocket, Eye, EyeOff, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 
 const registerSchema = z
   .object({
@@ -16,6 +17,9 @@ const registerSchema = z
     phone: z.string().optional(),
     password: z.string().min(8, 'Password must be at least 8 characters'),
     password_confirm: z.string(),
+    agree_to_terms: z.literal(true, {
+      errorMap: () => ({ message: 'You must agree to the Terms of Service' }),
+    }),
   })
   .refine((data) => data.password === data.password_confirm, {
     message: 'Passwords do not match',
@@ -23,6 +27,21 @@ const registerSchema = z
   });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
+
+function getPasswordStrength(password: string): { score: number; label: string; color: string } {
+  let score = 0;
+  if (password.length >= 8) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[a-z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+
+  if (score <= 1) return { score, label: 'Very Weak', color: 'bg-red-500' };
+  if (score === 2) return { score, label: 'Weak', color: 'bg-orange-500' };
+  if (score === 3) return { score, label: 'Fair', color: 'bg-yellow-500' };
+  if (score === 4) return { score, label: 'Strong', color: 'bg-lime-500' };
+  return { score, label: 'Very Strong', color: 'bg-emerald-500' };
+}
 
 export function RegisterForm() {
   const { register: registerUser, isRegistering } = useAuth();
@@ -32,6 +51,7 @@ export function RegisterForm() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -44,6 +64,9 @@ export function RegisterForm() {
       password_confirm: '',
     },
   });
+
+  const watchedPassword = watch('password');
+  const passwordStrength = useMemo(() => getPasswordStrength(watchedPassword || ''), [watchedPassword]);
 
   const onSubmit = (data: RegisterFormValues) => {
     registerUser(data);
@@ -167,6 +190,44 @@ export function RegisterForm() {
                 {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
+
+            {/* Password Strength Indicator */}
+            {watchedPassword && (
+              <div className="space-y-1.5">
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div
+                      key={i}
+                      className={cn(
+                        'h-1.5 flex-1 rounded-full transition-colors',
+                        i <= passwordStrength.score ? passwordStrength.color : 'bg-slate-200'
+                      )}
+                    />
+                  ))}
+                </div>
+                <p className="text-xs text-slate-500">
+                  Password strength: <span className="font-medium">{passwordStrength.label}</span>
+                </p>
+              </div>
+            )}
+
+            {/* Terms of Service */}
+            <label className="flex items-start gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                {...register('agree_to_terms')}
+                className="mt-1 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+              />
+              <span className="text-sm text-slate-600">
+                I agree to the{' '}
+                <Link to="/terms" className="text-brand-600 hover:underline">Terms of Service</Link>
+                {' '}and{' '}
+                <Link to="/privacy" className="text-brand-600 hover:underline">Privacy Policy</Link>
+              </span>
+            </label>
+            {errors.agree_to_terms && (
+              <p className="text-sm text-red-600">{errors.agree_to_terms.message}</p>
+            )}
 
             <Button
               type="submit"

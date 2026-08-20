@@ -19,6 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'locale' => \App\Http\Middleware\SetLocale::class,
             'verified' => \App\Http\Middleware\EnsureEmailVerified::class,
             '2fa' => \App\Http\Middleware\RequireTwoFactor::class,
+            'security-headers' => \App\Http\Middleware\SecurityHeaders::class,
+        ]);
+
+        $middleware->web(append: [
+            \App\Http\Middleware\SecurityHeaders::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -1,6 +1,7 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowRight, Sparkles, CheckCircle2, ChevronRight, Zap, Shield, Users } from 'lucide-react';
+import { ArrowRight, Sparkles, CheckCircle2, ChevronRight, Zap, Shield, Users, GraduationCap, BookOpen, Building2 } from 'lucide-react';
 import { websiteApi } from '@/lib/websiteApi';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { usePageView } from '@/hooks/usePageView';
@@ -36,7 +37,7 @@ function FeatureBand({ section }: { section: NonNullable<HomeData['sections'][st
                 key={stat.label}
                 className="group rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1"
               >
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600 transition-colors group-hover:bg-brand-600 group-hover:text-white">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600 transition-colors group-hover:bg-brand-500 group-hover:text-white">
                   <Icon className="h-6 w-6" />
                 </div>
                 <p className="font-display text-3xl font-bold text-slate-900 sm:text-4xl">{stat.value}</p>
@@ -62,7 +63,7 @@ function SplitFeature({
       <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
         <div className={`${reverse ? 'lg:order-2' : ''} reveal`}>
           {section.badge ? (
-            <span className="inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-700">
+            <span className="inline-block rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-700">
               {section.badge}
             </span>
           ) : null}
@@ -78,7 +79,7 @@ function SplitFeature({
           {section.button_label && section.button_url ? (
             <Link
               to={section.button_url}
-              className="mt-6 inline-flex h-12 items-center rounded-xl bg-brand-600 px-6 text-sm font-semibold text-white shadow-lg shadow-brand-600/20 transition-all hover:bg-brand-700 hover:shadow-xl hover:shadow-brand-600/30 hover:-translate-y-0.5"
+              className="mt-6 inline-flex h-12 items-center rounded-xl bg-brand-500 px-6 text-sm font-semibold text-slate-900 shadow-lg shadow-brand-500/20 transition-all hover:bg-brand-400 hover:shadow-xl hover:shadow-brand-500/30 hover:-translate-y-0.5"
             >
               {section.button_label}
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -94,8 +95,8 @@ function SplitFeature({
               loading="lazy"
             />
           ) : (
-            <div className="flex aspect-[4/3] items-center justify-center rounded-3xl bg-gradient-to-br from-brand-100 via-indigo-50 to-amber-50">
-              <span className="flex h-20 w-20 items-center justify-center rounded-full bg-white/70 text-brand-600 float-subtle">
+            <div className="flex aspect-[4/3] items-center justify-center rounded-3xl bg-gradient-to-br from-brand-800 via-brand-900 to-slate-900">
+              <span className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-500/20 text-brand-400 float-subtle">
                 <Sparkles className="h-10 w-10" />
               </span>
             </div>
@@ -114,6 +115,23 @@ export default function HomePage() {
     queryFn: websiteApi.site.get,
   });
 
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.text = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "Coder's Hero",
+      "url": window.location.origin,
+      "description": "Premium coding and STEM education platform for children in Kenya. Learn coding, robotics, and digital skills.",
+      "address": { "@type": "PostalAddress", "addressCountry": "KE" },
+      "contactPoint": { "@type": "ContactPoint", "contactType": "customer service" },
+      "sameAs": [],
+    });
+    document.head.appendChild(script);
+    return () => { document.head.removeChild(script); };
+  }, []);
+
   const settings = data?.settings;
   const sections = data?.sections ?? {};
 
@@ -130,7 +148,7 @@ export default function HomePage() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-200 border-t-brand-600" />
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-200 border-t-brand-500" />
           <span className="text-sm font-medium text-slate-400">Loading...</span>
         </div>
       </div>
@@ -165,36 +183,51 @@ export default function HomePage() {
   const blogIntro = sections.blog_intro;
   const cta = sections.cta;
 
+  // Social proof counters from CMS stats section (or defaults)
+  const defaultStats = [
+    { icon: Users, value: '500+', label: 'Students Enrolled' },
+    { icon: Building2, value: '15+', label: 'Partner Schools' },
+    { icon: BookOpen, value: '50+', label: 'Courses Available' },
+    { icon: GraduationCap, value: '20+', label: 'Expert Instructors' },
+  ];
+  const rawStats = (stats?.meta as StatsMeta | undefined)?.stats ?? [];
+  const socialProof = rawStats.length > 0
+    ? rawStats.map((s, i) => ({ ...s, icon: defaultStats[i % defaultStats.length].icon }))
+    : defaultStats;
+
   return (
     <div ref={scrollRef}>
-      {/* Hero Section */}
+      {/* Hero Section — Dark brand background */}
       {hero ? (
-        <section className="relative overflow-hidden bg-gradient-to-b from-brand-50 via-indigo-50/50 to-white">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImVub3ZkZXIiPjxnIGZpbGw9IiMzMGIyZjEiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptMC0zMHY2aDZ2LTZoLTZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-40" />
+        <section className="relative overflow-hidden bg-slate-900">
+          {/* Circuit pattern overlay */}
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImVub3ZkZXIiPjxnIGZpbGw9IiMwMEU1RTUiIGZpbGwtb3BhY2l0eT0iMC4wNCI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptMC0zMHY2aDZ2LTZoLTZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-60" />
+          {/* Cyan gradient accent */}
+          <div className="absolute inset-0 bg-gradient-to-br from-brand-900/40 via-transparent to-brand-800/20" />
           <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-28">
             <div>
               {hero.badge ? (
-                <span className="hero-fade-up inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-700">
+                <span className="hero-fade-up inline-flex items-center gap-1.5 rounded-full bg-brand-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-400 ring-1 ring-brand-500/30">
                   <Sparkles className="h-3.5 w-3.5" />
                   {hero.badge}
                 </span>
               ) : null}
-              <h1 className="hero-fade-up hero-fade-up-delay-1 mt-4 font-display text-4xl font-bold leading-tight tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
+              <h1 className="hero-fade-up hero-fade-up-delay-1 mt-4 font-display text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
                 {hero.title}
               </h1>
               {hero.subtitle ? (
-                <p className="hero-fade-up hero-fade-up-delay-2 mt-5 text-lg leading-relaxed text-slate-600 sm:text-xl">
+                <p className="hero-fade-up hero-fade-up-delay-2 mt-5 text-lg leading-relaxed text-slate-300 sm:text-xl">
                   {hero.subtitle}
                 </p>
               ) : null}
               {hero.body ? (
-                <p className="hero-fade-up hero-fade-up-delay-3 mt-3 text-base text-slate-500">{hero.body}</p>
+                <p className="hero-fade-up hero-fade-up-delay-3 mt-3 text-base text-slate-400">{hero.body}</p>
               ) : null}
               <div className="hero-fade-up hero-fade-up-delay-4 mt-8 flex flex-wrap items-center gap-3">
                 {hero.button_label && hero.button_url ? (
                   <Link
                     to={hero.button_url}
-                    className="inline-flex h-12 items-center rounded-xl bg-brand-600 px-7 text-base font-semibold text-white shadow-lg shadow-brand-600/25 transition-all hover:bg-brand-700 hover:shadow-xl hover:shadow-brand-600/30 hover:-translate-y-0.5"
+                    className="inline-flex h-12 items-center rounded-xl bg-brand-500 px-7 text-base font-semibold text-slate-900 shadow-lg shadow-brand-500/25 transition-all hover:bg-brand-400 hover:shadow-xl hover:shadow-brand-500/30 hover:-translate-y-0.5"
                   >
                     {hero.button_label}
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -202,7 +235,7 @@ export default function HomePage() {
                 ) : null}
                 <Link
                   to="/contact"
-                  className="inline-flex h-12 items-center rounded-xl border border-slate-300 bg-white px-7 text-base font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:shadow-md hover:-translate-y-0.5"
+                  className="inline-flex h-12 items-center rounded-xl border border-slate-600 bg-transparent px-7 text-base font-semibold text-white shadow-sm transition-all hover:bg-slate-800 hover:border-brand-500/50 hover:shadow-md hover:-translate-y-0.5"
                 >
                   Book a Free Trial
                 </Link>
@@ -218,19 +251,19 @@ export default function HomePage() {
                         <img
                           src={item.image_url}
                           alt={item.title}
-                          className="aspect-square w-full rounded-3xl border border-white object-cover shadow-xl transition-transform duration-300 hover:scale-105"
+                          className="aspect-square w-full rounded-3xl border border-slate-700 object-cover shadow-xl transition-transform duration-300 hover:scale-105"
                           loading="lazy"
                         />
                       ) : (
-                        <div className="flex aspect-square items-center justify-center rounded-3xl bg-gradient-to-br from-brand-100 to-indigo-100">
-                          <Sparkles className="h-8 w-8 text-brand-400" />
+                        <div className="flex aspect-square items-center justify-center rounded-3xl bg-gradient-to-br from-brand-800 to-slate-800">
+                          <Sparkles className="h-8 w-8 text-brand-500" />
                         </div>
                       )}
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="flex aspect-[4/3] items-center justify-center rounded-3xl bg-gradient-to-br from-brand-500 to-indigo-600">
+                <div className="flex aspect-[4/3] items-center justify-center rounded-3xl bg-gradient-to-br from-brand-700 to-slate-800">
                   <span className="text-6xl float-subtle">🚀</span>
                 </div>
               )}
@@ -238,6 +271,21 @@ export default function HomePage() {
           </div>
         </section>
       ) : null}
+
+      {/* Social Proof Counters — from CMS stats section or defaults */}
+      <section className="py-10 bg-white border-b border-slate-100">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            {socialProof.map((item) => (
+              <div key={item.label} className="reveal">
+                <item.icon className="h-8 w-8 mx-auto text-brand-500 mb-3" />
+                <div className="text-3xl font-bold text-slate-900">{item.value}</div>
+                <div className="text-sm text-slate-500 mt-1">{item.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Stats */}
       {stats ? <FeatureBand section={stats} /> : null}
@@ -335,7 +383,7 @@ export default function HomePage() {
         </section>
       ) : null}
 
-      {/* Testimonials with Carousel */}
+      {/* Testimonials */}
       {testimonialsIntro || data.testimonials.length > 0 ? (
         <section className="bg-white py-20">
           <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
@@ -392,19 +440,20 @@ export default function HomePage() {
         </section>
       ) : null}
 
-      {/* CTA */}
+      {/* CTA — Dark with cyan accents */}
       {cta ? (
-        <section className="relative overflow-hidden bg-gradient-to-br from-brand-600 via-brand-700 to-indigo-800 py-20">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImVub3ZkZXIiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNCI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptMC0zMHY2aDZ2LTZoLTZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-50" />
+        <section className="relative overflow-hidden bg-slate-900 py-20">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImVub3ZkZXIiPjxnIGZpbGw9IiMwMEU1RTUiIGZpbGwtb3BhY2l0eT0iMC4wNCI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptMC0zMHY2aDZ2LTZoLTZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-60" />
+          <div className="absolute inset-0 bg-gradient-to-br from-brand-900/40 via-transparent to-brand-800/20" />
           <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
             <div className="reveal">
               <h2 className="font-display text-3xl font-bold text-white sm:text-4xl lg:text-5xl">{cta.title}</h2>
               {cta.subtitle ? (
-                <p className="mt-4 text-lg text-brand-100 sm:text-xl">{cta.subtitle}</p>
+                <p className="mt-4 text-lg text-slate-300 sm:text-xl">{cta.subtitle}</p>
               ) : null}
               <Link
                 to={cta.button_url ?? '/contact'}
-                className="mt-8 inline-flex h-13 items-center rounded-xl bg-white px-8 text-base font-semibold text-brand-700 shadow-lg transition-all hover:bg-brand-50 hover:shadow-xl hover:-translate-y-0.5"
+                className="mt-8 inline-flex h-13 items-center rounded-xl bg-brand-500 px-8 text-base font-semibold text-slate-900 shadow-lg shadow-brand-500/25 transition-all hover:bg-brand-400 hover:shadow-xl hover:-translate-y-0.5"
               >
                 {cta.button_label ?? 'Get Started'}
                 <ArrowRight className="ml-2 h-5 w-5" />

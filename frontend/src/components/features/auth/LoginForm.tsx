@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Rocket, Eye, EyeOff, ArrowRight, Shield, BookOpen, Users } from 'lucide-react';
+import { Rocket, Eye, EyeOff, ArrowRight, Shield, BookOpen, Users, AlertTriangle, Info } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 const loginSchema = z.object({
@@ -19,7 +19,10 @@ export function LoginForm() {
   const { login, isLoggingIn } = useAuth();
   const location = useLocation();
   const stateEmail = (location.state as { email?: string } | null)?.email;
+  const sessionExpired = (location.state as { sessionExpired?: boolean } | null)?.sessionExpired;
+  const signedOut = (location.state as { signedOut?: boolean } | null)?.signedOut;
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const {
     register,
@@ -84,6 +87,26 @@ export function LoginForm() {
             </Link>
           </div>
 
+          {/* Session Expired / Signed Out Banners */}
+          {sessionExpired && (
+            <div className="mb-4 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
+              <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-amber-900">Session Expired</p>
+                <p className="text-xs text-amber-700">Your session has expired. Please sign in again.</p>
+              </div>
+            </div>
+          )}
+          {signedOut && (
+            <div className="mb-4 flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3">
+              <Info className="h-5 w-5 shrink-0 text-blue-600 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-blue-900">Signed Out</p>
+                <p className="text-xs text-blue-700">You have been signed out successfully.</p>
+              </div>
+            </div>
+          )}
+
           <div className="mb-8">
             <h1 className="text-2xl font-bold text-slate-900">Sign in to your account</h1>
             <p className="mt-2 text-sm text-slate-500">
@@ -120,9 +143,11 @@ export function LoginForm() {
             </div>
 
             <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 text-sm text-slate-600">
+              <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
                 <input
                   type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
                   className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
                 />
                 Remember me

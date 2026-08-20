@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AI\AiAdminController;
 use App\Http\Controllers\Api\AI\AiPlatformController;
 use App\Http\Controllers\Api\Admin\ActivityLogController;
+use App\Http\Controllers\Api\Admin\SearchController;
 use App\Http\Controllers\Api\Admin\SystemAdminController;
 use App\Http\Controllers\Api\AnalyticsDashboardController;
 use App\Http\Controllers\Api\Organization\AcademicYearController;
@@ -154,6 +155,8 @@ Route::prefix('public')->group(function () {
     Route::get('/certificates/qr/{verificationCode}', [CertificateController::class, 'qrCode']);
 });
 
+Route::post('/free-trial', [\App\Http\Controllers\Api\FreeTrialController::class, 'store']);
+
 Route::post('/forgot-password', [PasswordResetController::class, 'forgot']);
 Route::post('/reset-password', [PasswordResetController::class, 'reset']);
 Route::post('/reset-password/validate', [PasswordResetController::class, 'validateResetToken']);
@@ -263,6 +266,26 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/quizzes/{id}/statistics', [QuizController::class, 'statistics']);
     Route::get('/courses/{courseId}/quizzes', [QuizController::class, 'byCourse']);
 
+    // Gamification
+    Route::prefix('gamification')->group(function () {
+        Route::get('/streak', [\App\Http\Controllers\Api\GamificationController::class, 'streak']);
+        Route::get('/badges', [\App\Http\Controllers\Api\GamificationController::class, 'badges']);
+        Route::get('/points', [\App\Http\Controllers\Api\GamificationController::class, 'points']);
+        Route::get('/leaderboard', [\App\Http\Controllers\Api\GamificationController::class, 'leaderboard']);
+    });
+
+    // Subscriptions
+    Route::prefix('subscriptions')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Api\Finance\SubscriptionController::class, 'index']);
+        Route::post('/', [\App\Http\Controllers\Api\Finance\SubscriptionController::class, 'store']);
+        Route::post('/{id}/cancel', [\App\Http\Controllers\Api\Finance\SubscriptionController::class, 'cancel']);
+    });
+
+    // School Dashboard
+    Route::middleware('role:school_admin|admin|super_admin')->prefix('school')->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\Api\School\SchoolDashboardController::class, 'summary']);
+    });
+
     Route::middleware('role:admin|super_admin|director|branch_manager|school_admin')->prefix('admin')->group(function () {
 
         Route::get('/users', [UserController::class, 'index']);
@@ -367,6 +390,18 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/certificate-templates/{id}', [CertificateTemplateController::class, 'show']);
         Route::put('/certificate-templates/{id}', [CertificateTemplateController::class, 'update']);
         Route::delete('/certificate-templates/{id}', [CertificateTemplateController::class, 'destroy']);
+
+        // Search
+        Route::get('/search', [\App\Http\Controllers\Api\Admin\SearchController::class, 'search']);
+        Route::get('/free-trial-bookings', [\App\Http\Controllers\Api\FreeTrialController::class, 'index']);
+
+        // Refunds
+        Route::prefix('refunds')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\Finance\RefundController::class, 'index']);
+            Route::post('/', [\App\Http\Controllers\Api\Finance\RefundController::class, 'store']);
+            Route::post('/{id}/approve', [\App\Http\Controllers\Api\Finance\RefundController::class, 'approve']);
+            Route::post('/{id}/reject', [\App\Http\Controllers\Api\Finance\RefundController::class, 'reject']);
+        });
     });
 
     Route::middleware('role:admin|super_admin')->prefix('admin')->group(function () {

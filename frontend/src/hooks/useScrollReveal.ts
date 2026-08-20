@@ -1,13 +1,21 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 
 export function useScrollReveal(options?: IntersectionObserverInit) {
-  const ref = useRef<HTMLDivElement>(null);
+  const nodeRef = useRef<HTMLDivElement | null>(null);
+  const [node, setNode] = useState<HTMLDivElement | null>(null);
+
+  const callbackRef = useCallback((el: HTMLDivElement | null) => {
+    nodeRef.current = el;
+    setNode(el);
+  }, []);
 
   useEffect(() => {
-    const container = ref.current;
+    const container = node;
     if (!container) return;
 
-    // Fallback: if IntersectionObserver is not supported, reveal everything
+    // Mark container so CSS hides elements until observer reveals them
+    container.classList.add('reveal-ready');
+
     if (typeof IntersectionObserver === 'undefined') {
       container.querySelectorAll('.reveal').forEach((el) => el.classList.add('revealed'));
       container.querySelectorAll('.stagger-children').forEach((el) => el.classList.add('stagger-active'));
@@ -18,15 +26,12 @@ export function useScrollReveal(options?: IntersectionObserverInit) {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // Trigger reveal
             if (entry.target.classList.contains('reveal')) {
               entry.target.classList.add('revealed');
             }
-            // Trigger stagger-children
             if (entry.target.classList.contains('stagger-children')) {
               entry.target.classList.add('stagger-active');
             }
-            // Also check children for stagger-children
             if (entry.target.classList.contains('reveal')) {
               const staggerChildren = entry.target.querySelector('.stagger-children');
               if (staggerChildren) {
@@ -40,7 +45,6 @@ export function useScrollReveal(options?: IntersectionObserverInit) {
       { threshold: 0.08, rootMargin: '0px 0px -30px 0px', ...options }
     );
 
-    // Observe all current .reveal and .stagger-children elements
     const observeAll = () => {
       container.querySelectorAll('.reveal:not(.revealed)').forEach((el) => {
         observer.observe(el);
@@ -52,14 +56,13 @@ export function useScrollReveal(options?: IntersectionObserverInit) {
 
     observeAll();
 
-    // Watch for new elements added to the DOM (e.g. after API data loads)
     const mutationObserver = new MutationObserver(() => {
       observeAll();
     });
 
     mutationObserver.observe(container, { childList: true, subtree: true });
 
-    // Safety fallback: if nothing has revealed after 4s, force reveal everything
+    // Safety fallback: force reveal after 2s
     const safetyTimer = setTimeout(() => {
       container.querySelectorAll('.reveal:not(.revealed)').forEach((el) => {
         el.classList.add('revealed');
@@ -67,14 +70,14 @@ export function useScrollReveal(options?: IntersectionObserverInit) {
       container.querySelectorAll('.stagger-children:not(.stagger-active)').forEach((el) => {
         el.classList.add('stagger-active');
       });
-    }, 4000);
+    }, 2000);
 
     return () => {
       observer.disconnect();
       mutationObserver.disconnect();
       clearTimeout(safetyTimer);
     };
-  }, [options]);
+  }, [node, options]);
 
-  return ref;
+  return callbackRef;
 }

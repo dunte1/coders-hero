@@ -1,4 +1,4 @@
-import { Bell, Menu, Search, LogOut, User, Settings } from 'lucide-react';
+import { Bell, Menu, LogOut, User, Settings } from 'lucide-react';
 import { useI18n } from '@/i18n';
 import { useAuth } from '@/hooks/useAuth';
 import { useUIStore } from '@/store/uiStore';
@@ -12,7 +12,6 @@ import {
   DropdownMenuTrigger,
 } from '../ui/DropdownMenu';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 import { useNotificationStats } from '@/hooks/useNotifications';
 import { getInitials } from '@/lib/utils';
 
@@ -28,21 +27,13 @@ export function Header() {
   const { t } = useI18n();
   const { toggleSidebar, breadcrumbs } = useUIStore();
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
 
   const { data: notifStats } = useNotificationStats();
 
-  const displayName = user?.first_name || user?.email?.split('@')[0] || 'User';
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-    }
-  };
+  const displayName = user?.name || user?.email?.split('@')[0] || 'User';
 
   return (
-    <header className="sticky top-0 z-50 flex h-[100px] items-center gap-4 px-4 lg:px-6" style={{ backgroundColor: 'var(--header-bg)', borderBottom: '1px solid var(--header-border)' }}>
+    <header className="sticky top-0 z-50 flex h-16 items-center gap-4 px-4 lg:px-6" style={{ backgroundColor: 'var(--header-bg)', borderBottom: '1px solid var(--header-border)' }}>
       <Button
         variant="ghost"
         size="icon"
@@ -74,27 +65,12 @@ export function Header() {
         )}
       </div>
 
-      {/* Welcome message + Search bar */}
-      <div className="flex flex-1 items-center gap-4">
-        {/* Welcome message */}
+      {/* Welcome message */}
+      <div className="flex flex-1 items-center">
         <div className="hidden md:flex flex-col">
           <p className="text-sm text-slate-500">{getGreeting()} 👋</p>
           <p className="text-lg font-semibold text-slate-900">Welcome back, {displayName}!</p>
         </div>
-
-        {/* Search bar */}
-        <form onSubmit={handleSearch} className="flex-1 max-w-md ml-auto">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input
-              type="text"
-              placeholder={`${t('Search')}...`}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-4 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-            />
-          </div>
-        </form>
       </div>
 
       <div className="flex items-center gap-2">
@@ -116,9 +92,9 @@ export function Header() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-9 w-9 rounded-full">
               <Avatar className="h-9 w-9">
-                <AvatarImage src={user?.avatar} alt={user?.first_name} />
+                <AvatarImage src={user?.avatar} alt={user?.name} />
                 <AvatarFallback>
-                  {getInitials(user?.first_name || 'U', user?.last_name || 'U')}
+                  {getInitials(user?.name || 'U', '')}
                 </AvatarFallback>
               </Avatar>
             </Button>
@@ -126,7 +102,7 @@ export function Header() {
           <DropdownMenuContent align="end" className="w-48">
             <div className="px-2 py-1.5">
               <p className="text-sm font-medium text-slate-900">
-                {user?.first_name} {user?.last_name}
+                {user?.name || user?.email}
               </p>
               <p className="text-xs text-slate-500">{user?.email}</p>
             </div>

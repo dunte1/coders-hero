@@ -13,7 +13,13 @@ export function usePermissions(params?: Record<string, string | number | boolean
 export function usePermissionGroups() {
   return useQuery({
     queryKey: ['permission-groups'],
-    queryFn: permissionsApi.getPermissionGroups,
+    queryFn: async () => {
+      const res = await permissionsApi.getPermissionGroups();
+      // API returns { groupName: Permission[], ... } or string[]
+      if (Array.isArray(res)) return res;
+      if (res && typeof res === 'object') return Object.keys(res);
+      return [];
+    },
   });
 }
 

@@ -29,7 +29,7 @@ export function ChatWidget() {
     'chat.welcome_message',
     "Hello! I'm the Coder's Hero assistant. Ask me about our programs, pricing or age groups!"
   );
-  const primaryColor = getSetting(settings, 'chat.primary_color', '#4F46E5');
+  const primaryColor = getSetting(settings, 'chat.primary_color', '#00C8D7');
 
   const history = useRef<ChatMessage[]>([]);
 

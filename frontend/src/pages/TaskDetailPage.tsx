@@ -74,10 +74,10 @@ export default function TaskDetailPage() {
                   <Avatar className="h-6 w-6">
                     <AvatarImage src={task.assignee.avatar} />
                     <AvatarFallback className="text-[9px]">
-                      {getInitials(task.assignee.first_name, task.assignee.last_name)}
+                      {getInitials(task.assignee.name)}
                     </AvatarFallback>
                   </Avatar>
-                  {task.assignee.first_name} {task.assignee.last_name}
+                  {task.assignee.name}
                 </div>
               </div>
             )}

@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { BookOpen, Clock, BarChart } from 'lucide-react';
+import { BookOpen, Clock, BarChart, ArrowUpDown } from 'lucide-react';
 import { websiteApi } from '@/lib/websiteApi';
 import { usePageMeta, formatSiteTitle } from '@/hooks/usePageMeta';
 import { useCachedSiteName } from '@/hooks/useCachedSiteSettings';
@@ -17,15 +17,30 @@ const levelColors: Record<string, string> = {
 
 export default function PublicCoursesPage() {
   const siteName = useCachedSiteName();
-  usePageMeta({ title: formatSiteTitle('Courses', siteName) });
+  usePageMeta({
+    title: formatSiteTitle('Courses', siteName),
+    description: 'Browse our coding, robotics, and STEM courses for children aged 5-18.',
+  });
   usePageView();
 
   const [search, setSearch] = useState('');
+  const [sort, setSort] = useState('newest');
+  const [level, setLevel] = useState('');
 
   const { data: courses, isLoading, isError } = useQuery({
     queryKey: ['website', 'courses', search],
     queryFn: () => websiteApi.courses.list({ search: search || undefined }),
   });
+
+  const filteredCourses = useMemo(() => {
+    if (!courses) return [];
+    let result = [...courses];
+    if (level) result = result.filter((c) => c.level === level);
+    if (sort === 'price_low') result.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+    else if (sort === 'price_high') result.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
+    else if (sort === 'title') result.sort((a, b) => a.title.localeCompare(b.title));
+    return result;
+  }, [courses, sort, level]);
 
   return (
     <>
@@ -36,7 +51,7 @@ export default function PublicCoursesPage() {
       />
       <section className="bg-white py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-8">
+          <div className="mb-8 flex flex-wrap items-center gap-3">
             <input
               type="text"
               placeholder="Search courses..."
@@ -44,6 +59,35 @@ export default function PublicCoursesPage() {
               onChange={(e) => setSearch(e.target.value)}
               className="w-full max-w-md rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
             />
+            <div className="flex items-center gap-2">
+              <ArrowUpDown className="h-4 w-4 text-slate-400" />
+              <select
+                value={sort}
+                onChange={(e) => setSort(e.target.value)}
+                className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+              >
+                <option value="newest">Newest</option>
+                <option value="title">Alphabetical</option>
+                <option value="price_low">Price: Low to High</option>
+                <option value="price_high">Price: High to Low</option>
+              </select>
+            </div>
+            <div className="flex gap-2">
+              {['', 'beginner', 'intermediate', 'advanced'].map((l) => (
+                <button
+                  key={l}
+                  type="button"
+                  onClick={() => setLevel(l)}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                    level === l
+                      ? 'bg-brand-600 text-white'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {l || 'All Levels'}
+                </button>
+              ))}
+            </div>
           </div>
 
           {isLoading ? (
@@ -57,8 +101,10 @@ export default function PublicCoursesPage() {
               <p className="text-slate-400 mt-2">Try adjusting your search or check back later.</p>
             </div>
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {courses.map((course) => (
+            <>
+              <p className="text-sm text-slate-500 mb-4">{filteredCourses.length} course{filteredCourses.length !== 1 ? 's' : ''} found</p>
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {filteredCourses.map((course) => (
                 <div
                   key={course.id}
                   className="group rounded-2xl border border-slate-100 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow"
@@ -113,6 +159,7 @@ export default function PublicCoursesPage() {
                 </div>
               ))}
             </div>
+            </>
           )}
         </div>
       </section>

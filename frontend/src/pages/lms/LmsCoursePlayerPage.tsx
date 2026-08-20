@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, CheckCircle2, Play, ChevronDown, ChevronRight, FileText, Video, ClipboardCheck, PenTool } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Play, ChevronDown, ChevronRight, FileText, Video, ClipboardCheck, PenTool } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -93,6 +94,11 @@ export default function LmsCoursePlayerPage() {
     markCompleted.mutate(lessonId);
   };
 
+  // Find prev/next lessons
+  const currentLessonIndex = selectedLesson ? lessons.findIndex((l) => l.lesson_id === selectedLesson.lesson_id) : -1;
+  const prevLesson = currentLessonIndex > 0 ? lessons[currentLessonIndex - 1] : null;
+  const nextLesson = currentLessonIndex >= 0 && currentLessonIndex < lessons.length - 1 ? lessons[currentLessonIndex + 1] : null;
+
   const completedCount = lessons.filter((l) => l.completed).length;
   const totalCount = lessons.length;
   const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
@@ -123,30 +129,52 @@ export default function LmsCoursePlayerPage() {
                   {(() => { const Icon = typeIcons[selectedLesson.type ?? 'video'] ?? Video; return <Icon className="h-5 w-5 text-brand-600" />; })()}
                   <h2 className="text-xl font-bold text-slate-900">{selectedLesson.title}</h2>
                 </div>
+                {/* Video Player for video lessons */}
+                {selectedLesson.type === 'video' && selectedLesson.video_url && (
+                  <div className="aspect-video rounded-xl overflow-hidden mb-4 bg-slate-900">
+                    <video
+                      controls
+                      className="w-full h-full"
+                      src={selectedLesson.video_url}
+                      poster={selectedLesson.thumbnail}
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                )}
+
                 {selectedLesson.content ? (
                   <div className="prose prose-sm max-w-none text-slate-700">
-                    {selectedLesson.content.split('\n').map((line, i) => {
-                      if (line.startsWith('## ')) return <h3 key={i} className="text-lg font-semibold text-slate-900 mt-6 mb-2">{line.slice(3)}</h3>;
-                      if (line.startsWith('```')) return null;
-                      if (line.startsWith('- ')) return <li key={i} className="ml-4 text-slate-600">{line.slice(2)}</li>;
-                      if (line.trim() === '') return <br key={i} />;
-                      return <p key={i} className="mb-2">{line}</p>;
-                    })}
+                    <ReactMarkdown>{selectedLesson.content}</ReactMarkdown>
                   </div>
                 ) : (
                   <p className="text-slate-500 italic">No content available for this lesson.</p>
                 )}
-                <div className="mt-6 flex gap-3">
-                  {!selectedLesson.completed && (
-                    <Button onClick={() => handleComplete(selectedLesson.lesson_id)} loading={markCompleted.isPending}>
-                      <CheckCircle2 className="mr-2 h-4 w-4" />Mark as Complete
+
+                {/* Lesson Navigation */}
+                <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
+                  {prevLesson ? (
+                    <Button variant="outline" onClick={() => setSelectedLesson(prevLesson)}>
+                      <ArrowLeft className="mr-2 h-4 w-4" />Previous
                     </Button>
-                  )}
-                  {selectedLesson.completed && (
-                    <span className="inline-flex items-center gap-1 text-sm text-emerald-600 font-medium">
-                      <CheckCircle2 className="h-4 w-4" />Completed
-                    </span>
-                  )}
+                  ) : <div />}
+                  <div className="flex gap-3">
+                    {!selectedLesson.completed && (
+                      <Button onClick={() => handleComplete(selectedLesson.lesson_id)} loading={markCompleted.isPending}>
+                        <CheckCircle2 className="mr-2 h-4 w-4" />Mark as Complete
+                      </Button>
+                    )}
+                    {selectedLesson.completed && (
+                      <span className="inline-flex items-center gap-1 text-sm text-emerald-600 font-medium">
+                        <CheckCircle2 className="h-4 w-4" />Completed
+                      </span>
+                    )}
+                    {nextLesson ? (
+                      <Button onClick={() => setSelectedLesson(nextLesson)}>
+                        Next<ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    ) : null}
+                  </div>
                 </div>
               </CardContent>
             </Card>

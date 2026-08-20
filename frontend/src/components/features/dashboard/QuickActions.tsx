@@ -8,6 +8,11 @@ import {
   GraduationCap,
   Settings,
   BarChart3,
+  FileText,
+  Award,
+  ClipboardCheck,
+  CreditCard,
+  Users,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -35,6 +40,21 @@ const instructorActions: QuickAction[] = [
   { label: 'Settings', icon: Settings, href: '/settings', color: 'text-slate-600', bgColor: 'bg-slate-50 hover:bg-slate-100' },
 ];
 
+const studentActions: QuickAction[] = [
+  { label: 'My Courses', icon: GraduationCap, href: '/my-courses', color: 'text-blue-600', bgColor: 'bg-blue-50 hover:bg-blue-100' },
+  { label: 'Assignments', icon: FileText, href: '/student/assignments', color: 'text-purple-600', bgColor: 'bg-purple-50 hover:bg-purple-100' },
+  { label: 'Certificates', icon: Award, href: '/certificates', color: 'text-amber-600', bgColor: 'bg-amber-50 hover:bg-amber-100' },
+  { label: 'Settings', icon: Settings, href: '/settings', color: 'text-slate-600', bgColor: 'bg-slate-50 hover:bg-slate-100' },
+];
+
+const parentActions: QuickAction[] = [
+  { label: 'My Children', icon: Users, href: '/parent', color: 'text-blue-600', bgColor: 'bg-blue-50 hover:bg-blue-100' },
+  { label: 'Attendance', icon: ClipboardCheck, href: '/parent/attendance', color: 'text-emerald-600', bgColor: 'bg-emerald-50 hover:bg-emerald-100' },
+  { label: 'Fees', icon: CreditCard, href: '/parent/fees', color: 'text-red-600', bgColor: 'bg-red-50 hover:bg-red-100' },
+  { label: 'Report Cards', icon: GraduationCap, href: '/parent/report-cards', color: 'text-purple-600', bgColor: 'bg-purple-50 hover:bg-purple-100' },
+  { label: 'Settings', icon: Settings, href: '/settings', color: 'text-slate-600', bgColor: 'bg-slate-50 hover:bg-slate-100' },
+];
+
 interface QuickActionsProps {
   userRole?: string;
 }
@@ -43,7 +63,13 @@ export function QuickActions({ userRole }: QuickActionsProps) {
   const navigate = useNavigate();
   const role = userRole?.toLowerCase();
   const isAdmin = role === 'admin' || role === 'super_admin' || role === 'director' || role === 'branch_manager' || role === 'school_admin';
-  const actions = isAdmin ? adminActions : instructorActions;
+  const isStudent = role === 'student';
+  const isParent = role === 'parent';
+
+  let actions = instructorActions;
+  if (isAdmin) actions = adminActions;
+  else if (isStudent) actions = studentActions;
+  else if (isParent) actions = parentActions;
 
   return (
     <div className="flex flex-wrap items-center gap-2">

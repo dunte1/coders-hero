@@ -9,7 +9,7 @@ interface PageBannerProps {
 
 export function PageBanner({ title, subtitle, badge, children }: PageBannerProps) {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-brand-50 via-indigo-50/60 to-white">
+    <section className="relative overflow-hidden bg-gradient-to-b from-brand-50 via-brand-100/40 to-white">
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="max-w-2xl">
           {badge ? (

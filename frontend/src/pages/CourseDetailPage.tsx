@@ -11,7 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
 import { LessonList } from '@/components/features/courses/LessonList';
 import { formatCurrency, getInitials } from '@/lib/utils';
-import { Clock, Users, Star, Play } from 'lucide-react';
+import { Clock, Users, Star, Play, BookOpen } from 'lucide-react';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 export default function CourseDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -20,7 +21,15 @@ export default function CourseDetailPage() {
   const enrollMutation = useEnroll();
 
   if (isLoading) return <PageSpinner />;
-  if (!course) return <div className="text-center py-12 text-slate-500">Course not found</div>;
+  if (!course) return (
+    <div className="flex flex-col items-center justify-center py-20">
+      <EmptyState
+        icon={BookOpen}
+        title="Course not found"
+        description="The course you're looking for doesn't exist or has been removed."
+      />
+    </div>
+  );
 
   const isStudent = user?.role?.name?.toLowerCase() === 'student';
 
@@ -75,7 +84,11 @@ export default function CourseDetailPage() {
               {course.lessons && course.lessons.length > 0 ? (
                 <LessonList lessons={course.lessons} />
               ) : (
-                <p className="text-sm text-slate-500 text-center py-8">No lessons yet</p>
+                <EmptyState
+                  icon={BookOpen}
+                  title="No lessons yet"
+                  description="This course doesn't have any lessons yet."
+                />
               )}
             </CardContent>
           </Card>
@@ -119,12 +132,12 @@ export default function CourseDetailPage() {
                 <Avatar className="h-12 w-12">
                   <AvatarImage src={course.instructor?.avatar} />
                   <AvatarFallback>
-                    {getInitials(course.instructor?.first_name || 'I', course.instructor?.last_name || 'N')}
+                    {getInitials(course.instructor?.name || 'Instructor')}
                   </AvatarFallback>
                 </Avatar>
                 <div>
                   <p className="text-sm font-semibold text-slate-900">
-                    {course.instructor?.first_name} {course.instructor?.last_name}
+                    {course.instructor?.name}
                   </p>
                   <p className="text-xs text-slate-500">Instructor</p>
                 </div>

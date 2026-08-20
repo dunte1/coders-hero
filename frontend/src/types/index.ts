@@ -1,13 +1,16 @@
 export interface User {
   id: number;
   email: string;
-  first_name: string;
-  last_name: string;
+  name: string;
+  first_name?: string;
+  last_name?: string;
   phone?: string;
   avatar?: string;
-  role: Role;
+  role?: Role;
+  roles?: Role[];
   is_active: boolean;
-  date_joined: string;
+  date_joined?: string;
+  created_at?: string;
   last_login?: string;
   email_verified_at?: string | null;
 }
@@ -603,6 +606,11 @@ export interface DashboardStats {
   upcoming_events?: DashboardUpcomingEvent[];
   unread_notifications?: number;
   recent_notifications?: Notification[];
+  // Chart data
+  user_roles_distribution?: { name: string; value: number }[];
+  enrollment_by_level?: { name: string; value: number }[];
+  enrollment_by_month_12m?: { year: number; month: number; count: number }[];
+  revenue_by_month_12m?: { year: number; month: number; total: number }[];
   // Instructor dashboard
   courses?: DashboardCourseRef[];
   recent_enrollments?: DashboardEnrollmentRef[];

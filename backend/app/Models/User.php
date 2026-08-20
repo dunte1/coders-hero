@@ -37,6 +37,8 @@ class User extends Authenticatable
         'two_factor_recovery_codes',
         'two_factor_confirmed_at',
         'two_factor_enabled',
+        'onboarding_completed',
+        'onboarding_step',
     ];
 
     protected $hidden = [
@@ -213,6 +215,28 @@ class User extends Authenticatable
     public function codingSubmissions(): HasMany
     {
         return $this->hasMany(CodingSubmission::class);
+    }
+
+    public function learningStreak(): HasOne
+    {
+        return $this->hasOne(LearningStreak::class);
+    }
+
+    public function badges(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Badge::class, 'user_badges', 'user_id', 'badge_id')
+            ->withTimestamps()
+            ->withPivot('earned_at');
+    }
+
+    public function pointsTransactions(): HasMany
+    {
+        return $this->hasMany(PointsTransaction::class);
+    }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
     }
 
     public function notifications(): MorphMany

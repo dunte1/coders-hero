@@ -30,17 +30,27 @@ export function SidebarGroup({ entry, collapsed, defaultOpen }: SidebarGroupProp
     if (isActive) setOpen(true);
   }, [isActive]);
 
+  const [touchOpen, setTouchOpen] = useState(false);
+
   if (collapsed) {
     return (
-      <div className="relative group/nav" title={translatedLabel}>
+      <div
+        className="relative group/nav"
+        title={translatedLabel}
+        onMouseLeave={() => setTouchOpen(false)}
+      >
         <div
-          className="flex items-center justify-center rounded-lg px-2 py-2.5 transition-colors"
-          style={{ color: 'var(--sidebar-text)' }}
+          className="flex items-center justify-center rounded-lg px-2 py-2.5 transition-colors cursor-pointer"
+          style={{ color: '#ffffff' }}
+          onClick={() => setTouchOpen((v) => !v)}
         >
           {entry.icon && <entry.icon className="h-5 w-5 shrink-0" />}
         </div>
-        <div className="absolute left-full top-0 z-50 hidden min-w-48 rounded-lg border border-slate-700 bg-slate-800 p-2 shadow-xl group-hover/nav:block">
-          <p className="px-3 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+        <div className={cn(
+          "absolute left-full top-0 z-50 min-w-48 rounded-lg border border-slate-700 bg-slate-800 p-2 shadow-xl",
+          touchOpen ? "block" : "hidden group-hover/nav:block"
+        )}>
+          <p className="px-3 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-wider text-white">
             {translatedLabel}
           </p>
           {children.map((child) => (
@@ -59,20 +69,20 @@ export function SidebarGroup({ entry, collapsed, defaultOpen }: SidebarGroupProp
         className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"
         style={{
           backgroundColor: isActive ? 'rgba(255,255,255,0.05)' : undefined,
-          color: isActive ? 'var(--sidebar-active-text)' : 'var(--sidebar-text)',
+          color: '#ffffff',
         }}
         aria-expanded={open}
       >
         {entry.icon && (
           <entry.icon
             className="h-5 w-5 shrink-0"
-            style={{ color: isActive ? 'var(--sidebar-active)' : 'var(--sidebar-text)' }}
+            style={{ color: '#ffffff' }}
           />
         )}
         <span className="flex-1 text-left">{translatedLabel}</span>
         <ChevronDown
           className={cn('h-4 w-4 shrink-0 transition-transform', open && 'rotate-180')}
-          style={{ color: 'var(--sidebar-text)' }}
+          style={{ color: '#ffffff' }}
         />
       </button>
 

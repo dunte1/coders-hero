@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Search } from 'lucide-react';
+import { Search, ArrowRight } from 'lucide-react';
 import { websiteApi } from '@/lib/websiteApi';
 import { usePageMeta, formatSiteTitle } from '@/hooks/usePageMeta';
 import { useCachedSiteName } from '@/hooks/useCachedSiteSettings';
@@ -13,7 +14,10 @@ import { cn } from '@/lib/utils';
 
 export default function BlogPage() {
   const siteName = useCachedSiteName();
-  usePageMeta({ title: formatSiteTitle('Blog', siteName) });
+  usePageMeta({
+    title: formatSiteTitle('Blog', siteName),
+    description: 'Read the latest articles about coding education, robotics, STEM learning, and technology tips for kids and parents.',
+  });
   usePageView();
 
   const [page, setPage] = useState(1);
@@ -153,6 +157,22 @@ export default function BlogPage() {
               </button>
             </div>
           ) : null}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="bg-brand-600 py-16">
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+          <h2 className="font-display text-3xl font-bold text-white">Want Your Child to Love Tech?</h2>
+          <p className="mt-3 text-brand-100">Start their coding journey today with a free trial class.</p>
+          <div className="mt-6 flex flex-wrap justify-center gap-4">
+            <Link to="/free-trial" className="inline-flex h-12 items-center rounded-xl bg-white px-8 text-sm font-semibold text-brand-600 hover:bg-brand-50 transition-colors">
+              Book a Free Trial
+            </Link>
+            <Link to="/contact" className="inline-flex h-12 items-center gap-2 rounded-xl border-2 border-white px-8 text-sm font-semibold text-white hover:bg-white/10 transition-colors">
+              Contact Us<ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </section>
     </div>

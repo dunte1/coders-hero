@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Bot, Send, Plus, Trash2 } from 'lucide-react';
+import Markdown from 'react-markdown';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -184,7 +185,31 @@ function MessageBubble({ message }: { message: AiTutorMessage }) {
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
       <div className={`max-w-[80%] rounded-lg px-4 py-3 text-sm ${isUser ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-800'}`}>
-        <p className="whitespace-pre-wrap">{message.content}</p>
+        <div className={isUser ? 'whitespace-pre-wrap' : 'prose prose-sm prose-slate max-w-none'}>
+          {isUser ? (
+            <p>{message.content}</p>
+          ) : (
+            <Markdown
+              components={{
+                pre: ({ children }) => (
+                  <pre className="overflow-x-auto rounded-md bg-slate-900 p-3 text-sm text-slate-100">
+                    {children}
+                  </pre>
+                ),
+                code: ({ children, className, ...rest }) => {
+                  const isInline = !className;
+                  return isInline ? (
+                    <code className="rounded bg-slate-200 px-1 py-0.5 text-xs font-mono" {...rest}>{children}</code>
+                  ) : (
+                    <code className={className} {...rest}>{children}</code>
+                  );
+                },
+              }}
+            >
+              {message.content}
+            </Markdown>
+          )}
+        </div>
         <p className={`mt-1 text-[10px] ${isUser ? 'text-brand-200' : 'text-slate-400'}`}>
           {formatRelativeDate(message.created_at)}
         </p>

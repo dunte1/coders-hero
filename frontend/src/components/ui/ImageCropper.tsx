@@ -35,7 +35,7 @@ function getCroppedImg(imageSrc: string, pixelCrop: { x: number; y: number; widt
         pixelCrop.width,
         pixelCrop.height
       );
-      resolve(canvas.toDataURL('image/png'));
+      resolve(canvas.toDataURL('image/jpeg', 0.85));
     };
     image.src = imageSrc;
   });

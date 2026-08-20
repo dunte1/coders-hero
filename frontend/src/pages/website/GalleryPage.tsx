@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { X } from 'lucide-react';
 import { websiteApi } from '@/lib/websiteApi';
@@ -12,7 +13,10 @@ import { cn } from '@/lib/utils';
 
 export default function GalleryPage() {
   const siteName = useCachedSiteName();
-  usePageMeta({ title: formatSiteTitle('Gallery', siteName) });
+  usePageMeta({
+    title: formatSiteTitle('Gallery', siteName),
+    description: 'See photos from our coding classes, robotics workshops, and student projects at Coder\'s Hero.',
+  });
   usePageView();
 
   const [category, setCategory] = useState('');
@@ -153,6 +157,7 @@ export default function GalleryPage() {
         >
           <button
             type="button"
+            onClick={() => setLightbox(null)}
             className="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
             aria-label="Close"
           >
@@ -168,6 +173,22 @@ export default function GalleryPage() {
           </figure>
         </div>
       ) : null}
+
+      {/* CTA */}
+      <section className="bg-brand-600 py-16">
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+          <h2 className="font-display text-3xl font-bold text-white">See Our Students in Action</h2>
+          <p className="mt-3 text-brand-100">Enroll your child and watch them build amazing projects.</p>
+          <div className="mt-6 flex flex-wrap justify-center gap-4">
+            <Link to="/free-trial" className="inline-flex h-12 items-center rounded-xl bg-white px-8 text-sm font-semibold text-brand-600 hover:bg-brand-50 transition-colors">
+              Book a Free Trial
+            </Link>
+            <Link to="/contact" className="inline-flex h-12 items-center rounded-xl border-2 border-white px-8 text-sm font-semibold text-white hover:bg-white/10 transition-colors">
+              Contact Us
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

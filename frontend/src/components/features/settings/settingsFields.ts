@@ -12,13 +12,15 @@ export const generalFields: SettingsField[] = [
 
 export const brandingFields: SettingsField[] = [
   { key: 'branding.logo', label: 'Logo URL', type: 'text', default: '', isPublic: true },
+  { key: 'branding.logo_wide', label: 'Wide logo URL (header)', type: 'text', default: '', isPublic: true },
+  { key: 'branding.logo_icon', label: 'Icon logo URL (sidebar/footer)', type: 'text', default: '', isPublic: true },
   { key: 'branding.favicon', label: 'Favicon URL', type: 'text', default: '', isPublic: true },
-  { key: 'branding.primary_color', label: 'Primary color', type: 'color', default: '#4F46E5', isPublic: true },
-  { key: 'branding.secondary_color', label: 'Secondary color', type: 'color', default: '#0F766E', isPublic: true },
+  { key: 'branding.primary_color', label: 'Primary color', type: 'color', default: '#00E5E5', isPublic: true },
+  { key: 'branding.secondary_color', label: 'Secondary color', type: 'color', default: '#00C8D7', isPublic: true },
   { key: 'branding.accent_color', label: 'Accent color', type: 'color', default: '#F59E0B', isPublic: true },
   { key: 'branding.sidebar_bg_color', label: 'Sidebar background', type: 'color', default: '#0F172A', isPublic: true },
   { key: 'branding.sidebar_text_color', label: 'Sidebar text color', type: 'color', default: '#CBD5E1', isPublic: true },
-  { key: 'branding.sidebar_active_color', label: 'Sidebar active item', type: 'color', default: '#4F46E5', isPublic: true },
+  { key: 'branding.sidebar_active_color', label: 'Sidebar active item', type: 'color', default: '#00E5E5', isPublic: true },
   { key: 'branding.sidebar_active_text_color', label: 'Sidebar active text', type: 'color', default: '#FFFFFF', isPublic: true },
   { key: 'branding.header_bg_color', label: 'Header background', type: 'color', default: '#FFFFFF', isPublic: true },
   { key: 'branding.header_border_color', label: 'Header border color', type: 'color', default: '#E2E8F0', isPublic: true },

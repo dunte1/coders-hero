@@ -17,21 +17,21 @@ export function ProgramCard({ program }: { program: Program }) {
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
           {program.is_featured ? (
-            <span className="absolute left-3 top-3 rounded-full bg-amber-400 px-2.5 py-1 text-xs font-bold text-amber-950">
+            <span className="absolute left-3 top-3 rounded-full bg-brand-500 px-2.5 py-1 text-xs font-bold text-slate-900">
               Featured
             </span>
           ) : null}
         </div>
       ) : (
-        <div className="flex aspect-[16/10] items-center justify-center bg-gradient-to-br from-brand-50 to-indigo-50">
-          <span className="rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
+        <div className="flex aspect-[16/10] items-center justify-center bg-gradient-to-br from-slate-900 via-brand-900 to-slate-800">
+          <span className="rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-400 ring-1 ring-brand-500/30">
             {categoryLabels[program.category] ?? program.category}
           </span>
         </div>
       )}
 
       <div className="flex flex-1 flex-col p-5">
-        <span className="inline-flex w-fit items-center rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
+        <span className="inline-flex w-fit items-center rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700 ring-1 ring-brand-200">
           {categoryLabels[program.category] ?? program.category}
         </span>
         <h3 className="mt-3 font-display text-lg font-bold text-slate-900 group-hover:text-brand-700">

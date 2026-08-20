@@ -5,7 +5,6 @@ import { ImageCropper } from '@/components/ui/ImageCropper';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
 import { Label } from '@/components/ui/Label';
 import { Switch } from '@/components/ui/Switch';
 import { PageSpinner } from '@/components/ui/Spinner';
@@ -17,6 +16,8 @@ import {
   SelectItem,
 } from '@/components/ui/Select';
 
+const imageFields = ['branding.logo', 'branding.logo_wide', 'branding.logo_icon', 'branding.favicon'];
+
 export default function SettingsBrandingPage() {
   const { data: settings, isLoading } = useSiteSettings();
   const updateSettings = useUpdateSiteSettings();
@@ -27,16 +28,20 @@ export default function SettingsBrandingPage() {
   };
 
   const [logo, setLogo] = useState('');
+  const [logoWide, setLogoWide] = useState('');
+  const [logoIcon, setLogoIcon] = useState('');
   const [favicon, setFavicon] = useState('');
   const [form, setForm] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (settings) {
       setLogo(getValue('branding.logo'));
+      setLogoWide(getValue('branding.logo_wide'));
+      setLogoIcon(getValue('branding.logo_icon'));
       setFavicon(getValue('branding.favicon'));
       const initial: Record<string, string> = {};
       brandingFields.forEach((f) => {
-        if (f.key !== 'branding.logo' && f.key !== 'branding.favicon') {
+        if (!imageFields.includes(f.key)) {
           initial[f.key] = getValue(f.key, f.default ?? '');
         }
       });
@@ -51,9 +56,11 @@ export default function SettingsBrandingPage() {
   const handleSave = () => {
     const payload = [
       { key: 'branding.logo', value: logo, group: 'branding' },
+      { key: 'branding.logo_wide', value: logoWide, group: 'branding' },
+      { key: 'branding.logo_icon', value: logoIcon, group: 'branding' },
       { key: 'branding.favicon', value: favicon, group: 'branding' },
       ...brandingFields
-        .filter((f) => f.key !== 'branding.logo' && f.key !== 'branding.favicon')
+        .filter((f) => !imageFields.includes(f.key))
         .map((f) => ({
           key: f.key,
           value: form[f.key] ?? f.default ?? '',
@@ -65,9 +72,7 @@ export default function SettingsBrandingPage() {
     });
   };
 
-  const nonImageFields = brandingFields.filter(
-    (f) => f.key !== 'branding.logo' && f.key !== 'branding.favicon'
-  );
+  const nonImageFields = brandingFields.filter((f) => !imageFields.includes(f.key));
 
   return (
     <div className="space-y-6">
@@ -76,27 +81,80 @@ export default function SettingsBrandingPage() {
         <CardHeader>
           <CardTitle>Logo & Favicon</CardTitle>
           <CardDescription>
-            Upload a logo shown in the sidebar, navbar and footer. The favicon appears in browser tabs.
+            Upload different logo variants for different parts of the application.
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-6 sm:grid-cols-2">
-          <ImageCropper
-            value={logo || null}
-            onChange={setLogo}
-            label="Logo"
-            aspect={1}
-            circular={false}
-            hint="Square or landscape image. Recommended: 200x200px or larger."
-          />
-          <ImageCropper
-            value={favicon || null}
-            onChange={setFavicon}
-            label="Favicon"
-            aspect={1}
-            circular={false}
-            hint="Square image, ideally 64x64px or 128x128px."
-          />
+        <CardContent className="space-y-6">
+          {/* Wide logo - for website header and landing page */}
+          <div>
+            <p className="mb-1 text-sm font-semibold text-slate-900">Wide Logo (Header & Landing Page)</p>
+            <p className="mb-3 text-xs text-slate-500">
+              Horizontal/landscape logo shown in the website navbar, footer, and landing page. Recommended: 400x100px or wider.
+            </p>
+            <ImageCropper
+              value={logoWide || null}
+              onChange={setLogoWide}
+              label="Wide Logo"
+              aspect={4 / 1}
+              circular={false}
+              hint="Landscape/horizontal logo. Shown in the public website header."
+            />
+          </div>
+
+          {/* Icon logo - for sidebar and small spaces */}
+          <div>
+            <p className="mb-1 text-sm font-semibold text-slate-900">Icon Logo (Sidebar & Footer)</p>
+            <p className="mb-3 text-xs text-slate-500">
+              Square/compact logo shown in the admin sidebar and footer. Recommended: 200x200px or larger, square aspect.
+            </p>
+            <ImageCropper
+              value={logoIcon || null}
+              onChange={setLogoIcon}
+              label="Icon Logo"
+              aspect={1}
+              circular={false}
+              hint="Square logo for sidebar, footer, and compact spaces."
+            />
+          </div>
+
+          {/* Legacy logo - fallback for all locations */}
+          <div>
+            <p className="mb-1 text-sm font-semibold text-slate-900">Default Logo (Fallback)</p>
+            <p className="mb-3 text-xs text-slate-500">
+              Used as fallback when wide or icon logo is not set. Recommended: 200x200px or larger.
+            </p>
+            <ImageCropper
+              value={logo || null}
+              onChange={setLogo}
+              label="Default Logo"
+              aspect={1}
+              circular={false}
+              hint="Square or landscape. Used as fallback if wide/icon logo is not set."
+            />
+          </div>
+
+          {/* Favicon */}
+          <div>
+            <p className="mb-1 text-sm font-semibold text-slate-900">Favicon</p>
+            <p className="mb-3 text-xs text-slate-500">
+              Browser tab icon. Square image, ideally 64x64px or 128x128px.
+            </p>
+            <ImageCropper
+              value={favicon || null}
+              onChange={setFavicon}
+              label="Favicon"
+              aspect={1}
+              circular={false}
+              hint="Square image for browser tab icon."
+            />
+          </div>
         </CardContent>
+        <CardFooter className="border-t border-slate-100 flex items-center justify-between">
+          {savedAt ? <p className="text-xs text-emerald-600">Saved at {savedAt}</p> : <span />}
+          <Button onClick={handleSave} disabled={updateSettings.isPending}>
+            {updateSettings.isPending ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </CardFooter>
       </Card>
 
       {/* Colors & Typography */}

@@ -60,6 +60,22 @@ class SiteSetting extends Model
     }
 
     /**
+     * Wide logo URL for website header and landing page.
+     */
+    public static function siteLogoWide(): ?string
+    {
+        return static::getValue('branding.logo_wide');
+    }
+
+    /**
+     * Icon logo URL for sidebar and footer.
+     */
+    public static function siteLogoIcon(): ?string
+    {
+        return static::getValue('branding.logo_icon');
+    }
+
+    /**
      * Branded tagline from settings.
      */
     public static function siteTagline(): ?string
@@ -68,11 +84,11 @@ class SiteSetting extends Model
     }
 
     /**
-     * Branded primary color from settings, falling back to the default indigo.
+     * Branded primary color from settings, falling back to Hero Cyan.
      */
     public static function sitePrimaryColor(): string
     {
-        return static::getValue('branding.primary_color', '#4F46E5');
+        return static::getValue('branding.primary_color', '#00E5E5');
     }
 
     /**

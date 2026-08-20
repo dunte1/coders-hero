@@ -81,7 +81,7 @@ export default function ProgramDetailPage() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-gradient-to-b from-brand-50 via-indigo-50/60 to-white">
+      <section className="relative overflow-hidden bg-gradient-to-b from-brand-50 via-brand-100/40 to-white">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <Link
             to="/programs"
@@ -152,8 +152,8 @@ export default function ProgramDetailPage() {
                 className="aspect-[4/3] w-full rounded-3xl border border-white object-cover shadow-xl"
               />
             ) : (
-              <div className="flex aspect-[4/3] w-full items-center justify-center rounded-3xl bg-gradient-to-br from-brand-500 to-indigo-600">
-                <span className="font-display text-2xl font-bold text-white">{program.name}</span>
+              <div className="flex aspect-[4/3] w-full items-center justify-center rounded-3xl bg-gradient-to-br from-slate-900 via-brand-900 to-slate-800">
+                <span className="font-display text-2xl font-bold text-brand-400">{program.name}</span>
               </div>
             )}
           </div>
@@ -207,7 +207,7 @@ export default function ProgramDetailPage() {
       {program.outcomes.length > 0 ? (
         <section className="bg-white py-16">
           <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-            <div className="rounded-3xl bg-gradient-to-br from-brand-600 to-indigo-700 p-8 sm:p-10">
+            <div className="rounded-3xl bg-gradient-to-br from-slate-900 via-brand-900 to-slate-800 p-8 sm:p-10">
               <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-white">
                 <Award className="h-6 w-6" />
                 Learning outcomes

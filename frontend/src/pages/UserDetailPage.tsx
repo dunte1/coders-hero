@@ -22,7 +22,7 @@ export default function UserDetailPage() {
         breadcrumbs={[
           { label: 'Dashboard', href: '/dashboard' },
           { label: 'Users', href: '/users' },
-          { label: `${user.first_name} ${user.last_name}` },
+          { label: user.name || user.email },
         ]}
       />
 
@@ -32,10 +32,10 @@ export default function UserDetailPage() {
             <Avatar className="h-24 w-24 mb-4">
               <AvatarImage src={user.avatar} />
               <AvatarFallback className="text-2xl">
-                {getInitials(user.first_name, user.last_name)}
+                {getInitials(user.name, '')}
               </AvatarFallback>
             </Avatar>
-            <h2 className="text-xl font-bold">{user.first_name} {user.last_name}</h2>
+            <h2 className="text-xl font-bold">{user.name || user.email}</h2>
             <Badge className="mt-2">{user.role?.name || 'No Role'}</Badge>
             <Badge className={user.is_active ? 'bg-emerald-100 text-emerald-700 mt-2' : 'bg-red-100 text-red-700 mt-2'}>
               {user.is_active ? 'Active' : 'Inactive'}

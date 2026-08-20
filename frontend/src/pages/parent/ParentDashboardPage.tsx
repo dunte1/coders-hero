@@ -65,11 +65,11 @@ export default function ParentDashboardPage() {
       <Card>
         <CardContent className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-600 text-lg font-semibold text-white">
-            {getInitials(user?.first_name || 'P', user?.last_name || 'P')}
+            {getInitials(user?.name || 'Parent')}
           </div>
           <div className="flex-1">
             <h2 className="text-lg font-semibold text-slate-900">
-              Welcome back, {user?.first_name || 'Parent'}!
+              Welcome back, {user?.name?.split(' ')[0] || 'Parent'}!
             </h2>
             <p className="text-sm text-slate-500">
               {summary?.guardian
@@ -138,6 +138,11 @@ export default function ParentDashboardPage() {
                   <p className="text-sm text-slate-500">
                     {student.student_id} · {[student.grade, student.branch].filter(Boolean).join(' · ') || 'No class assigned'}
                   </p>
+                  {student.last_login_at && (
+                    <p className="mt-1 text-xs text-slate-400">
+                      Last active: {new Date(student.last_login_at).toLocaleDateString()}
+                    </p>
+                  )}
                   {typeof student.outstanding_fees === 'number' && student.outstanding_fees > 0 && (
                     <p className="mt-2 text-xs font-medium text-amber-600">
                       {student.outstanding_fees} outstanding fee{student.outstanding_fees === 1 ? '' : 's'}

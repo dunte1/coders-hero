@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { quizzesApi } from '@/lib/api';
 import { QuizTaker } from '@/components/features/quizzes/QuizTaker';
 import { PageSpinner } from '@/components/ui/Spinner';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { HelpCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import type { QuizSubmission } from '@/types';
 
@@ -17,7 +19,15 @@ export default function QuizTakerPage() {
   });
 
   if (isLoading) return <PageSpinner />;
-  if (!quiz) return <div className="text-center py-12">Quiz not found</div>;
+  if (!quiz) return (
+    <div className="flex flex-col items-center justify-center py-20">
+      <EmptyState
+        icon={HelpCircle}
+        title="Quiz not found"
+        description="The quiz you're looking for doesn't exist or has been removed."
+      />
+    </div>
+  );
 
   const handleSubmit = async (answers: QuizSubmission[]) => {
     try {

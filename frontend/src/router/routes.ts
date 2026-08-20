@@ -94,6 +94,11 @@ export const routes: RouteConfig[] = [
     meta: { title: 'Contact', public: true, layout: 'website' },
   },
   {
+    path: '/free-trial',
+    element: React.lazy(() => import('@/pages/website/FreeTrialPage')),
+    meta: { title: 'Book a Free Trial', public: true, layout: 'website' },
+  },
+  {
     path: '/school-partnerships',
     element: React.lazy(() => import('@/pages/website/PartnerSchoolsPage')),
     meta: { title: 'School Partnerships', public: true, layout: 'website' },
@@ -781,6 +786,16 @@ export const routes: RouteConfig[] = [
     element: React.lazy(() => import('@/pages/lms/LmsCoursePlayerPage')),
     meta: { title: 'Course Player' },
   },
+  {
+    path: '/lms/analytics',
+    element: React.lazy(() => import('@/pages/lms/StudentAnalyticsPage')),
+    meta: { title: 'My Analytics' },
+  },
+  {
+    path: '/lms/achievements',
+    element: React.lazy(() => import('@/pages/lms/AchievementsPage')),
+    meta: { title: 'Achievements' },
+  },
 
   // Messages (parents, teachers, admins)
   {
@@ -1034,6 +1049,11 @@ export const routes: RouteConfig[] = [
     path: '/finance/fee-structures',
     element: React.lazy(() => import('@/pages/finance/FeeStructuresPage')),
     meta: { title: 'Fee Structures', roles: ['admin', 'super_admin', 'accountant'] },
+  },
+  {
+    path: '/subscriptions',
+    element: React.lazy(() => import('@/pages/finance/SubscriptionsPage')),
+    meta: { title: 'Subscription' },
   },
 
   // Academics

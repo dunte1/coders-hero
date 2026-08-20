@@ -50,12 +50,12 @@ export default function AnnouncementDetailPage() {
             <Avatar className="h-8 w-8">
               <AvatarImage src={data.author?.avatar} />
               <AvatarFallback className="text-xs">
-                {getInitials(data.author?.first_name || 'A', data.author?.last_name || 'U')}
+                {getInitials(data.author?.name || 'Author')}
               </AvatarFallback>
             </Avatar>
             <div>
               <p className="text-sm font-medium">
-                {data.author?.first_name} {data.author?.last_name}
+                {data.author?.name}
               </p>
               <p className="text-xs text-slate-500">{formatDateTime(data.created_at)}</p>
             </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Pin, Lock, Trash2 } from 'lucide-react';
+import { ArrowLeft, Pin, Lock, Trash2, Reply } from 'lucide-react';
+import Markdown from 'react-markdown';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -9,6 +10,36 @@ import { Spinner } from '@/components/ui/Spinner';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { formatRelativeDate, getInitials } from '@/lib/utils';
 import { useForumThread, useCreatePost, useDeleteThread } from '@/hooks/useLms';
+import type { ForumPost } from '@/types/lms';
+
+function renderReply(
+  post: ForumPost,
+  allPosts: ForumPost[]
+): React.ReactNode {
+  const children = allPosts.filter((p) => p.parent_id === post.id);
+
+  return (
+    <div key={post.id} className="flex items-start gap-4 rounded-lg border border-slate-200 p-4">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-medium text-slate-700">
+        {post.user ? getInitials(post.user.name.split(' ')[0], post.user.name.split(' ')[1] ?? '') : '?'}
+      </div>
+      <div className="flex-1">
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-medium text-slate-900">{post.user?.name ?? 'Unknown'}</p>
+          <span className="text-xs text-slate-400">{formatRelativeDate(post.created_at)}</span>
+        </div>
+        <div className="prose prose-sm prose-slate mt-1 max-w-none">
+          <Markdown>{post.content}</Markdown>
+        </div>
+      </div>
+      {children.length > 0 && (
+        <div className="mt-2 w-full space-y-3 pl-8 border-l-2 border-slate-100">
+          {children.map((child) => renderReply(child, allPosts))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function LmsForumThreadPage() {
   const { id } = useParams<{ id: string }>();
@@ -17,6 +48,7 @@ export default function LmsForumThreadPage() {
   const createPost = useCreatePost(threadId);
   const deleteThread = useDeleteThread();
   const [content, setContent] = useState('');
+  const [replyTo, setReplyTo] = useState<number | null>(null);
 
   if (isLoading) return <Spinner />;
   if (!thread) return <EmptyState title="Thread not found" />;
@@ -26,8 +58,8 @@ export default function LmsForumThreadPage() {
 
   const handlePost = () => {
     createPost.mutate(
-      { content },
-      { onSuccess: () => setContent('') }
+      { content, parentId: replyTo ?? undefined },
+      { onSuccess: () => { setContent(''); setReplyTo(null); } }
     );
   };
 
@@ -66,7 +98,9 @@ export default function LmsForumThreadPage() {
                 {thread.is_pinned && <Pin className="h-3 w-3 text-brand-600" />}
                 {thread.is_locked && <Lock className="h-3 w-3 text-slate-400" />}
               </div>
-              <p className="mt-2 whitespace-pre-wrap text-sm text-slate-700">{thread.content}</p>
+              <div className="prose prose-sm prose-slate mt-2 max-w-none">
+                <Markdown>{thread.content}</Markdown>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -82,17 +116,34 @@ export default function LmsForumThreadPage() {
               <EmptyState title="No replies yet" description="Be the first to reply." />
             ) : (
               topLevel.map((p) => (
-                <div key={p.id} className="flex items-start gap-4 rounded-lg border border-slate-200 p-4">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-medium text-slate-700">
-                    {p.user ? getInitials(p.user.name.split(' ')[0], p.user.name.split(' ')[1] ?? '') : '?'}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-slate-900">{p.user?.name ?? 'Unknown'}</p>
-                      <span className="text-xs text-slate-400">{formatRelativeDate(p.created_at)}</span>
+                <div key={p.id}>
+                  <div className="flex items-start gap-4 rounded-lg border border-slate-200 p-4">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-medium text-slate-700">
+                      {p.user ? getInitials(p.user.name.split(' ')[0], p.user.name.split(' ')[1] ?? '') : '?'}
                     </div>
-                    <p className="mt-1 whitespace-pre-wrap text-sm text-slate-700">{p.content}</p>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium text-slate-900">{p.user?.name ?? 'Unknown'}</p>
+                        <span className="text-xs text-slate-400">{formatRelativeDate(p.created_at)}</span>
+                      </div>
+                      <div className="prose prose-sm prose-slate mt-1 max-w-none">
+                        <Markdown>{p.content}</Markdown>
+                      </div>
+                      {!thread.is_locked && (
+                        <button
+                          onClick={() => setReplyTo(replyTo === p.id ? null : p.id)}
+                          className="mt-2 flex items-center gap-1 text-xs text-slate-500 hover:text-brand-600"
+                        >
+                          <Reply className="h-3 w-3" /> Reply
+                        </button>
+                      )}
+                    </div>
                   </div>
+                  {p.replies && p.replies.length > 0 && (
+                    <div className="ml-8 mt-2 space-y-3 border-l-2 border-slate-100 pl-4">
+                      {p.replies.map((child) => renderReply(child, posts))}
+                    </div>
+                  )}
                 </div>
               ))
             )}
@@ -102,6 +153,12 @@ export default function LmsForumThreadPage() {
         {!thread.is_locked && (
           <Card>
             <CardContent className="p-6">
+              {replyTo !== null && (
+                <div className="mb-3 flex items-center justify-between rounded-md bg-slate-50 px-3 py-2 text-sm text-slate-600">
+                  <span>Replying to post #{replyTo}</span>
+                  <button onClick={() => setReplyTo(null)} className="text-xs text-slate-400 hover:text-slate-600">Cancel</button>
+                </div>
+              )}
               <Textarea
                 label="Your reply"
                 value={content}

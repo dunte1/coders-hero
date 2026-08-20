@@ -11,7 +11,10 @@ import { Spinner } from '@/components/ui/Spinner';
 
 export default function FaqPage() {
   const siteName = useCachedSiteName();
-  usePageMeta({ title: formatSiteTitle('FAQs', siteName) });
+  usePageMeta({
+    title: formatSiteTitle('FAQs', siteName),
+    description: 'Frequently asked questions about Coder\'s Hero coding and robotics programs for children. Find answers about enrollment, pricing, and more.',
+  });
   usePageView();
 
   const { data, isLoading, isError } = useQuery({

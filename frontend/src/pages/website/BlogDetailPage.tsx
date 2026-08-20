@@ -141,7 +141,7 @@ export default function BlogDetailPage() {
             </div>
           ) : null}
 
-          <div className="mt-8 rounded-2xl bg-gradient-to-br from-brand-600 to-indigo-700 p-8 text-center">
+          <div className="mt-8 rounded-2xl bg-gradient-to-br from-slate-900 via-brand-900 to-slate-800 p-8 text-center">
             <h2 className="font-display text-2xl font-bold text-white">
               Want your child to love tech?
             </h2>

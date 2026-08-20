@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { websiteApi, isProgramCategory } from '@/lib/websiteApi';
 import { usePageMeta, formatSiteTitle } from '@/hooks/usePageMeta';
@@ -20,7 +20,10 @@ const filters = [
 
 export default function ProgramsPage() {
   const siteName = useCachedSiteName();
-  usePageMeta({ title: formatSiteTitle('Programs', siteName) });
+  usePageMeta({
+    title: formatSiteTitle('Programs', siteName),
+    description: 'Explore our coding, robotics, and STEM programs designed for children aged 5-18. Find the perfect program for your child.',
+  });
   usePageView();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -135,12 +138,12 @@ export default function ProgramsPage() {
           <p className="mt-3 text-slate-600">
             Talk to us and we'll help you pick the perfect program for your child's age and interests.
           </p>
-          <a
-            href="/contact"
+          <Link
+            to="/contact"
             className="mt-6 inline-flex h-11 items-center rounded-xl bg-brand-600 px-6 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
           >
             Book a Free Trial
-          </a>
+          </Link>
         </div>
       </section>
     </div>

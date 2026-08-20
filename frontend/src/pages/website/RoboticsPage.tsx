@@ -29,7 +29,10 @@ const highlights = [
 
 export default function RoboticsPage() {
   const siteName = useCachedSiteName();
-  usePageMeta({ title: formatSiteTitle('Robotics', siteName) });
+  usePageMeta({
+    title: formatSiteTitle('Robotics', siteName),
+    description: 'Hands-on robotics classes for kids. Build, program, and control robots while learning STEM skills at Coder\'s Hero.',
+  });
   usePageView();
 
   const { data: site } = useQuery({ queryKey: ['website', 'site'], queryFn: websiteApi.site.get });

@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { CheckCircle2, Clock, Mail, MapPin, Phone } from 'lucide-react';
+import { CheckCircle2, Clock, Mail, MapPin, Phone, MessageCircle } from 'lucide-react';
 import { websiteApi } from '@/lib/websiteApi';
 import { usePageMeta, formatSiteTitle } from '@/hooks/usePageMeta';
 import { useCachedSiteName } from '@/hooks/useCachedSiteSettings';
@@ -26,7 +26,10 @@ type ContactFormValues = z.infer<typeof contactSchema>;
 
 export default function ContactPage() {
   const siteName = useCachedSiteName();
-  usePageMeta({ title: formatSiteTitle('Contact', siteName) });
+  usePageMeta({
+    title: formatSiteTitle('Contact', siteName),
+    description: 'Get in touch with Coder\'s Hero. Questions about our coding and robotics programs? Send us a message or call us.',
+  });
   usePageView();
 
   const { data } = useQuery({ queryKey: ['website', 'site'], queryFn: websiteApi.site.get });
@@ -143,6 +146,21 @@ export default function ContactPage() {
           </div>
 
           <div className="space-y-4 lg:col-span-2">
+            {/* WhatsApp Button */}
+            <a
+              href="https://wa.me/254793474747?text=Hi%20Coder's%20Hero%2C%20I'm%20interested%20in%20your%20programs"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 rounded-2xl border border-green-200 bg-green-50 p-5 transition-colors hover:bg-green-100"
+            >
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-500 text-white">
+                <MessageCircle className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Chat with us</p>
+                <p className="mt-0.5 text-sm font-medium text-green-900">Message on WhatsApp</p>
+              </div>
+            </a>
             {contactDetails.map(
               (item) =>
                 item && (

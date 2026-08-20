@@ -5,24 +5,24 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 185 100% 6%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 185 100% 6%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --popover-foreground: 185 100% 6%;
+    --primary: 180 100% 47%;
+    --primary-foreground: 185 100% 6%;
+    --secondary: 180 32% 94%;
+    --secondary-foreground: 185 100% 6%;
+    --muted: 180 20% 96%;
+    --muted-foreground: 180 5% 46%;
+    --accent: 180 32% 94%;
+    --accent-foreground: 185 100% 6%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --destructive-foreground: 180 40% 98%;
+    --border: 180 13% 91%;
+    --input: 180 13% 91%;
+    --ring: 180 100% 47%;
     --radius: 0.5rem;
   }
 
@@ -60,13 +60,18 @@
     -webkit-line-clamp: 2;
   }
 
-  /* Scroll reveal animation */
+  /* Scroll reveal — CONTENT FIRST: visible by default */
   .reveal {
-    opacity: 0;
-    transform: translateY(24px);
+    opacity: 1;
+    transform: translateY(0);
     transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .reveal.revealed {
+  /* When JS observer is active, hide elements until revealed */
+  .reveal-ready .reveal:not(.revealed) {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  .reveal-ready .reveal.revealed {
     opacity: 1;
     transform: translateY(0);
   }
@@ -97,23 +102,28 @@
     transition: opacity 0.2s ease-out, transform 0.2s ease-out;
   }
 
-  /* Stagger children — paused until .stagger-active is added */
+  /* Stagger children — CONTENT FIRST: visible by default */
   .stagger-children > * {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal-ready .stagger-children:not(.stagger-active) > * {
     opacity: 0;
     transform: translateY(20px);
   }
-  .stagger-children.stagger-active > * {
+  .reveal-ready .stagger-children.stagger-active > * {
     animation: staggerChild 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
-  .stagger-children.stagger-active > *:nth-child(1) { animation-delay: 0.05s; }
-  .stagger-children.stagger-active > *:nth-child(2) { animation-delay: 0.1s; }
-  .stagger-children.stagger-active > *:nth-child(3) { animation-delay: 0.15s; }
-  .stagger-children.stagger-active > *:nth-child(4) { animation-delay: 0.2s; }
-  .stagger-children.stagger-active > *:nth-child(5) { animation-delay: 0.25s; }
-  .stagger-children.stagger-active > *:nth-child(6) { animation-delay: 0.3s; }
-  .stagger-children.stagger-active > *:nth-child(7) { animation-delay: 0.35s; }
-  .stagger-children.stagger-active > *:nth-child(8) { animation-delay: 0.4s; }
-  .stagger-children.stagger-active > *:nth-child(n+9) { animation-delay: 0.45s; }
+  .reveal-ready .stagger-children.stagger-active > *:nth-child(1) { animation-delay: 0.05s; }
+  .reveal-ready .stagger-children.stagger-active > *:nth-child(2) { animation-delay: 0.1s; }
+  .reveal-ready .stagger-children.stagger-active > *:nth-child(3) { animation-delay: 0.15s; }
+  .reveal-ready .stagger-children.stagger-active > *:nth-child(4) { animation-delay: 0.2s; }
+  .reveal-ready .stagger-children.stagger-active > *:nth-child(5) { animation-delay: 0.25s; }
+  .reveal-ready .stagger-children.stagger-active > *:nth-child(6) { animation-delay: 0.3s; }
+  .reveal-ready .stagger-children.stagger-active > *:nth-child(7) { animation-delay: 0.35s; }
+  .reveal-ready .stagger-children.stagger-active > *:nth-child(8) { animation-delay: 0.4s; }
+  .reveal-ready .stagger-children.stagger-active > *:nth-child(n+9) { animation-delay: 0.45s; }
 
   /* Shimmer loading */
   .shimmer {

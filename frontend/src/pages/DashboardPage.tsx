@@ -11,6 +11,10 @@ import {
   EnrollmentChart,
   CourseStatsChart,
   CompletionChart,
+  AttendanceDoughnut,
+  UserRolesPie,
+  EnrollmentByLevelBar,
+  RevenueChart,
 } from '@/components/features/dashboard/Charts';
 import { NotificationList } from '@/components/features/notifications/NotificationList';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -93,8 +97,19 @@ function buildDeadlines(stats: DashboardStats): DeadlineItem[] {
     .slice(0, 6);
 }
 
+function buildAttendanceSlices(stats: DashboardStats): { name: string; value: number }[] {
+  const s = stats.overview?.attendance_summary;
+  if (!s || s.total === 0) return [];
+  return [
+    { name: 'present', value: s.present },
+    { name: 'late', value: s.late },
+    { name: 'absent', value: s.absent },
+    { name: 'excused', value: Number((s as Record<string, unknown>).excused ?? 0) },
+  ].filter((d) => d.value > 0);
+}
+
 export default function DashboardPage() {
-  const { data: stats, isLoading } = useDashboard();
+  const { data: stats, isLoading, isError } = useDashboard();
   const { user } = useAuth();
 
   if (user?.role?.name?.toLowerCase() === 'parent') {
@@ -102,7 +117,7 @@ export default function DashboardPage() {
   }
 
   if (isLoading) return <PageSpinner />;
-  if (error) return (
+  if (isError) return (
     <div className="flex flex-col items-center justify-center py-20">
       <div className="text-slate-400 mb-4">
         <svg className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -131,8 +146,9 @@ export default function DashboardPage() {
   const activities = buildActivities(stats);
   const deadlines = buildDeadlines(stats);
   const hasAdminData = Boolean(stats.enrollment_stats);
+  const attendanceSlices = buildAttendanceSlices(stats);
 
-  const enrollmentData = (stats.enrollment_stats?.monthly ?? []).map((m) => ({
+  const enrollmentData = (stats.enrollment_by_month_12m ?? stats.enrollment_stats?.monthly ?? []).map((m) => ({
     month: MONTHS[(m.month - 1) % 12],
     enrollments: m.count,
   }));
@@ -146,37 +162,49 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Stats Grid */}
+
+      {/* ── Section 1: Stats Cards ── */}
       <StatsGrid stats={stats} userRole={user?.role?.name} />
 
-      {/* Quick Actions */}
+      {/* ── Section 2: Quick Actions ── */}
       <QuickActions userRole={user?.role?.name} />
 
-      {/* Main Content: Charts + Activity/Deadlines */}
-      {hasAdminData ? (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <EnrollmentChart data={enrollmentData} />
-            <CompletionChart data={completionData} />
-          </div>
-          <div className="space-y-6">
-            <RecentActivity activities={activities} />
-            <UpcomingDeadlines items={deadlines} />
-          </div>
-        </div>
-      ) : (
+      {/* ── Section 3: Charts Row 1 — Trends ── */}
+      {hasAdminData && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <RecentActivity activities={activities} />
-          <UpcomingDeadlines items={deadlines} />
+          <EnrollmentChart data={enrollmentData} />
+          <RevenueChart data={stats.revenue_by_month_12m ?? []} />
         </div>
       )}
 
-      {/* Course Distribution + Notifications */}
+      {/* ── Section 4: Charts Row 2 — Distribution ── */}
+      {hasAdminData && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="lg:col-span-2">
+            <CompletionChart data={completionData} />
+          </div>
+          <AttendanceDoughnut data={attendanceSlices} />
+          <UserRolesPie data={stats.user_roles_distribution ?? []} />
+        </div>
+      )}
+
+      {/* ── Section 5: Charts Row 3 — Popularity + Activity ── */}
       {hasAdminData && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <CourseStatsChart data={courseData} />
+            <EnrollmentByLevelBar data={stats.enrollment_by_level ?? []} />
           </div>
+          <CourseStatsChart data={courseData} />
+        </div>
+      )}
+
+      {/* ── Section 6: Activity + Deadlines ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <RecentActivity activities={activities} />
+        </div>
+        <div className="space-y-6">
+          <UpcomingDeadlines items={deadlines} />
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Recent Notifications</CardTitle>
@@ -186,14 +214,14 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </div>
-      )}
+      </div>
 
-      {/* AI Insights */}
+      {/* ── Section 7: AI Insights ── */}
       {hasAdminData && stats.overview?.ai_insights && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Bot className="h-5 w-5 text-indigo-500" />
+              <Bot className="h-5 w-5 text-brand-600" />
               AI Platform Insights
               <span className="text-xs font-normal text-slate-400 ml-1">(last 30 days)</span>
             </CardTitle>
@@ -201,12 +229,12 @@ export default function DashboardPage() {
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
               {[
-                { icon: MessageSquare, label: 'Interactions', value: stats.overview.ai_insights.total_interactions_30d, color: 'text-blue-500' },
-                { icon: TrendingUp, label: 'Tokens Used', value: stats.overview.ai_insights.total_tokens_30d.toLocaleString(), color: 'text-emerald-500' },
+                { icon: MessageSquare, label: 'Interactions', value: stats.overview.ai_insights.total_interactions_30d, color: 'text-brand-600' },
+                { icon: TrendingUp, label: 'Tokens Used', value: stats.overview.ai_insights.total_tokens_30d.toLocaleString(), color: 'text-blue-500' },
                 { icon: Coins, label: 'Total Cost', value: `$${stats.overview.ai_insights.total_cost_30d.toFixed(2)}`, color: 'text-amber-500' },
                 { icon: TrendingUp, label: 'Avg Tokens/Chat', value: stats.overview.ai_insights.avg_tokens_per_interaction, color: 'text-purple-500' },
                 { icon: Users, label: 'Active Users', value: stats.overview.ai_insights.unique_users_30d, color: 'text-rose-500' },
-                { icon: Bot, label: 'Top Assistant', value: stats.overview.ai_insights.top_assistant ?? 'N/A', color: 'text-indigo-500', isText: true },
+                { icon: Bot, label: 'Top Assistant', value: stats.overview.ai_insights.top_assistant ?? 'N/A', color: 'text-slate-600', isText: true },
               ].map((item) => (
                 <div key={item.label} className="flex flex-col items-center text-center p-3 rounded-xl bg-slate-50">
                   <item.icon className={`h-5 w-5 mb-2 ${item.color}`} />

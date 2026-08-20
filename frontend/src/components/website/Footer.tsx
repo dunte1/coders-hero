@@ -10,7 +10,7 @@ import {
   Mail,
   MapPin,
   Clock,
-  Rocket,
+  Zap,
 } from 'lucide-react';
 import { websiteApi } from '@/lib/websiteApi';
 import { getSetting } from '@/types/website';
@@ -44,6 +44,8 @@ export function Footer() {
   const address = getSetting(settings, 'general.address');
   const hours = getSetting(settings, 'general.hours');
   const logo = getSetting(settings, 'branding.logo');
+  const logoWide = getSetting(settings, 'branding.logo_wide');
+  const footerLogo = logoWide || logo;
 
   return (
     <footer className="border-t border-slate-800 bg-slate-900 text-slate-300">
@@ -51,14 +53,16 @@ export function Footer() {
         <div className="grid gap-10 lg:grid-cols-4">
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 text-white">
-                {logo ? (
-                  <img src={logo} alt={siteName} className="h-5 w-5 rounded object-contain" />
-                ) : (
-                  <Rocket className="h-5 w-5" />
-                )}
-              </span>
-              <span className="font-display text-lg font-bold text-white">{siteName}</span>
+              {footerLogo ? (
+                <img src={footerLogo} alt={siteName} className="h-[50px] max-w-[200px] rounded object-contain" />
+              ) : logo ? (
+                <img src={logo} alt={siteName} className="h-[50px] w-[50px] rounded object-contain" />
+              ) : (
+                <Zap className="h-10 w-10 text-brand-400" />
+              )}
+              {!footerLogo && (
+                <span className="font-display text-lg font-bold text-white">{siteName}</span>
+              )}
             </Link>
             <p className="text-sm text-slate-400">{tagline}</p>
             <div className="flex items-center gap-2">
@@ -72,7 +76,7 @@ export function Footer() {
                     target="_blank"
                     rel="noreferrer"
                     aria-label={key}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-800 text-slate-400 transition-colors hover:bg-brand-600 hover:text-white"
+                    className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-800 text-slate-400 transition-colors hover:bg-brand-500 hover:text-slate-900"
                   >
                     <Icon className="h-4 w-4" />
                   </a>
@@ -165,6 +169,17 @@ export function Footer() {
                   <span>{hours}</span>
                 </li>
               ) : null}
+              <li className="flex items-center gap-2.5">
+                <MessageCircle className="h-4 w-4 shrink-0 text-green-400" />
+                <a
+                  href="https://wa.me/254793474747?text=Hi%20Coder's%20Hero%2C%20I'm%20interested%20in%20your%20programs"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white"
+                >
+                  Chat on WhatsApp
+                </a>
+              </li>
             </ul>
           </div>
         </div>

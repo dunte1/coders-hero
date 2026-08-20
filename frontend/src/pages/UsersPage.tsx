@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
 import { DialogRoot, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/Dialog';
-import { getInitials, getStatusColor } from '@/lib/utils';
+import { getStatusColor } from '@/lib/utils';
 import { Pencil, Trash2 } from 'lucide-react';
 import type { User } from '@/types';
 
@@ -24,27 +24,34 @@ export default function UsersPage() {
     {
       key: 'user',
       header: 'User',
-      render: (item) => (
-        <div className="flex items-center gap-3">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={item.avatar} />
-            <AvatarFallback className="text-xs">
-              {getInitials(item.first_name, item.last_name)}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="font-medium text-slate-900">{item.first_name} {item.last_name}</p>
-            <p className="text-xs text-slate-500">{item.email}</p>
+      render: (item) => {
+        const nameParts = (item.name ?? '').trim().split(/\s+/);
+        const initials = `${nameParts[0]?.[0] ?? ''}${nameParts[1]?.[0] ?? ''}`.toUpperCase();
+        return (
+          <div className="flex items-center gap-3">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={item.avatar} />
+              <AvatarFallback className="text-xs">
+                {initials || '??'}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-medium text-slate-900">{item.name || item.email}</p>
+              <p className="text-xs text-slate-500">{item.email}</p>
+            </div>
           </div>
-        </div>
-      ),
+        );
+      },
     },
     {
       key: 'role',
       header: 'Role',
-      render: (item) => (
-        <Badge variant="secondary">{item.role?.name || 'No Role'}</Badge>
-      ),
+      render: (item) => {
+        const role = Array.isArray(item.roles) ? item.roles[0] : item.role;
+        return (
+          <Badge variant="secondary">{role?.name || 'No Role'}</Badge>
+        );
+      },
     },
     {
       key: 'is_active',
@@ -58,7 +65,11 @@ export default function UsersPage() {
     {
       key: 'date_joined',
       header: 'Joined',
-      render: (item) => new Date(item.date_joined).toLocaleDateString(),
+      render: (item) => {
+        const d = item.created_at ?? item.date_joined;
+        if (!d) return <span className="text-slate-400">—</span>;
+        return <span>{new Date(d).toLocaleDateString()}</span>;
+      },
     },
   ];
 

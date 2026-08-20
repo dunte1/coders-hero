@@ -249,21 +249,21 @@ export const loginHistoryApi = {
 // Users
 export const usersApi = {
   getUsers: (params?: Record<string, string | number | boolean>) =>
-    api.get<PaginatedResponse<User>>('/admin/users/', { params }).then(unwrapPage),
+    api.get(`/admin/users`, { params }).then((r) => unwrapPage<User>(r)),
   getUser: (id: number) =>
-    api.get<User>(`/admin/users/${id}/`).then(handleResponse),
+    api.get(`/admin/users/${id}`).then((r) => handleResponse<User>(r)),
   createUser: (data: UserCreate) =>
-    api.post<User>('/admin/users/', data).then(handleResponse),
+    api.post('/admin/users', data).then((r) => handleResponse<User>(r)),
   updateUser: (id: number, data: UserUpdate) =>
-    api.put<User>(`/admin/users/${id}/`, data).then(handleResponse),
+    api.put(`/admin/users/${id}`, data).then((r) => handleResponse<User>(r)),
   deleteUser: (id: number) =>
-    api.delete(`/admin/users/${id}/`).then(handleResponse),
+    api.delete(`/admin/users/${id}`).then(handleResponse),
   assignRole: (userId: number, roleName: string) =>
-    api.post(`/admin/users/${userId}/assign-role/`, { role: roleName }).then(handleResponse),
+    api.post(`/admin/users/${userId}/assign-role`, { role: roleName }).then(handleResponse),
   removeRole: (userId: number, roleName: string) =>
-    api.delete(`/admin/users/${userId}/remove-role/`, { data: { role: roleName } }).then(handleResponse),
+    api.delete(`/admin/users/${userId}/remove-role`, { data: { role: roleName } }).then(handleResponse),
   toggleStatus: (userId: number) =>
-    api.post(`/admin/users/${userId}/toggle-status/`).then(handleResponse),
+    api.post(`/admin/users/${userId}/toggle-status`).then(handleResponse),
 };
 
 // Courses
@@ -524,4 +524,10 @@ export const studentAssignmentsApi = {
     }).then(unwrap),
   mySubmissions: (params?: Record<string, string | number | boolean>) =>
     api.get('/student/assignments/my-submissions', { params }).then(unwrapPage),
+};
+
+// Search
+export const searchApi = {
+  search: (params: { q: string; type?: string }) =>
+    api.get('/admin/search', { params }).then((res) => res.data.data),
 };

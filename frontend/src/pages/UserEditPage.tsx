@@ -12,8 +12,7 @@ import { Switch } from '@/components/ui/Switch';
 
 const schema = z.object({
   email: z.string().email('Valid email required'),
-  first_name: z.string().min(2, 'Min 2 characters'),
-  last_name: z.string().min(2, 'Min 2 characters'),
+  name: z.string().min(2, 'Min 2 characters'),
   phone: z.string().optional(),
   is_active: z.boolean(),
 });
@@ -30,8 +29,7 @@ export default function UserEditPage() {
     resolver: zodResolver(schema),
     values: {
       email: user?.email || '',
-      first_name: user?.first_name || '',
-      last_name: user?.last_name || '',
+      name: user?.name || '',
       phone: user?.phone || '',
       is_active: user?.is_active ?? true,
     },
@@ -53,10 +51,7 @@ export default function UserEditPage() {
       <Card>
         <CardContent className="p-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Input label="First Name" error={errors.first_name?.message} {...register('first_name')} />
-              <Input label="Last Name" error={errors.last_name?.message} {...register('last_name')} />
-            </div>
+            <Input label="Full Name" error={errors.name?.message} {...register('name')} />
             <Input label="Email" type="email" error={errors.email?.message} {...register('email')} />
             <Input label="Phone" type="tel" {...register('phone')} />
             <div className="flex items-center gap-3">

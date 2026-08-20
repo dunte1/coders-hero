@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { Calendar, MapPin, Clock } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Calendar, MapPin, Clock, Download, ArrowRight } from 'lucide-react';
 import { websiteApi } from '@/lib/websiteApi';
 import { usePageMeta, formatSiteTitle } from '@/hooks/usePageMeta';
 import { useCachedSiteName } from '@/hooks/useCachedSiteSettings';
@@ -17,9 +18,33 @@ const eventTypeColors: Record<string, string> = {
   other: 'bg-slate-100 text-slate-700',
 };
 
+const addToCalendar = (event: { title: string; description?: string | null; starts_at: string; ends_at?: string | null; location?: string | null }) => {
+  const formatIcsDate = (d: string) => new Date(d).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  const ics = [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', "PRODID:-//Coder's Hero//Events//EN",
+    'BEGIN:VEVENT',
+    `DTSTART:${formatIcsDate(event.starts_at)}`,
+    `DTEND:${formatIcsDate(event.ends_at || event.starts_at)}`,
+    `SUMMARY:${event.title}`,
+    `DESCRIPTION:${event.description || ''}`,
+    event.location ? `LOCATION:${event.location}` : '',
+    'END:VEVENT', 'END:VCALENDAR',
+  ].filter(Boolean).join('\n');
+  const blob = new Blob([ics], { type: 'text/calendar' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${event.title.replace(/[^a-z0-9]/gi, '_')}.ics`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
 export default function EventsPage() {
   const siteName = useCachedSiteName();
-  usePageMeta({ title: formatSiteTitle('Events', siteName) });
+  usePageMeta({
+    title: formatSiteTitle('Events', siteName),
+    description: 'Stay updated with upcoming coding workshops, robotics competitions, exhibitions, and community events at Coder\'s Hero.',
+  });
   usePageView();
 
   const { data: events, isLoading, isError } = useQuery({
@@ -82,10 +107,34 @@ export default function EventsPage() {
                       </div>
                     )}
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => addToCalendar(event)}
+                    className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-brand-600 hover:text-brand-700"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Add to Calendar
+                  </button>
                 </div>
               ))}
             </div>
           )}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="bg-brand-600 py-16">
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+          <h2 className="font-display text-3xl font-bold text-white">Don't Miss Our Events</h2>
+          <p className="mt-3 text-brand-100">Join our next workshop or competition and let your child explore technology.</p>
+          <div className="mt-6 flex flex-wrap justify-center gap-4">
+            <Link to="/free-trial" className="inline-flex h-12 items-center rounded-xl bg-white px-8 text-sm font-semibold text-brand-600 hover:bg-brand-50 transition-colors">
+              Book a Free Trial
+            </Link>
+            <Link to="/contact" className="inline-flex h-12 items-center gap-2 rounded-xl border-2 border-white px-8 text-sm font-semibold text-white hover:bg-white/10 transition-colors">
+              Contact Us<ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </section>
     </>

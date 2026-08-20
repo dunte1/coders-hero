@@ -26,8 +26,7 @@ import {
 } from 'lucide-react';
 
 const profileSchema = z.object({
-  first_name: z.string().min(2),
-  last_name: z.string().min(2),
+  name: z.string().min(2),
   email: z.string().email(),
   phone: z.string().optional(),
 });
@@ -113,8 +112,7 @@ export default function ProfilePage() {
   const { register: regProfile, handleSubmit: handleSubmitProfile, formState: { errors: profileErrors } } = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
     values: {
-      first_name: user?.first_name || '',
-      last_name: user?.last_name || '',
+      name: user?.name || '',
       email: user?.email || '',
       phone: user?.phone || '',
     },
@@ -218,7 +216,7 @@ export default function ProfilePage() {
             <Avatar className="h-24 w-24 ring-4 ring-white shadow-lg">
               <AvatarImage src={avatarPreview || user.avatar} />
               <AvatarFallback className="text-2xl bg-brand-100 text-brand-700">
-                {getInitials(user.first_name || 'U', user.last_name || 'U')}
+                {getInitials(user.name || 'User')}
               </AvatarFallback>
             </Avatar>
             <button
@@ -240,7 +238,7 @@ export default function ProfilePage() {
 
           <div className="flex-1 min-w-0">
             <h2 className="text-xl font-bold text-slate-900">
-              {user.first_name} {user.last_name}
+              {user.name}
             </h2>
             <p className="text-sm text-slate-500">{user.email}</p>
             <div className="mt-1.5 flex flex-wrap items-center gap-2">
@@ -308,10 +306,7 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmitProfile(onProfileSubmit)} className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Input label="First Name" error={profileErrors.first_name?.message} {...regProfile('first_name')} />
-              <Input label="Last Name" error={profileErrors.last_name?.message} {...regProfile('last_name')} />
-            </div>
+            <Input label="Name" error={profileErrors.name?.message} {...regProfile('name')} />
             <div>
               <Input
                 label="Email"

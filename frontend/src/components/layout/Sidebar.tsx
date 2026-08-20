@@ -16,7 +16,8 @@ export function Sidebar({ className }: SidebarProps) {
   const { user } = useAuthStore();
   const { sidebarOpen, setSidebarOpen, sidebarCollapsed, toggleSidebarCollapsed } = useUIStore();
   const { navigation } = useNavigation();
-  const { siteName, logo } = useSiteBranding();
+  const { siteName, logo, logoIcon } = useSiteBranding();
+  const sidebarLogo = logoIcon || logo;
 
   return (
     <>
@@ -39,24 +40,24 @@ export function Sidebar({ className }: SidebarProps) {
         {/* Header */}
         <div className="flex h-16 items-center justify-between px-4" style={{ borderBottom: '1px solid var(--header-border)' }}>
           {sidebarCollapsed ? (
-            <div className="mx-auto flex h-8 w-8 items-center justify-center rounded-lg" style={{ backgroundColor: 'var(--sidebar-active)' }}>
-              {logo ? (
-                <img src={logo} alt={siteName} className="h-5 w-5 rounded object-contain" />
+            <div className="mx-auto flex h-10 w-10 items-center justify-center">
+              {sidebarLogo ? (
+                <img src={sidebarLogo} alt={siteName} className="h-8 w-8 object-contain" />
               ) : (
-                <GraduationCap className="h-5 w-5" style={{ color: 'var(--sidebar-active-text)' }} />
+                <GraduationCap className="h-6 w-6 text-white" />
               )}
             </div>
           ) : (
             <>
               <div className="flex items-center gap-2 min-w-0">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: 'var(--sidebar-active)' }}>
-                  {logo ? (
-                    <img src={logo} alt={siteName} className="h-5 w-5 rounded object-contain" />
+                <div className="flex shrink-0 items-center justify-center">
+                  {sidebarLogo ? (
+                    <img src={sidebarLogo} alt={siteName} className="h-8 w-8 object-contain" />
                   ) : (
-                    <GraduationCap className="h-5 w-5" style={{ color: 'var(--sidebar-active-text)' }} />
+                    <GraduationCap className="h-6 w-6 text-white" />
                   )}
                 </div>
-                <span className="text-lg font-bold truncate" style={{ color: 'var(--sidebar-active-text)' }}>{siteName}</span>
+                <span className="text-lg font-bold truncate text-white">{siteName}</span>
               </div>
               <Button
                 variant="ghost"
@@ -92,14 +93,14 @@ export function Sidebar({ className }: SidebarProps) {
         <div className="p-3" style={{ borderTop: '1px solid var(--header-border)' }}>
           <div className={cn('flex items-center gap-3 rounded-lg px-3 py-2', sidebarCollapsed && 'justify-center px-2')}>
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white text-xs font-medium" style={{ backgroundColor: 'var(--sidebar-active)' }}>
-              {user?.first_name?.[0]}{user?.last_name?.[0]}
+              {(user?.name ?? user?.email ?? '??').split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()}
             </div>
             {!sidebarCollapsed && (
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate" style={{ color: 'var(--sidebar-active-text)' }}>
-                  {user?.first_name} {user?.last_name}
+                <p className="text-sm font-medium truncate text-white">
+                  {user?.name || user?.email}
                 </p>
-                <p className="text-xs truncate" style={{ color: 'var(--sidebar-text)' }}>{user?.role?.name}</p>
+                <p className="text-xs truncate text-white/60">{user?.email}</p>
               </div>
             )}
           </div>

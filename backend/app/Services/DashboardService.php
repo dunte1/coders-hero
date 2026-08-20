@@ -65,11 +65,18 @@ class DashboardService
                     'present' => $attendanceToday->where('status', 'present')->count(),
                     'late' => $attendanceToday->where('status', 'late')->count(),
                     'absent' => $attendanceToday->where('status', 'absent')->count(),
+                    'excused' => $attendanceToday->where('status', 'excused')->count(),
                     'total' => $attendanceToday->count(),
                 ],
                 // AI
                 'ai_insights' => $this->buildAiInsights(),
             ],
+            // ── Chart data ──
+            'user_roles_distribution' => $this->getUserRolesDistribution(),
+            'enrollment_by_level' => $this->getEnrollmentByLevel(),
+            'enrollment_by_month_12m' => $this->getEnrollmentByMonth(12),
+            'revenue_by_month_12m' => $this->getRevenueByMonth(12),
+            // ── Lists ──
             'recent_users' => User::latest()->take(5)->with('roles')->get(),
             'recent_enrollments' => Enrollment::latest()->with(['user', 'course'])->take(5)->get(),
             'recent_tasks' => Task::latest()->with(['assigner', 'assignee'])->take(5)->get(),
@@ -231,6 +238,56 @@ class DashboardService
                 ->take(5)
                 ->get(),
         ];
+    }
+
+    private function getUserRolesDistribution(): array
+    {
+        $roles = \DB::table('model_has_roles')
+            ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+            ->selectRaw('roles.name as role, count(*) as count')
+            ->groupBy('roles.name')
+            ->get();
+
+        return $roles->map(fn ($r) => ['name' => $r->role, 'value' => (int) $r->count])->toArray();
+    }
+
+    private function getEnrollmentByLevel(): array
+    {
+        $levels = Enrollment::join('courses', 'enrollments.course_id', '=', 'courses.id')
+            ->selectRaw('courses.level as name, count(*) as value')
+            ->groupBy('courses.level')
+            ->get()
+            ->map(fn ($r) => ['name' => ucfirst($r->name), 'value' => (int) $r->value]);
+
+        return $levels->toArray();
+    }
+
+    private function getEnrollmentByMonth(int $months): array
+    {
+        $start = now()->subMonths($months)->startOfMonth();
+
+        return Enrollment::where('enrolled_at', '>=', $start)
+            ->selectRaw('YEAR(enrolled_at) as year, MONTH(enrolled_at) as month, count(*) as count')
+            ->groupBy('year', 'month')
+            ->orderBy('year')
+            ->orderBy('month')
+            ->get()
+            ->map(fn ($r) => ['year' => (int) $r->year, 'month' => (int) $r->month, 'count' => (int) $r->count])
+            ->toArray();
+    }
+
+    private function getRevenueByMonth(int $months): array
+    {
+        $start = now()->subMonths($months)->startOfMonth();
+
+        return Payment::where('created_at', '>=', $start)
+            ->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, sum(amount) as total')
+            ->groupBy('year', 'month')
+            ->orderBy('year')
+            ->orderBy('month')
+            ->get()
+            ->map(fn ($r) => ['year' => (int) $r->year, 'month' => (int) $r->month, 'total' => (float) round($r->total, 2)])
+            ->toArray();
     }
 
     /**

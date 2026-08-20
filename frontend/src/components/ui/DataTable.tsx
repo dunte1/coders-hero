@@ -130,8 +130,16 @@ export function DataTable<T>({
             <tbody className="divide-y divide-slate-200">
               {loading ? (
                 <tr>
-                  <td colSpan={columns.length + (rowActions ? 1 : 0)} className="px-4 py-12 text-center text-sm text-slate-500">
-                    Loading...
+                  <td colSpan={columns.length + (rowActions ? 1 : 0)} className="p-0">
+                    <div className="divide-y divide-slate-100">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <div key={i} className="flex items-center gap-4 px-4 py-3">
+                          <div className="h-4 w-1/4 animate-pulse rounded bg-slate-200" />
+                          <div className="h-4 w-1/3 animate-pulse rounded bg-slate-200" />
+                          <div className="h-4 w-1/6 animate-pulse rounded bg-slate-200" />
+                        </div>
+                      ))}
+                    </div>
                   </td>
                 </tr>
               ) : data.length === 0 ? (

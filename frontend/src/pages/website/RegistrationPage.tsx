@@ -40,7 +40,10 @@ const initialFormData: FormData = {
 
 export default function RegistrationPage() {
   const siteName = useCachedSiteName();
-  usePageMeta({ title: formatSiteTitle('Online Registration', siteName) });
+  usePageMeta({
+    title: formatSiteTitle('Online Registration', siteName),
+    description: 'Register your child for coding and robotics classes at Coder\'s Hero. Complete the online admission form to get started.',
+  });
   usePageView();
 
   const [form, setForm] = useState<FormData>(initialFormData);

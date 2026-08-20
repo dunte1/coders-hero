@@ -29,7 +29,10 @@ const highlights = [
 
 export default function CodingPage() {
   const siteName = useCachedSiteName();
-  usePageMeta({ title: formatSiteTitle('Coding', siteName) });
+  usePageMeta({
+    title: formatSiteTitle('Coding', siteName),
+    description: 'Learn coding from Scratch to Python and JavaScript. Structured programming courses for children aged 5-18 at Coder\'s Hero.',
+  });
   usePageView();
 
   const { data: site } = useQuery({ queryKey: ['website', 'site'], queryFn: websiteApi.site.get });
@@ -61,7 +64,7 @@ export default function CodingPage() {
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {highlights.map(({ icon: Icon, title, body }) => (
               <div key={title} className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-600 text-white">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-brand-400">
                   <Icon className="h-5 w-5" />
                 </span>
                 <h3 className="mt-4 font-display text-lg font-bold text-slate-900">{title}</h3>

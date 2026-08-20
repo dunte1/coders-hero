@@ -31,7 +31,7 @@ class SiteSettingsController extends Controller
         $validated = $request->validate([
             'settings' => ['required', 'array'],
             'settings.*.key' => ['required', 'string', 'max:255'],
-            'settings.*.value' => ['nullable', 'string', 'max:5000'],
+            'settings.*.value' => ['nullable', 'string'],
             'settings.*.group' => ['sometimes', 'string', 'max:50'],
             'settings.*.is_public' => ['sometimes', 'boolean'],
         ]);

@@ -22,6 +22,8 @@ export function FaqAccordion({ faqs }: { faqs: Faq[] }) {
               type="button"
               onClick={() => setOpenIndex(isOpen ? null : index)}
               className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
+              aria-expanded={isOpen}
+              aria-controls={`faq-answer-${faq.id}`}
             >
               <span className="font-medium text-slate-900">{faq.question}</span>
               <ChevronDown
@@ -32,7 +34,11 @@ export function FaqAccordion({ faqs }: { faqs: Faq[] }) {
               />
             </button>
             {isOpen ? (
-              <div className="border-t border-slate-100 px-5 py-4 text-sm leading-relaxed text-slate-600">
+              <div
+                id={`faq-answer-${faq.id}`}
+                role="region"
+                className="border-t border-slate-100 px-5 py-4 text-sm leading-relaxed text-slate-600"
+              >
                 {faq.answer}
               </div>
             ) : null}

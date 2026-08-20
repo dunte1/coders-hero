@@ -42,6 +42,7 @@ export function TwoFactorChallengeForm({ className }: TwoFactorChallengeFormProp
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<ChallengeFormValues>({
     resolver: zodResolver(buildSchema(mode)),
@@ -53,6 +54,14 @@ export function TwoFactorChallengeForm({ className }: TwoFactorChallengeFormProp
       challenge.mutate({ code: values.code });
     } else {
       challenge.mutate({ recovery_code: values.recovery_code });
+    }
+  };
+
+  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+    setValue('code', value, { shouldValidate: true });
+    if (value.length === 6) {
+      handleSubmit(onSubmit)();
     }
   };
 
@@ -86,6 +95,7 @@ export function TwoFactorChallengeForm({ className }: TwoFactorChallengeFormProp
               maxLength={6}
               error={errors.code?.message}
               {...register('code')}
+              onChange={handleCodeChange}
             />
           ) : (
             <Input

@@ -73,12 +73,12 @@ export default function RoleDetailPage() {
           <Avatar className="h-8 w-8">
             <AvatarImage src={item.avatar} />
             <AvatarFallback className="text-xs">
-              {getInitials(item.first_name, item.last_name)}
+              {getInitials(item.name, '')}
             </AvatarFallback>
           </Avatar>
           <div>
             <p className="font-medium text-slate-900">
-              {item.first_name} {item.last_name}
+              {item.name || item.email}
             </p>
             <p className="text-xs text-slate-500">{item.email}</p>
           </div>
