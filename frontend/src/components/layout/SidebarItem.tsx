@@ -38,7 +38,7 @@ export function SidebarItem({ label, href, icon: Icon, collapsed, badge }: Sideb
       )}
       {!collapsed && (
         <>
-          <span className="flex-1">{translated}</span>
+          <span className="flex-1 truncate">{translated}</span>
           {badge !== undefined && badge > 0 && (
             <span
               className="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-medium"

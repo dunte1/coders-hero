@@ -31,7 +31,7 @@ export function Sidebar({ className }: SidebarProps) {
       <aside
         className={cn(
           'fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 lg:translate-x-0 lg:static lg:z-auto',
-          sidebarCollapsed ? 'w-[68px]' : 'w-64',
+          sidebarCollapsed ? 'w-[68px]' : 'w-56',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full',
           className
         )}
@@ -100,7 +100,6 @@ export function Sidebar({ className }: SidebarProps) {
                 <p className="text-sm font-medium truncate text-white">
                   {user?.name || user?.email}
                 </p>
-                <p className="text-xs truncate text-white/60">{user?.email}</p>
               </div>
             )}
           </div>
