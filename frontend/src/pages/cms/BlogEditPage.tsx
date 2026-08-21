@@ -11,6 +11,7 @@ import { PageSpinner } from '@/components/ui/Spinner';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
+import { RichTextEditor } from '@/components/ui/RichTextEditor';
 import { Switch } from '@/components/ui/Switch';
 import {
   SelectRoot,
@@ -115,8 +116,6 @@ function BlogForm({ post, isEdit, onSubmit, isSaving }: BlogFormProps) {
     onSubmit(payload);
   };
 
-  const contentPreview = watch('content');
-
   return (
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -179,22 +178,13 @@ function BlogForm({ post, isEdit, onSubmit, isSaving }: BlogFormProps) {
         </div>
       </div>
 
-      <Textarea
+      <RichTextEditor
         label="Content"
-        rows={10}
-        className="font-mono text-sm"
-        placeholder="HTML content of the post..."
+        value={watch('content') || ''}
+        onChange={(val) => setValue('content', val, { shouldValidate: true })}
+        placeholder="Start writing your blog post..."
         error={methods.formState.errors.content?.message}
-        {...register('content')}
       />
-
-      <div className="space-y-2">
-        <p className="text-sm font-medium text-slate-700">Preview</p>
-        <div
-          className="prose prose-sm max-w-none rounded-lg border border-slate-200 bg-slate-50 p-4"
-          dangerouslySetInnerHTML={{ __html: contentPreview || '<p class="text-slate-400">Nothing to preview yet.</p>' }}
-        />
-      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input

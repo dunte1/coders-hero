@@ -26,7 +26,7 @@ import {
   DialogFooter,
 } from '@/components/ui/Dialog';
 import { Bell, Send, RefreshCw, Users, Smartphone, LayoutTemplate, TrendingUp } from 'lucide-react';
-import type { NotificationDeliveryLog, NotificationChannel } from '@/types';
+import type { NotificationDeliveryLog, NotificationChannel, NotificationTemplate } from '@/types';
 import { formatDateTime } from '@/lib/utils';
 
 const channelOptions: NotificationChannel[] = ['in_app', 'email', 'sms', 'push'];
@@ -67,7 +67,7 @@ export default function NotificationsAdminPage() {
   };
 
   const openSendDialog = () => {
-    const templates = templatesData?.results ?? [];
+    const templates = ((templatesData as any)?.results ?? []) as NotificationTemplate[];
     setEvent(templates[0]?.event ?? '');
     setRecipientType('role');
     setRole('student');
@@ -251,10 +251,10 @@ export default function NotificationsAdminPage() {
               </div>
               <DataTable
                 columns={deliveriesColumns}
-                data={deliveries?.results ?? []}
-                totalCount={deliveries?.meta.total ?? 0}
-                page={deliveries?.meta.current_page ?? 1}
-                pageSize={deliveries?.meta.per_page ?? 15}
+                data={((deliveries as any)?.results ?? []) as NotificationDeliveryLog[]}
+                totalCount={(deliveries as any)?.meta?.total ?? 0}
+                page={(deliveries as any)?.meta?.current_page ?? 1}
+                pageSize={(deliveries as any)?.meta?.per_page ?? 15}
                 onPageChange={setPage}
                 loading={deliveriesLoading}
                 searchable={false}

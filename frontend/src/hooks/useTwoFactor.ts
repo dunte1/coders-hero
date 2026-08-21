@@ -8,7 +8,7 @@ import type { TwoFactorStatus, VerifyTwoFactorRequest } from '@/types';
 export function useTwoFactorStatus() {
   return useQuery<TwoFactorStatus>({
     queryKey: ['two-factor', 'status'],
-    queryFn: authApi.getTwoFactorStatus,
+    queryFn: () => authApi.getTwoFactorStatus() as Promise<TwoFactorStatus>,
   });
 }
 

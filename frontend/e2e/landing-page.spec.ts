@@ -3,7 +3,8 @@ import { test, expect } from '@playwright/test';
 test.describe('Landing Page - Hero Section', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(1000);
   });
 
   test('hero section is visible with main heading', async ({ page }) => {
@@ -59,7 +60,8 @@ test.describe('Landing Page - Hero Section', () => {
 test.describe('Landing Page - Stats/Counters', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(1000);
   });
 
   test('social proof counters are displayed', async ({ page }) => {
@@ -78,7 +80,8 @@ test.describe('Landing Page - Stats/Counters', () => {
 test.describe('Landing Page - Navigation', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(1000);
   });
 
   test('navbar is sticky with transition on scroll', async ({ page }) => {
@@ -126,7 +129,8 @@ test.describe('Landing Page - Navigation', () => {
 test.describe('Landing Page - Floating Elements', () => {
   test('chat widget button is visible', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(1000);
     
     const chatButton = page.locator('button[class*="fixed"], button[class*="bottom-"]').first();
     if (await chatButton.isVisible()) {
@@ -149,7 +153,8 @@ test.describe('Landing Page - Floating Elements', () => {
 
   test('chat widget has hover transition', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(1000);
     
     const chatButton = page.locator('button[class*="fixed"]').first();
     if (await chatButton.isVisible()) {
@@ -162,7 +167,8 @@ test.describe('Landing Page - Floating Elements', () => {
 
   test('chat widget opens panel on click', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(1000);
     
     const chatButton = page.locator('button[class*="fixed"]').first();
     if (await chatButton.isVisible()) {
@@ -178,7 +184,8 @@ test.describe('Landing Page - Floating Elements', () => {
 test.describe('Landing Page - Sections', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(1000);
   });
 
   test('services section exists with cards', async ({ page }) => {

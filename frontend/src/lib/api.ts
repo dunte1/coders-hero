@@ -59,12 +59,12 @@ import type {
   ResetTokenValidation,
 } from '@/types';
 
-const handleResponse = <T>(response: { data: any }): T => {
-  const body = response.data;
+const handleResponse = <T>(response: { data: T }): T => {
+  const body = response.data as any;
   if (body && typeof body === 'object' && 'data' in body) {
-    return body.data as T;
+    return body.data;
   }
-  return body as T;
+  return body;
 };
 
 const unwrap = <T>(response: { data: { data: T } }): T => response.data.data;
@@ -120,22 +120,17 @@ interface LoginPayload {
 }
 
 function normalizeUser(raw: RawUser): User {
-  const role = raw.roles && raw.roles.length > 0
-    ? { ...raw.roles[0], permissions: raw.roles[0].permissions || [] }
-    : { id: 0, name: 'user', permissions: [] as Permission[] };
-
-  const parts = (raw.name || '').trim().split(/\s+/);
-  const first_name = parts.shift() || '';
-  const last_name = parts.join(' ');
+  const roles = (raw.roles ?? []).map((r) => ({ ...r, permissions: r.permissions || [] }));
+  const role = roles.length > 0 ? roles[0] : { id: 0, name: 'user', permissions: [] as Permission[] };
 
   return {
     id: raw.id,
     email: raw.email,
-    first_name,
-    last_name,
+    name: raw.name,
     phone: raw.phone ?? undefined,
     avatar: raw.avatar ?? undefined,
     role,
+    roles,
     is_active: raw.is_active,
     date_joined: raw.created_at,
     last_login: raw.last_login_at ?? undefined,
@@ -195,7 +190,7 @@ export const authApi = {
     }).then(unwrapUser);
   },
   getLoginHistory: (params?: Record<string, string | number | boolean>) =>
-    api.get<PaginatedResponse<LoginHistory>>('/admin/login-history/', { params }).then(unwrapPage),
+    api.get<PaginatedResponse<LoginHistory>>('/admin/login-history/', { params }).then((r) => unwrapPage<LoginHistory>(r)),
   clearLoginHistory: () =>
     api.delete('/admin/login-history/').then(handleResponse),
 };
@@ -203,7 +198,7 @@ export const authApi = {
 // Roles
 export const rolesApi = {
   getRoles: (params?: Record<string, string | number | boolean>) =>
-    api.get<PaginatedResponse<Role>>('/admin/roles/', { params }).then(unwrapPage),
+    api.get<PaginatedResponse<Role>>('/admin/roles/', { params }).then((r) => unwrapPage<Role>(r)),
   getRole: (id: number) =>
     api.get<Role>(`/admin/roles/${id}/`).then(handleResponse),
   createRole: (data: RoleCreate) =>
@@ -217,13 +212,13 @@ export const rolesApi = {
   getRolePermissions: (id: number) =>
     api.get<Permission[]>(`/admin/roles/${id}/permissions/`).then(handleResponse),
   getRoleUsers: (id: number, params?: Record<string, string | number | boolean>) =>
-    api.get<PaginatedResponse<User>>(`/admin/roles/${id}/users/`, { params }).then(unwrapPage),
+    api.get<PaginatedResponse<User>>(`/admin/roles/${id}/users/`, { params }).then((r) => unwrapPage<User>(r)),
 };
 
 // Permissions
 export const permissionsApi = {
   getPermissions: (params?: Record<string, string | number | boolean>) =>
-    api.get<PaginatedResponse<Permission>>('/admin/permissions/', { params }).then(unwrapPage),
+    api.get<PaginatedResponse<Permission>>('/admin/permissions/', { params }).then((r) => unwrapPage<Permission>(r)),
   getPermission: (id: number) =>
     api.get<Permission>(`/admin/permissions/${id}/`).then(handleResponse),
   getPermissionGroups: () =>
@@ -239,7 +234,7 @@ export const permissionsApi = {
 // Login History
 export const loginHistoryApi = {
   getAll: (params?: Record<string, string | number | boolean>) =>
-    api.get<PaginatedResponse<LoginHistory>>('/admin/login-history/', { params }).then(unwrapPage),
+    api.get<PaginatedResponse<LoginHistory>>('/admin/login-history/', { params }).then((r) => unwrapPage<LoginHistory>(r)),
   getOne: (id: number) =>
     api.get<LoginHistory>(`/admin/login-history/${id}/`).then(handleResponse),
   clearAll: () =>
@@ -371,7 +366,7 @@ export const projectsApi = {
 // Employees
 export const employeesApi = {
   getEmployees: (params?: Record<string, string | number | boolean>) =>
-    api.get<PaginatedResponse<Employee>>('/admin/employees/', { params }).then(unwrapPage),
+    api.get<PaginatedResponse<Employee>>('/admin/employees/', { params }).then((r) => unwrapPage<Employee>(r)),
   getEmployee: (id: number) =>
     api.get<Employee>(`/admin/employees/${id}/`).then(handleResponse),
   createEmployee: (data: EmployeeCreate) =>
@@ -399,7 +394,7 @@ export const departmentsApi = {
 // Positions
 export const positionsApi = {
   getPositions: (params?: Record<string, string | number | boolean>) =>
-    api.get<PaginatedResponse<Position>>('/admin/positions/', { params }).then(unwrapPage),
+    api.get<PaginatedResponse<Position>>('/admin/positions/', { params }).then((r) => unwrapPage<Position>(r)),
   createPosition: (data: { title: string; description?: string; department_id: number; min_salary?: number; max_salary?: number }) =>
     api.post<Position>('/admin/positions/', data).then(handleResponse),
   updatePosition: (id: number, data: Partial<{ title: string; description?: string; department_id: number }>) =>
@@ -425,7 +420,7 @@ export const quizzesApi = {
 // Certificates
 export const certificatesApi = {
   getCertificates: (params?: Record<string, string | number | boolean>) =>
-    api.get<PaginatedResponse<Certificate>>('/certificates/', { params }).then(handleResponse),
+    api.get<PaginatedResponse<Certificate>>('/certificates/', { params }).then((r) => unwrapPage<Certificate>(r)),
   getCertificate: (id: number) =>
     api.get<Certificate>(`/certificates/${id}/`).then(handleResponse),
   verifyCertificate: (certId: string) =>
@@ -449,7 +444,7 @@ export const announcementsApi = {
 // Notifications
 export const notificationsApi = {
   getNotifications: (params?: Record<string, string | number | boolean>) =>
-    api.get<{ data: Notification[]; meta: PaginationMeta }>('/notifications', { params }).then(unwrapPage),
+    api.get<{ data: Notification[]; meta: PaginationMeta }>('/notifications', { params }).then((r) => unwrapPage<Notification>(r)),
   getUnreadNotifications: () =>
     api.get<{ data: Notification[] }>('/notifications/unread').then(unwrap<Notification[]>),
   markAsRead: (id: string) =>
@@ -471,7 +466,7 @@ export const notificationsApi = {
   revokeFcmToken: (id: number) =>
     api.delete(`/fcm-tokens/${id}`).then(handleResponse),
   getTemplates: (params?: Record<string, string | number | boolean>) =>
-    api.get<{ data: NotificationTemplate[]; meta: PaginationMeta }>('/notification-templates', { params }).then(unwrapPage),
+    api.get<{ data: NotificationTemplate[]; meta: PaginationMeta }>('/notification-templates', { params }).then((r) => unwrapPage<NotificationTemplate>(r)),
 };
 
 // Notifications admin
@@ -479,13 +474,13 @@ export const notificationAdminApi = {
   getSummary: () =>
     api.get<{ data: NotificationAdminSummary }>('/admin/notifications/summary').then(unwrap<NotificationAdminSummary>),
   getDeliveries: (params?: Record<string, string | number | boolean>) =>
-    api.get<{ data: NotificationDeliveryLog[]; meta: PaginationMeta }>('/admin/notifications/deliveries', { params }).then(unwrapPage),
+    api.get<{ data: NotificationDeliveryLog[]; meta: PaginationMeta }>('/admin/notifications/deliveries', { params }).then((r) => unwrapPage<NotificationDeliveryLog>(r)),
   sendBroadcast: (data: NotificationBroadcastInput) =>
     api.post<{ data: Notification }>('/admin/notifications/send', data).then(unwrap<Notification>),
   retryDelivery: (id: number) =>
     api.post<{ data: NotificationDeliveryLog }>(`/admin/notifications/deliveries/${id}/retry`).then(unwrap<NotificationDeliveryLog>),
   getTemplates: (params?: Record<string, string | number | boolean>) =>
-    api.get<{ data: NotificationTemplate[]; meta: PaginationMeta }>('/admin/notification-templates', { params }).then(unwrapPage),
+    api.get<{ data: NotificationTemplate[]; meta: PaginationMeta }>('/admin/notification-templates', { params }).then((r) => unwrapPage<NotificationTemplate>(r)),
   createTemplate: (data: NotificationTemplateInput) =>
     api.post<{ data: NotificationTemplate }>('/admin/notification-templates', data).then(unwrap<NotificationTemplate>),
   updateTemplate: (id: number, data: Partial<NotificationTemplateInput>) =>

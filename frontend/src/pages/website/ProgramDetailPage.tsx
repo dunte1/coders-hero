@@ -16,17 +16,7 @@ import { useCachedSiteName } from '@/hooks/useCachedSiteSettings';
 import { usePageView } from '@/hooks/usePageView';
 import { Spinner } from '@/components/ui/Spinner';
 
-function renderParagraphs(text: string | null | undefined) {
-  if (!text) return null;
-  return text
-    .split(/\n\s*\n/)
-    .filter((p) => p.trim())
-    .map((paragraph, index) => (
-      <p key={index} className="text-base leading-relaxed text-slate-600">
-        {paragraph}
-      </p>
-    ));
-}
+
 
 export default function ProgramDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -160,11 +150,14 @@ export default function ProgramDetailPage() {
         </div>
       </section>
 
-      {renderParagraphs(program.long_description) ? (
+      {program.long_description ? (
         <section className="bg-white py-16">
           <div className="mx-auto max-w-3xl space-y-5 px-4 sm:px-6 lg:px-8">
             <h2 className="font-display text-2xl font-bold text-slate-900">About this program</h2>
-            {renderParagraphs(program.long_description)}
+            <div
+              className="prose prose-slate max-w-none prose-p:text-base prose-p:leading-relaxed prose-p:text-slate-600 prose-headings:font-display prose-headings:text-slate-900 prose-a:text-brand-600 prose-img:rounded-2xl"
+              dangerouslySetInnerHTML={{ __html: program.long_description }}
+            />
           </div>
         </section>
       ) : null}

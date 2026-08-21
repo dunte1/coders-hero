@@ -1,16 +1,6 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Dashboard Page', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/login');
-    await page.waitForLoadState('networkidle');
-    
-    await page.getByLabel(/email/i).fill('admin@codershero.com');
-    await page.getByLabel(/password/i).fill('password');
-    await page.getByRole('button', { name: /sign in|log in|login/i }).click();
-    await page.waitForURL(/\/dashboard/, { timeout: 10000 });
-  });
-
   test('dashboard loads with stats grid', async ({ page }) => {
     const statsGrid = page.locator('[class*="grid"], [class*="stats"]');
     const count = await statsGrid.count();
@@ -63,19 +53,9 @@ test.describe('Dashboard Page', () => {
 });
 
 test.describe('LMS Course Player', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/login');
-    await page.waitForLoadState('networkidle');
-    
-    await page.getByLabel(/email/i).fill('admin@codershero.com');
-    await page.getByLabel(/password/i).fill('password');
-    await page.getByRole('button', { name: /sign in|log in|login/i }).click();
-    await page.waitForURL(/\/dashboard/, { timeout: 10000 });
-  });
-
   test('courses page loads with course list', async ({ page }) => {
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     
     const content = page.locator('[class*="grid"], [class*="list"], table');
     const count = await content.count();
@@ -84,12 +64,12 @@ test.describe('LMS Course Player', () => {
 
   test('course detail page loads', async ({ page }) => {
     await page.goto('/courses');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     
     const firstCourse = page.locator('a[href*="/courses/"]').first();
     if (await firstCourse.isVisible()) {
       await firstCourse.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       
       const title = page.locator('h1, h2').first();
       await expect(title).toBeVisible();
@@ -100,7 +80,7 @@ test.describe('LMS Course Player', () => {
 test.describe('Public Courses Catalog', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/courses-catalog');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test('courses catalog loads with course cards', async ({ page }) => {
@@ -129,16 +109,6 @@ test.describe('Public Courses Catalog', () => {
 });
 
 test.describe('Parent Portal', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/login');
-    await page.waitForLoadState('networkidle');
-    
-    await page.getByLabel(/email/i).fill('parent@codershero.com');
-    await page.getByLabel(/password/i).fill('password');
-    await page.getByRole('button', { name: /sign in|log in|login/i }).click();
-    await page.waitForURL(/\/parent/, { timeout: 10000 });
-  });
-
   test('parent dashboard loads', async ({ page }) => {
     await expect(page).toHaveURL(/\/parent/);
     
@@ -155,16 +125,6 @@ test.describe('Parent Portal', () => {
 });
 
 test.describe('Teacher Portal', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/login');
-    await page.waitForLoadState('networkidle');
-    
-    await page.getByLabel(/email/i).fill('teacher@codershero.com');
-    await page.getByLabel(/password/i).fill('password');
-    await page.getByRole('button', { name: /sign in|log in|login/i }).click();
-    await page.waitForURL(/\/teacher/, { timeout: 10000 });
-  });
-
   test('teacher dashboard loads', async ({ page }) => {
     await expect(page).toHaveURL(/\/teacher/);
     

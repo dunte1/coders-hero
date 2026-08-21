@@ -204,6 +204,9 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImVub3ZkZXIiPjxnIGZpbGw9IiMwMEU1RTUiIGZpbGwtb3BhY2l0eT0iMC4wNCI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptMC0zMHY2aDZ2LTZoLTZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-60" />
           {/* Cyan gradient accent */}
           <div className="absolute inset-0 bg-gradient-to-br from-brand-900/40 via-transparent to-brand-800/20" />
+          {/* Floating decorative orbs */}
+          <div className="absolute -top-20 -right-20 h-72 w-72 rounded-full bg-brand-500/10 blur-3xl float-subtle" />
+          <div className="absolute -bottom-32 -left-20 h-96 w-96 rounded-full bg-brand-400/8 blur-3xl float-subtle" style={{ animationDelay: '2s' }} />
           <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-28">
             <div>
               {hero.badge ? (
@@ -445,6 +448,9 @@ export default function HomePage() {
         <section className="relative overflow-hidden bg-slate-900 py-20">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImVub3ZkZXIiPjxnIGZpbGw9IiMwMEU1RTUiIGZpbGwtb3BhY2l0eT0iMC4wNCI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptMC0zMHY2aDZ2LTZoLTZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-60" />
           <div className="absolute inset-0 bg-gradient-to-br from-brand-900/40 via-transparent to-brand-800/20" />
+          {/* Floating decorative orbs */}
+          <div className="absolute -top-16 -left-16 h-56 w-56 rounded-full bg-brand-500/12 blur-3xl float-subtle" />
+          <div className="absolute -bottom-20 -right-16 h-64 w-64 rounded-full bg-brand-400/10 blur-3xl float-subtle" style={{ animationDelay: '3s' }} />
           <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
             <div className="reveal">
               <h2 className="font-display text-3xl font-bold text-white sm:text-4xl lg:text-5xl">{cta.title}</h2>

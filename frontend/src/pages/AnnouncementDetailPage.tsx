@@ -42,9 +42,10 @@ export default function AnnouncementDetailPage() {
             <Badge variant="outline">{data.target_audience}</Badge>
           </div>
 
-          <div className="prose prose-slate max-w-none mb-6">
-            <p className="whitespace-pre-wrap text-slate-700">{data.content}</p>
-          </div>
+          <div
+            className="prose prose-slate max-w-none mb-6 prose-p:text-slate-700 prose-headings:text-slate-900"
+            dangerouslySetInnerHTML={{ __html: data.content }}
+          />
 
           <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
             <Avatar className="h-8 w-8">

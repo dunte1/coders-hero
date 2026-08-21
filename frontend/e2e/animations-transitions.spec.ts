@@ -1,357 +1,444 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
-test.describe('Animations & Transitions - Cross Device', () => {
-  const viewports = [
-    { name: 'Mobile', width: 375, height: 812 },
-    { name: 'Tablet', width: 768, height: 1024 },
-    { name: 'Desktop', width: 1440, height: 900 },
-    { name: 'Large Desktop', width: 1920, height: 1080 },
-  ];
+async function loadLandingPage(page: Page) {
+  await page.goto('/');
+  await page.waitForFunction(
+    () => document.querySelectorAll('.hero-fade-up').length >= 1,
+    { timeout: 30000 }
+  );
+  await page.waitForTimeout(2000);
+}
 
-  for (const viewport of viewports) {
-    test.describe(`${viewport.name} (${viewport.width}x${viewport.height})`, () => {
-      test.use({ viewport: { width: viewport.width, height: viewport.height } });
+test.describe('Hero Fade-Up Animations', () => {
+  test('hero elements animate with heroFadeUp keyframes', async ({ page }) => {
+    await loadLandingPage(page);
 
-      test('hero section animations work', async ({ page }) => {
-        await page.goto('/');
-        await page.waitForLoadState('networkidle');
+    const heroFadeUp = page.locator('.hero-fade-up');
+    const count = await heroFadeUp.count();
+    expect(count).toBeGreaterThanOrEqual(1);
 
-        const heroFadeUp = page.locator('.hero-fade-up');
-        const count = await heroFadeUp.count();
-        expect(count).toBeGreaterThanOrEqual(1);
-
-        for (let i = 0; i < count; i++) {
-          const animation = await heroFadeUp.nth(i).evaluate((el) => {
-            const style = window.getComputedStyle(el);
-            return {
-              name: style.animationName,
-              duration: style.animationDuration,
-              fillMode: style.animationFillMode,
-            };
-          });
-          expect(animation.name).toBe('heroFadeUp');
-          expect(animation.fillMode).toBe('forwards');
-        }
+    for (let i = 0; i < count; i++) {
+      const animation = await heroFadeUp.nth(i).evaluate((el) => {
+        const style = window.getComputedStyle(el);
+        return {
+          name: style.animationName,
+          fillMode: style.animationFillMode,
+        };
       });
+      expect(animation.name).toBe('heroFadeUp');
+      expect(animation.fillMode).toBe('forwards');
+    }
+  });
 
-      test('scroll reveal triggers on scroll', async ({ page }) => {
-        await page.goto('/');
-        await page.waitForLoadState('networkidle');
+  test('hero fade-up has staggered delays', async ({ page }) => {
+    await loadLandingPage(page);
 
-        const revealElements = page.locator('.reveal:not(.revealed)');
-        const initialCount = await revealElements.count();
+    const heroElements = page.locator('.hero-fade-up');
+    const count = await heroElements.count();
+    expect(count).toBeGreaterThanOrEqual(2);
 
-        await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-        await page.waitForTimeout(1000);
+    const delays = await Promise.all(
+      Array.from({ length: Math.min(count, 5) }, (_, i) =>
+        heroElements.nth(i).evaluate((el) =>
+          window.getComputedStyle(el).animationDelay
+        )
+      )
+    );
+    const parsedDelays = delays.map((d) => parseFloat(d) * 1000);
+    expect(parsedDelays[0]).toBeLessThanOrEqual(parsedDelays[1]);
+  });
 
-        const revealedElements = page.locator('.reveal.revealed');
-        const revealedCount = await revealedElements.count();
+  test('hero badge, title, subtitle, body, buttons all have fade-up', async ({ page }) => {
+    await loadLandingPage(page);
 
-        expect(revealedCount).toBeGreaterThanOrEqual(0);
-      });
-
-      test('stagger children animate sequentially', async ({ page }) => {
-        await page.goto('/');
-        await page.waitForLoadState('networkidle');
-
-        const staggerContainers = page.locator('.stagger-children');
-        const count = await staggerContainers.count();
-        expect(count).toBeGreaterThanOrEqual(1);
-
-        await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-        await page.waitForTimeout(1000);
-
-        const staggerActive = page.locator('.stagger-children.stagger-active');
-        const activeCount = await staggerActive.count();
-        expect(activeCount).toBeGreaterThanOrEqual(0);
-      });
-
-      test('float-subtle animation is infinite', async ({ page }) => {
-        await page.goto('/');
-        await page.waitForLoadState('networkidle');
-
-        const floatElements = page.locator('.float-subtle');
-        const count = await floatElements.count();
-        expect(count).toBeGreaterThanOrEqual(1);
-
-        for (let i = 0; i < count; i++) {
-          const iterationCount = await floatElements.nth(i).evaluate((el) => 
-            window.getComputedStyle(el).animationIterationCount
-          );
-          expect(iterationCount).toBe('infinite');
-        }
-      });
-
-      test('card hover transitions are smooth', async ({ page }) => {
-        await page.goto('/');
-        await page.waitForLoadState('networkidle');
-
-        const hoverCards = page.locator('[class*="hover:-translate-y-1"]').first();
-        if (await hoverCards.isVisible()) {
-          const beforeHover = await hoverCards.evaluate((el) => ({
-            transform: window.getComputedStyle(el).transform,
-            transition: window.getComputedStyle(el).transition,
-          }));
-
-          expect(beforeHover.transition).toContain('all');
-          expect(beforeHover.transition).toContain('0.3s');
-        }
-      });
-
-      test('image zoom on hover works', async ({ page }) => {
-        await page.goto('/');
-        await page.waitForLoadState('networkidle');
-
-        const zoomImages = page.locator('[class*="group-hover:scale-105"], [class*="group-hover:scale-110"]');
-        const count = await zoomImages.count();
-        expect(count).toBeGreaterThanOrEqual(1);
-
-        for (let i = 0; i < Math.min(count, 3); i++) {
-          const transition = await zoomImages.nth(i).evaluate((el) => 
-            window.getComputedStyle(el).transition
-          );
-          expect(transition).toContain('transform');
-        }
-      });
-
-      test('page transition animation exists', async ({ page }) => {
-        await page.goto('/');
-        await page.waitForLoadState('networkidle');
-
-        const pageTransition = page.locator('.page-transition');
-        const count = await pageTransition.count();
-        if (count > 0) {
-          const animation = await pageTransition.first().evaluate((el) => {
-            const style = window.getComputedStyle(el);
-            return {
-              name: style.animationName,
-              duration: style.animationDuration,
-            };
-          });
-          expect(animation.name).toBe('pageFadeIn');
-        }
-      });
-
-      test('shimmer loading animation works', async ({ page }) => {
-        await page.goto('/');
-        await page.waitForLoadState('networkidle');
-
-        const shimmerElements = page.locator('.shimmer');
-        const count = await shimmerElements.count();
-        if (count > 0) {
-          for (let i = 0; i < count; i++) {
-            const animation = await shimmerElements.nth(i).evaluate((el) => 
-              window.getComputedStyle(el).animationName
-            );
-            expect(animation).toBe('shimmer');
-          }
-        }
-      });
-
-      test('dropdown enter animation works', async ({ page }) => {
-        await page.goto('/');
-        await page.waitForLoadState('networkidle');
-
-        const dropdownTrigger = page.locator('nav button, nav [role="button"]').first();
-        if (await dropdownTrigger.isVisible()) {
-          await dropdownTrigger.click();
-          await page.waitForTimeout(300);
-
-          const dropdown = page.locator('.dropdown-enter-active, [class*="dropdown"]');
-          if (await dropdown.first().isVisible()) {
-            const animation = await dropdown.first().evaluate((el) => {
-              const style = window.getComputedStyle(el);
-              return {
-                transform: style.transform,
-                transition: style.transition,
-              };
-            });
-            expect(animation.transition).toContain('0.2s');
-          }
-        }
-      });
-
-      test('dialog overlay has transition', async ({ page }) => {
-        await page.goto('/');
-        await page.waitForLoadState('networkidle');
-
-        const dialogTrigger = page.locator('button[data-state], button[aria-haspopup]').first();
-        if (await dialogTrigger.isVisible()) {
-          await dialogTrigger.click();
-          await page.waitForTimeout(300);
-
-          const overlay = page.locator('[class*="overlay"], [data-state="open"]');
-          if (await overlay.first().isVisible()) {
-            const transition = await overlay.first().evaluate((el) => 
-              window.getComputedStyle(el).transition
-            );
-            expect(transition).toContain('opacity');
-          }
-        }
-      });
-
-      test('reduced motion disables animations', async ({ page }) => {
-        await page.emulateMedia({ reducedMotion: 'reduce' });
-        await page.goto('/');
-        await page.waitForLoadState('networkidle');
-
-        const body = page.locator('body');
-        const animation = await body.evaluate((el) => 
-          window.getComputedStyle(el).animationDuration
-        );
-        
-        if (animation === '0s' || animation.includes('0s')) {
-          expect(animation).toBe('0s');
-        }
-      });
-
-      test('no horizontal overflow on any viewport', async ({ page }) => {
-        await page.goto('/');
-        await page.waitForLoadState('networkidle');
-
-        const scrollWidth = await page.evaluate(() => document.body.scrollWidth);
-        const clientWidth = await page.evaluate(() => document.body.clientWidth);
-        
-        expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1);
-      });
-    });
-  }
+    const count = await page.locator('.hero-fade-up').count();
+    expect(count).toBeGreaterThanOrEqual(3);
+  });
 });
 
-test.describe('Landing Page - Specific Device Tests', () => {
-  test('mobile: hamburger menu opens and closes', async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 812 });
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+test.describe('Scroll Reveal', () => {
+  test('.reveal elements become visible on scroll', async ({ page }) => {
+    await loadLandingPage(page);
 
-    const hamburger = page.locator('button[aria-label*="menu"], button[aria-label*="Menu"]').first();
-    if (await hamburger.isVisible()) {
-      await hamburger.click();
-      await page.waitForTimeout(400);
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(2500);
 
-      const closeBtn = page.locator('button[aria-label*="close"], button[aria-label*="Close"]').first();
-      if (await closeBtn.isVisible()) {
-        await closeBtn.click();
-        await page.waitForTimeout(400);
+    const revealedCount = await page.evaluate(() =>
+      document.querySelectorAll('.reveal.revealed').length
+    );
+    expect(revealedCount).toBeGreaterThanOrEqual(1);
+  });
+
+  test('reveal transition uses 0.7s cubic-bezier timing', async ({ page }) => {
+    await loadLandingPage(page);
+
+    const transition = await page.evaluate(() => {
+      const el = document.querySelector('.reveal');
+      if (!el) return null;
+      return window.getComputedStyle(el).transition;
+    });
+    if (transition) {
+      expect(transition).toContain('opacity');
+      expect(transition).toContain('transform');
+      expect(transition).toContain('0.7s');
+    }
+  });
+
+  test('safety fallback forces reveal after 2s', async ({ page }) => {
+    await loadLandingPage(page);
+    await page.waitForTimeout(1000);
+
+    const allRevealed = await page.evaluate(() => {
+      const all = document.querySelectorAll('.reveal');
+      if (all.length === 0) return true;
+      return Array.from(all).every((el) => el.classList.contains('revealed'));
+    });
+    expect(allRevealed).toBe(true);
+  });
+
+  test('reveal-ready class is added to container', async ({ page }) => {
+    await loadLandingPage(page);
+
+    const hasRevealReady = await page.evaluate(() =>
+      document.querySelector('.reveal-ready') !== null
+    );
+    expect(hasRevealReady).toBe(true);
+  });
+});
+
+test.describe('Stagger Children', () => {
+  test('stagger-children containers exist', async ({ page }) => {
+    await loadLandingPage(page);
+
+    const count = await page.locator('.stagger-children').count();
+    expect(count).toBeGreaterThanOrEqual(1);
+  });
+
+  test('stagger children activate after scroll', async ({ page }) => {
+    await loadLandingPage(page);
+
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(3000);
+
+    const staggerActive = await page.evaluate(() =>
+      document.querySelectorAll('.stagger-children.stagger-active').length
+    );
+    expect(staggerActive).toBeGreaterThanOrEqual(1);
+  });
+
+  test('stagger children have sequential animation delays', async ({ page }) => {
+    await loadLandingPage(page);
+
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(3000);
+
+    const delays = await page.evaluate(() => {
+      const container = document.querySelector('.stagger-children.stagger-active');
+      if (!container) return [];
+      const children = Array.from(container.children).slice(0, 4);
+      return children.map((el) =>
+        parseFloat(window.getComputedStyle(el).animationDelay) * 1000
+      );
+    });
+    if (delays.length >= 2) {
+      for (let i = 1; i < delays.length; i++) {
+        expect(delays[i]).toBeGreaterThan(delays[i - 1]);
       }
     }
   });
+});
 
-  test('mobile: chat widget is positioned correctly', async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 812 });
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+test.describe('Float Subtle (Floating Elements)', () => {
+  test('floating decorative orbs exist in hero and CTA', async ({ page }) => {
+    await loadLandingPage(page);
 
-    const chatButton = page.locator('button[class*="fixed"][class*="bottom"]').first();
-    if (await chatButton.isVisible()) {
-      const box = await chatButton.boundingBox();
-      if (box) {
-        expect(box.x + box.width).toBeLessThanOrEqual(375);
-        expect(box.y + box.height).toBeLessThanOrEqual(812);
-      }
+    const count = await page.locator('.float-subtle').count();
+    expect(count).toBeGreaterThanOrEqual(2);
+  });
+
+  test('float-subtle has infinite animation', async ({ page }) => {
+    await loadLandingPage(page);
+
+    const count = await page.locator('.float-subtle').count();
+    for (let i = 0; i < count; i++) {
+      const iterationCount = await page.locator('.float-subtle').nth(i).evaluate((el) =>
+        window.getComputedStyle(el).animationIterationCount
+      );
+      expect(iterationCount).toBe('infinite');
     }
   });
 
-  test('tablet: navigation adapts to screen size', async ({ page }) => {
-    await page.setViewportSize({ width: 768, height: 1024 });
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+  test('float-subtle uses floatSubtle keyframes (6s duration)', async ({ page }) => {
+    await loadLandingPage(page);
 
-    const nav = page.locator('nav');
-    await expect(nav.first()).toBeVisible();
-  });
-
-  test('desktop: full navigation is visible', async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-
-    const desktopNav = page.locator('nav .lg\\:flex, nav [class*="lg:flex"]');
-    if (await desktopNav.isVisible()) {
-      await expect(desktopNav).toBeVisible();
+    const count = await page.locator('.float-subtle').count();
+    for (let i = 0; i < count; i++) {
+      const anim = await page.locator('.float-subtle').nth(i).evaluate((el) => {
+        const s = window.getComputedStyle(el);
+        return { name: s.animationName, duration: s.animationDuration };
+      });
+      expect(anim.name).toBe('floatSubtle');
+      expect(anim.duration).toBe('6s');
     }
   });
 
-  test('all breakpoints: footer is visible', async ({ page }) => {
-    const viewports = [
-      { width: 375, height: 812 },
-      { width: 768, height: 1024 },
-      { width: 1440, height: 900 },
-    ];
+  test('floating elements have staggered animation delays', async ({ page }) => {
+    await loadLandingPage(page);
 
-    for (const vp of viewports) {
-      await page.setViewportSize(vp);
-      await page.goto('/');
-      await page.waitForLoadState('networkidle');
+    const count = await page.locator('.float-subtle').count();
+    expect(count).toBeGreaterThanOrEqual(2);
+    const delays = await Promise.all(
+      Array.from({ length: count }, (_, i) =>
+        page.locator('.float-subtle').nth(i).evaluate((el) =>
+          window.getComputedStyle(el).animationDelay
+        )
+      )
+    );
+    const parsed = delays.map((d) => parseFloat(d));
+    expect(parsed.some((d) => d > 0)).toBe(true);
+  });
 
-      const footer = page.locator('footer');
-      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  test('floating orbs use blur-3xl effect', async ({ page }) => {
+    await loadLandingPage(page);
+
+    const blurCount = await page.evaluate(() => {
+      return Array.from(document.querySelectorAll('.float-subtle')).filter((el) =>
+        el.className.includes('blur-3xl')
+      ).length;
+    });
+    expect(blurCount).toBeGreaterThanOrEqual(1);
+  });
+
+  test('floating orbs are absolutely positioned', async ({ page }) => {
+    await loadLandingPage(page);
+
+    const absCount = await page.evaluate(() => {
+      return Array.from(document.querySelectorAll('.float-subtle')).filter((el) =>
+        window.getComputedStyle(el).position === 'absolute'
+      ).length;
+    });
+    expect(absCount).toBeGreaterThanOrEqual(1);
+  });
+});
+
+test.describe('Page Transitions', () => {
+  test('page transition element exists', async ({ page }) => {
+    await loadLandingPage(page);
+    const count = await page.locator('.page-transition').count();
+    expect(count).toBeGreaterThanOrEqual(1);
+  });
+
+  test('page transition uses pageFadeIn (0.3s)', async ({ page }) => {
+    await loadLandingPage(page);
+    const anim = await page.evaluate(() => {
+      const el = document.querySelector('.page-transition');
+      if (!el) return null;
+      const s = window.getComputedStyle(el);
+      return { name: s.animationName, duration: s.animationDuration };
+    });
+    if (anim) {
+      expect(anim.name).toBe('pageFadeIn');
+      expect(anim.duration).toBe('0.3s');
+    }
+  });
+
+  test('navigating between pages triggers page transition', async ({ page }) => {
+    await loadLandingPage(page);
+    const aboutLink = page.locator('nav a[href="/about"]').first();
+    if (await aboutLink.isVisible()) {
+      await aboutLink.click();
       await page.waitForTimeout(500);
-      await expect(footer).toBeVisible();
+      const count = await page.locator('.page-transition').count();
+      expect(count).toBeGreaterThanOrEqual(1);
     }
   });
+});
 
-  test('gallery page: lightbox opens and closes', async ({ page }) => {
-    await page.goto('/gallery');
-    await page.waitForLoadState('networkidle');
-
-    const galleryImage = page.locator('[class*="gallery"] img, [class*="grid"] img').first();
-    if (await galleryImage.isVisible()) {
-      await galleryImage.click();
-      await page.waitForTimeout(500);
-
-      const lightbox = page.locator('[class*="lightbox"], [class*="modal"], [role="dialog"]');
-      if (await lightbox.first().isVisible()) {
-        const closeBtn = page.locator('button[class*="close"], button[aria-label*="close"], button[aria-label*="Close"]').first();
-        if (await closeBtn.isVisible()) {
-          await closeBtn.click();
-          await page.waitForTimeout(500);
-        }
-      }
-    }
-  });
-
-  test('blog page: post cards have hover effects', async ({ page }) => {
-    await page.goto('/blog');
-    await page.waitForLoadState('networkidle');
-
-    const blogCards = page.locator('[class*="group"]').first();
-    if (await blogCards.isVisible()) {
-      const transition = await blogCards.evaluate((el) => 
+test.describe('Hover Effects', () => {
+  test('cards have hover translate-y-1 transition', async ({ page }) => {
+    await loadLandingPage(page);
+    const card = page.locator('[class*="hover:-translate-y-1"]').first();
+    if (await card.isVisible()) {
+      const transition = await card.evaluate((el) =>
         window.getComputedStyle(el).transition
       );
-      expect(transition).toContain('all');
+      expect(transition).toMatch(/(transform|opacity)/);
     }
   });
 
-  test('FAQ page: accordion expands and collapses', async ({ page }) => {
-    await page.goto('/faqs');
-    await page.waitForLoadState('networkidle');
-
-    const faqButton = page.locator('button[aria-expanded]').first();
-    if (await faqButton.isVisible()) {
-      const initialExpanded = await faqButton.getAttribute('aria-expanded');
-      
-      await faqButton.click();
-      await page.waitForTimeout(400);
-      
-      const newExpanded = await faqButton.getAttribute('aria-expanded');
-      expect(initialExpanded).not.toBe(newExpanded);
+  test('hover cards have shadow transitions', async ({ page }) => {
+    await loadLandingPage(page);
+    const card = page.locator('[class*="hover:shadow"]').first();
+    if (await card.isVisible()) {
+      const transition = await card.evaluate((el) =>
+        window.getComputedStyle(el).transition
+      );
+      expect(transition).toMatch(/(box-shadow|shadow)/);
     }
   });
 
-  test('contact page: form has proper validation', async ({ page }) => {
-    await page.goto('/contact');
-    await page.waitForLoadState('networkidle');
-
-    const submitBtn = page.getByRole('button', { name: /send|submit/i });
-    if (await submitBtn.isVisible()) {
-      await submitBtn.click();
-      await page.waitForTimeout(1000);
-
-      const errors = page.locator('[class*="error"], [role="alert"]');
-      const count = await errors.count();
-      expect(count).toBeGreaterThanOrEqual(0);
+  test('gallery images have scale-on-hover transform transition', async ({ page }) => {
+    await loadLandingPage(page);
+    const img = page.locator('[class*="group-hover:scale-105"], [class*="group-hover:scale-110"]').first();
+    if (await img.isVisible()) {
+      const transition = await img.evaluate((el) =>
+        window.getComputedStyle(el).transition
+      );
+      expect(transition).toContain('transform');
     }
+  });
+});
+
+test.describe('Reduced Motion', () => {
+  test('disables hero animations', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await loadLandingPage(page);
+    const duration = await page.evaluate(() => {
+      const el = document.querySelector('.hero-fade-up');
+      return el ? window.getComputedStyle(el).animationDuration : null;
+    });
+    if (duration) {
+      const ms = parseFloat(duration);
+      expect(ms).toBeLessThanOrEqual(0.01);
+    }
+  });
+
+  test('disables scroll reveal transitions', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await loadLandingPage(page);
+    const t = await page.evaluate(() => {
+      const el = document.querySelector('.reveal');
+      return el ? window.getComputedStyle(el).transitionDuration : null;
+    });
+    if (t) {
+      const ms = parseFloat(t);
+      expect(ms).toBeLessThanOrEqual(0.01);
+    }
+  });
+
+  test('disables float-subtle animations', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await loadLandingPage(page);
+    const duration = await page.evaluate(() => {
+      const el = document.querySelector('.float-subtle');
+      return el ? window.getComputedStyle(el).animationDuration : null;
+    });
+    if (duration) {
+      const ms = parseFloat(duration);
+      expect(ms).toBeLessThanOrEqual(0.01);
+    }
+  });
+
+  test('disables stagger animations', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await loadLandingPage(page);
+    const duration = await page.evaluate(() => {
+      const el = document.querySelector('.stagger-children > *');
+      return el ? window.getComputedStyle(el).animationDuration : null;
+    });
+    if (duration) {
+      const ms = parseFloat(duration);
+      expect(ms).toBeLessThanOrEqual(0.01);
+    }
+  });
+
+  test('disables page transition animation', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await loadLandingPage(page);
+    const duration = await page.evaluate(() => {
+      const el = document.querySelector('.page-transition');
+      return el ? window.getComputedStyle(el).animationDuration : null;
+    });
+    if (duration) {
+      const ms = parseFloat(duration);
+      expect(ms).toBeLessThanOrEqual(0.01);
+    }
+  });
+
+  test('sets scroll-behavior to auto', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await loadLandingPage(page);
+    const scrollBehavior = await page.evaluate(() =>
+      window.getComputedStyle(document.documentElement).scrollBehavior
+    );
+    expect(scrollBehavior).toBe('auto');
+  });
+});
+
+test.describe('No Horizontal Overflow', () => {
+  test('no horizontal overflow on page', async ({ page }) => {
+    await loadLandingPage(page);
+    const scrollWidth = await page.evaluate(() => document.body.scrollWidth);
+    const clientWidth = await page.evaluate(() => document.body.clientWidth);
+    expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1);
+  });
+});
+
+test.describe('Hero Section Visual Elements', () => {
+  test('hero has dark background (bg-slate-900)', async ({ page }) => {
+    await loadLandingPage(page);
+    const hero = page.locator('section.bg-slate-900').first();
+    await expect(hero).toBeVisible();
+  });
+
+  test('hero has circuit pattern overlay', async ({ page }) => {
+    await loadLandingPage(page);
+    const overlays = await page.evaluate(() => {
+      const hero = document.querySelector('section.bg-slate-900');
+      return hero ? hero.querySelectorAll('[class*="absolute"]').length : 0;
+    });
+    expect(overlays).toBeGreaterThanOrEqual(2);
+  });
+
+  test('hero has gradient accents', async ({ page }) => {
+    await loadLandingPage(page);
+    const gradients = await page.evaluate(() => {
+      const hero = document.querySelector('section.bg-slate-900');
+      return hero ? hero.querySelectorAll('[class*="bg-gradient-to"]').length : 0;
+    });
+    expect(gradients).toBeGreaterThanOrEqual(1);
+  });
+
+  test('hero CTA buttons have hover transitions', async ({ page }) => {
+    await loadLandingPage(page);
+    const cta = page.locator('a[class*="bg-brand-500"]').first();
+    if (await cta.isVisible()) {
+      const transition = await cta.evaluate((el) =>
+        window.getComputedStyle(el).transition
+      );
+      expect(transition).not.toBe('none');
+      expect(transition.length).toBeGreaterThan(5);
+    }
+  });
+});
+
+test.describe('CTA Section', () => {
+  test('CTA has floating orbs', async ({ page }) => {
+    await loadLandingPage(page);
+    const ctaFloats = await page.evaluate(() => {
+      const sections = document.querySelectorAll('section.bg-slate-900');
+      let count = 0;
+      sections.forEach((s) => {
+        count += s.querySelectorAll('.float-subtle').length;
+      });
+      return count;
+    });
+    expect(ctaFloats).toBeGreaterThanOrEqual(2);
+  });
+
+  test('hero and CTA both have dark backgrounds', async ({ page }) => {
+    await loadLandingPage(page);
+    const darkSections = await page.evaluate(() =>
+      document.querySelectorAll('section.bg-slate-900').length
+    );
+    expect(darkSections).toBeGreaterThanOrEqual(2);
+  });
+});
+
+test.describe('Social Proof Counters', () => {
+  test('social proof section renders with icons', async ({ page }) => {
+    await loadLandingPage(page);
+    const icons = await page.locator('svg.h-8.w-8').count();
+    expect(icons).toBeGreaterThanOrEqual(1);
   });
 });

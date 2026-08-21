@@ -29,6 +29,8 @@ interface LessonProgress {
   content?: string;
   type?: string;
   module_name?: string;
+  video_url?: string;
+  thumbnail?: string;
   completed: boolean;
   progress: number;
 }
@@ -154,7 +156,7 @@ export default function LmsCoursePlayerPage() {
                 {/* Lesson Navigation */}
                 <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
                   {prevLesson ? (
-                    <Button variant="outline" onClick={() => setSelectedLesson(prevLesson)}>
+                    <Button variant="outline" onClick={() => setSelectedLessonId(prevLesson.lesson_id)}>
                       <ArrowLeft className="mr-2 h-4 w-4" />Previous
                     </Button>
                   ) : <div />}
@@ -170,7 +172,7 @@ export default function LmsCoursePlayerPage() {
                       </span>
                     )}
                     {nextLesson ? (
-                      <Button onClick={() => setSelectedLesson(nextLesson)}>
+                      <Button onClick={() => setSelectedLessonId(nextLesson.lesson_id)}>
                         Next<ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     ) : null}

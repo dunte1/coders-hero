@@ -9,6 +9,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { useCodingLeaderboardForCourse } from '@/hooks/useLms';
 import { useMyCourses } from '@/hooks/useEnrollments';
+import type { Enrollment } from '@/types';
 import { formatDate } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 
@@ -22,7 +23,7 @@ export default function LmsLeaderboardPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { data: myCoursesData, isLoading: coursesLoading } = useMyCourses();
-  const myCourses = useMemo(() => myCoursesData?.results ?? [], [myCoursesData]);
+  const myCourses = useMemo(() => ((myCoursesData as any)?.results ?? []) as Enrollment[], [myCoursesData]);
 
   const selectedId = searchParams.get('courseId');
   const courseId = Number(selectedId) || myCourses[0]?.course?.id || 0;

@@ -26,7 +26,13 @@
     --radius: 0.5rem;
   }
 
-  * {
+  html, body, #root {
+    border: 0;
+  }
+
+  *,
+  *::before,
+  *::after {
     border-color: hsl(var(--border));
   }
 

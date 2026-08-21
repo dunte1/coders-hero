@@ -121,11 +121,10 @@ export default function BlogDetailPage() {
 
       <section className="bg-white py-12">
         <div className="mx-auto max-w-3xl space-y-5 px-4 sm:px-6 lg:px-8">
-          {post.content.split(/\n\s*\n/).filter((p) => p.trim()).map((paragraph, index) => (
-            <p key={index} className="text-base leading-relaxed text-slate-700">
-              {paragraph}
-            </p>
-          ))}
+          <div
+            className="prose prose-slate max-w-none prose-headings:font-display prose-headings:text-slate-900 prose-p:text-base prose-p:leading-relaxed prose-p:text-slate-700 prose-a:text-brand-600 prose-a:no-underline hover:prose-a:underline prose-img:rounded-2xl"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
 
           {post.tags.length > 0 ? (
             <div className="mt-8 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-6">

@@ -22,6 +22,7 @@ export function useUpdateSiteSettings() {
       cmsApi.siteSettings.update(settings),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['site-settings'] });
+      queryClient.invalidateQueries({ queryKey: ['website', 'site'] });
       toast.success('Settings saved successfully');
     },
     onError: (error: unknown) => toast.error(getErrorMessage(error)),

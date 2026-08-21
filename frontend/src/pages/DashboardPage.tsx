@@ -179,10 +179,8 @@ export default function DashboardPage() {
 
       {/* ── Section 4: Charts Row 2 — Distribution ── */}
       {hasAdminData && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="lg:col-span-2">
-            <CompletionChart data={completionData} />
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <CompletionChart data={completionData} />
           <AttendanceDoughnut data={attendanceSlices} />
           <UserRolesPie data={stats.user_roles_distribution ?? []} />
         </div>

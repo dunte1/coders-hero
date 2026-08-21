@@ -67,9 +67,9 @@ export default function AcademicsEnrollmentsPage() {
 
       <DataTable
         columns={columns}
-        data={data?.results ?? []}
-        totalCount={data?.count ?? 0}
-        pageSize={data?.results?.length || 10}
+        data={(data as any)?.results ?? []}
+        totalCount={(data as any)?.count ?? 0}
+        pageSize={(data as any)?.results?.length || 10}
         searchPlaceholder="Search student or course..."
         onSearch={setSearch}
         rowActions={(item) => (

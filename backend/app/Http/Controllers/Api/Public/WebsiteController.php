@@ -241,7 +241,7 @@ class WebsiteController extends Controller
         }
 
         $courses = $query->take((int) $request->get('per_page', 12))
-            ->get(['id', 'title', 'slug', 'description', 'thumbnail', 'category_id', 'instructor_id', 'level', 'duration', 'price']);
+            ->get(['id', 'title', 'slug', 'description', 'thumbnail', 'category_id', 'instructor_id', 'level', 'duration_hours', 'price']);
 
         return $this->successResponse($courses, 'Courses retrieved successfully.');
     }

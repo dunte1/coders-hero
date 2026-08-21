@@ -26,7 +26,7 @@ export function TwoFactorSetupForm({ onComplete, onCancel }: TwoFactorSetupFormP
   const handleEnable = () => {
     enable.mutate(undefined, {
       onSuccess: (data) => {
-        setSetup(data);
+        setSetup(data as TwoFactorSetup);
         setStep('qr');
       },
     });

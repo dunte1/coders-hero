@@ -457,7 +457,7 @@ export function RevenueChart({ data }: { data: { year: number; month: number; to
                 tick={{ fontSize: 12, fill: '#94a3b8' }}
                 axisLine={false}
                 tickLine={false}
-                tickFormatter={(v: number) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}
+                tickFormatter={(v: number) => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v))}
               />
               <Tooltip
                 content={({ active, payload, label }) => {

@@ -1,1 +1,0 @@
-const t=["annual","sick","maternity","paternity","study","unpaid","compassionate"],a=["contract","national_id","certificate","degree","payslip","other"],e=["permanent","fixed_term","contract","intern"],n=["full_time","part_time","contract","intern"],i=["active","on_leave","terminated","resigned"];export{e as C,a as D,n as E,t as L,i as a};
