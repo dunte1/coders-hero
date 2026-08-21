@@ -1,0 +1,27 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Serve frontend assets from build directory
+    RewriteRule ^assets/(.+)$ build/assets/$1 [L]
+
+    # Serve existing files (vite.svg, etc)
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+
+    # Serve existing directories
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Root: serve React frontend
+    RewriteRule ^$ build/index.html [L]
+
+    # Laravel API
+    RewriteRule ^api(?:/.*)?$ index.php [L]
+
+    # Sitemap and robots
+    RewriteRule ^sitemap\.xml$ index.php [L]
+    RewriteRule ^robots\.txt$ index.php [L]
+
+    # React SPA routes - fallback to index.html
+    RewriteRule ^ build/index.html [L]
+</IfModule>
