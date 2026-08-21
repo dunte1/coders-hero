@@ -1,0 +1,190 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Program;
+use Illuminate\Database\Seeder;
+
+class ProgramSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $programs = [
+            [
+                'name' => 'Scratch Coding Adventures',
+                'tagline' => 'A playful first step into programming',
+                'description' => 'Young coders create animations, stories and games using Scratch — learning logic, loops and problem-solving without any typing.',
+                'long_description' => "Scratch Coding Adventures introduces children aged 6-9 to programming through MIT's Scratch platform. Kids snap together colorful blocks to create interactive stories, animations and mini-games.\n\nEach session is built around a fun project, so children are always creating something they can share. Along the way they learn sequencing, loops, conditionals and the confidence to think like programmers.",
+                'category' => 'coding',
+                'level' => 'beginner',
+                'age_group' => '6 - 9 years',
+                'duration_weeks' => 12,
+                'sessions_per_week' => 1,
+                'price' => 180.00,
+                'price_suffix' => '/ term',
+                'image' => 'https://placehold.co/900x600/8B5CF6/ffffff.png?text=Scratch+Coding',
+                'is_featured' => true,
+                'curriculum' => [
+                    ['title' => 'Block Basics', 'description' => 'Learn the Scratch interface, sprites and motion blocks.', 'topics' => ['Movement & animation', 'Sprites & costumes', 'Sounds']],
+                    ['title' => 'Logic Builders', 'description' => 'Discover how code makes decisions.', 'topics' => ['Loops & repeats', 'If/then logic', 'Events & messages']],
+                    ['title' => 'Game Creator', 'description' => 'Combine skills to build original games.', 'topics' => ['Scoring & lives', 'Game mechanics', 'Debugging']],
+                ],
+                'outcomes' => ['Understand core programming concepts', 'Create and share original Scratch projects', 'Build confidence with technology', 'Develop logical thinking'],
+            ],
+            [
+                'name' => 'Python Programming',
+                'tagline' => 'Real text-based programming for young coders',
+                'description' => 'A hands-on introduction to Python — the world\'s friendliest text language — used by teens to build games, tools and data projects.',
+                'long_description' => "Python Programming moves students from blocks to a real programming language. Through guided projects students learn variables, functions, loops and lists while building text adventures, drawing with turtle graphics and mini-games.\n\nSmall classes and project check-ins mean every student codes, tests and presents their own work.",
+                'category' => 'coding',
+                'level' => 'intermediate',
+                'age_group' => '10 - 15 years',
+                'duration_weeks' => 16,
+                'sessions_per_week' => 1,
+                'price' => 240.00,
+                'price_suffix' => '/ term',
+                'image' => 'https://placehold.co/900x600/6366F1/ffffff.png?text=Python',
+                'is_featured' => true,
+                'curriculum' => [
+                    ['title' => 'Python Foundations', 'description' => 'Get comfortable with the Python environment and syntax.', 'topics' => ['Variables & types', 'Input & output', 'Comments']],
+                    ['title' => 'Control Flow', 'description' => 'Make programs decide and repeat.', 'topics' => ['Conditionals', 'Loops', 'Lists & ranges']],
+                    ['title' => 'Functions & Projects', 'description' => 'Structure code and build capstone projects.', 'topics' => ['Defining functions', 'Turtle graphics', 'Mini-games']],
+                ],
+                'outcomes' => ['Write real Python programs', 'Read, debug and improve code', 'Design structured solutions', 'Complete a capstone project'],
+            ],
+            [
+                'name' => 'Web Development with HTML, CSS & JS',
+                'tagline' => 'Build your own websites from scratch',
+                'description' => 'Teens learn the three languages of the web and ship responsive, interactive websites they can share with the world.',
+                'long_description' => "Students design and build multi-page websites using HTML for structure, CSS for styling and JavaScript for interactivity. Every module ends with a live site published to the web.\n\nBy the end of the course, students have a personal portfolio website and a solid foundation for modern web development.",
+                'category' => 'coding',
+                'level' => 'intermediate',
+                'age_group' => '12 - 16 years',
+                'duration_weeks' => 16,
+                'sessions_per_week' => 1,
+                'price' => 260.00,
+                'price_suffix' => '/ term',
+                'image' => 'https://placehold.co/900x600/0EA5E9/ffffff.png?text=Web+Dev',
+                'is_featured' => false,
+                'curriculum' => [
+                    ['title' => 'HTML Structure', 'description' => 'Learn to structure content for the web.', 'topics' => ['Semantic HTML', 'Links & images', 'Forms']],
+                    ['title' => 'CSS Styling', 'description' => 'Make websites beautiful and responsive.', 'topics' => ['Selectors & flexbox', 'Colors & typography', 'Responsive layout']],
+                    ['title' => 'JavaScript Interactivity', 'description' => 'Add behaviour to your pages.', 'topics' => ['DOM & events', 'Animations', 'Portfolio launch']],
+                ],
+                'outcomes' => ['Build responsive multi-page websites', 'Style with modern CSS', 'Add interactivity with JavaScript', 'Publish a personal portfolio'],
+            ],
+            [
+                'name' => 'Game Development with Python',
+                'tagline' => 'Design, code and play your own games',
+                'description' => 'From retro arcade classics to 2D adventures, students design and code playable games while mastering programming fundamentals.',
+                'long_description' => "This project-driven course uses Pygame and Python to take students from the very first game loop to complete playable games with sprites, collisions, scoring and sound.\n\nStudents keep a working portfolio of games and present a final project at our end-of-term demo day.",
+                'category' => 'coding',
+                'level' => 'intermediate',
+                'age_group' => '10 - 14 years',
+                'duration_weeks' => 16,
+                'sessions_per_week' => 1,
+                'price' => 240.00,
+                'price_suffix' => '/ term',
+                'image' => 'https://placehold.co/900x600/F59E0B/ffffff.png?text=Game+Dev',
+                'is_featured' => true,
+                'curriculum' => [
+                    ['title' => 'Game Loop Basics', 'description' => 'Understand how games run.', 'topics' => ['Pygame setup', 'Sprites & surfaces', 'The game loop']],
+                    ['title' => 'Mechanics & Design', 'description' => 'Make games fun and challenging.', 'topics' => ['Collisions', 'Scoring & levels', 'Player controls']],
+                    ['title' => 'Polish & Present', 'description' => 'Finish and share a complete game.', 'topics' => ['Sound & effects', 'Difficulty balancing', 'Demo day']],
+                ],
+                'outcomes' => ['Build complete playable games', 'Apply game design principles', 'Master core Python concepts', 'Present projects with confidence'],
+            ],
+            [
+                'name' => 'LEGO Robotics Foundations',
+                'tagline' => 'Learn by building with LEGO WeDo & SPIKE',
+                'description' => 'Build motorised LEGO models and program them to sense, think and move — the perfect introduction to robotics and engineering.',
+                'long_description' => "Using LEGO WeDo and SPIKE Prime, students follow engineering builds and then program their creations with block coding. They explore gears, pulleys and sensors while solving real engineering challenges.\n\nPairs and small teams tackle missions together, building collaboration skills alongside technical ones.",
+                'category' => 'robotics',
+                'level' => 'beginner',
+                'age_group' => '7 - 10 years',
+                'duration_weeks' => 12,
+                'sessions_per_week' => 1,
+                'price' => 190.00,
+                'price_suffix' => '/ term',
+                'image' => 'https://placehold.co/900x600/10B981/ffffff.png?text=LEGO+Robotics',
+                'is_featured' => true,
+                'curriculum' => [
+                    ['title' => 'Build & Move', 'description' => 'First builds, first programs.', 'topics' => ['Motors & hubs', 'Simple programs', 'Gears & pulleys']],
+                    ['title' => 'Sense & React', 'description' => 'Robots that respond to the world.', 'topics' => ['Distance sensors', 'Color sensors', 'Conditional logic']],
+                    ['title' => 'Mission Challenge', 'description' => 'Solve an engineering mission as a team.', 'topics' => ['Mission design', 'Iteration & testing', 'Showcase']],
+                ],
+                'outcomes' => ['Build working LEGO robots', 'Program with block coding', 'Understand gears, motors and sensors', 'Collaborate on team missions'],
+            ],
+            [
+                'name' => 'Arduino & Electronics',
+                'tagline' => 'Wire it, code it, light it up',
+                'description' => 'Teens combine electronics and C-style programming on Arduino boards to build interactive devices, sensors and smart gadgets.',
+                'long_description' => "Working with Arduino Uno boards, breadboards and components, students learn circuits, sensors and microcontrollers. They program in the Arduino language to create light shows, temperature monitors, alarms and more.\n\nSafety first: every project is supervised and designed with beginner-friendly components.",
+                'category' => 'robotics',
+                'level' => 'intermediate',
+                'age_group' => '11 - 15 years',
+                'duration_weeks' => 16,
+                'sessions_per_week' => 1,
+                'price' => 250.00,
+                'price_suffix' => '/ term',
+                'image' => 'https://placehold.co/900x600/EF4444/ffffff.png?text=Arduino',
+                'is_featured' => false,
+                'curriculum' => [
+                    ['title' => 'Electronics Basics', 'description' => 'Build your first circuits.', 'topics' => ['Breadboards & components', 'LEDs & resistors', 'Reading schematics']],
+                    ['title' => 'Programming the Board', 'description' => 'Bring circuits to life with code.', 'topics' => ['Digital & analog I/O', 'Sensors & inputs', 'Serial output']],
+                    ['title' => 'Smart Projects', 'description' => 'Design a personal project.', 'topics' => ['Project design', 'Prototyping', 'Final build & demo']],
+                ],
+                'outcomes' => ['Build and debug real circuits', 'Program Arduino microcontrollers', 'Read schematics and datasheets', 'Complete an independent project'],
+            ],
+            [
+                'name' => 'Robotics Competition Team',
+                'tagline' => 'Train like a champion',
+                'description' => 'An advanced team program where students design, build and program competition-grade robots under expert mentorship.',
+                'long_description' => "Our competition team prepares students for LEGO and FLL-style tournaments. Teams research the year's challenge, design solutions, build and program robots and practise presenting their work to judges.\n\nThis is our most immersive program — students leave with engineering portfolios and competition experience.",
+                'category' => 'robotics',
+                'level' => 'advanced',
+                'age_group' => '10 - 17 years',
+                'duration_weeks' => 20,
+                'sessions_per_week' => 2,
+                'price' => 420.00,
+                'price_suffix' => '/ season',
+                'image' => 'https://placehold.co/900x600/1D4ED8/ffffff.png?text=Competition+Team',
+                'is_featured' => true,
+                'curriculum' => [
+                    ['title' => 'Challenge Analysis', 'description' => 'Understand the competition season.', 'topics' => ['Mission review', 'Strategy & roles', 'Research project']],
+                    ['title' => 'Build & Iterate', 'description' => 'Design robust robot attachments.', 'topics' => ['Mechanisms & gears', 'Precision programming', 'Testing & iteration']],
+                    ['title' => 'Compete & Present', 'description' => 'Perform at tournament day.', 'topics' => ['Match strategy', 'Judging presentation', 'Tournament day']],
+                ],
+                'outcomes' => ['Design competition-grade robots', 'Work effectively in engineering teams', 'Present projects to judges', 'Gain real tournament experience'],
+            ],
+            [
+                'name' => 'Young Engineers: STEM Explorers',
+                'tagline' => 'Curiosity, experiments and big questions',
+                'description' => 'Our youngest engineers explore science, physics and math through hands-on experiments and build-it-yourself challenges.',
+                'long_description' => "STEM Explorers turns everyday wonder into structured discovery. Children build bridges, launch balloon rockets, make slime circuits and run simple experiments while learning the scientific method.\n\nEvery class is hands-on, messy sometimes, and always designed around questions kids are already asking.",
+                'category' => 'stem',
+                'level' => 'beginner',
+                'age_group' => '5 - 8 years',
+                'duration_weeks' => 12,
+                'sessions_per_week' => 1,
+                'price' => 160.00,
+                'price_suffix' => '/ term',
+                'image' => 'https://placehold.co/900x600/84CC16/ffffff.png?text=STEM+Explorers',
+                'is_featured' => false,
+                'curriculum' => [
+                    ['title' => 'Build It', 'description' => 'Engineering with everyday materials.', 'topics' => ['Bridges & towers', 'Simple machines', 'Paper & popsicle structures']],
+                    ['title' => 'Experiment', 'description' => 'The scientific method in action.', 'topics' => ['Hypotheses', 'Fair tests', 'Recording results']],
+                    ['title' => 'Wonder Lab', 'description' => 'Big questions, hands-on answers.', 'topics' => ['Bubbles & air', 'Magnets & motion', 'Sink or float']],
+                ],
+                'outcomes' => ['Think like young scientists', 'Design and test builds', 'Ask good questions', 'Build early STEM confidence'],
+            ],
+        ];
+
+        foreach ($programs as $data) {
+            Program::updateOrCreate(
+                ['slug' => \Str::slug($data['name'])],
+                $data
+            );
+        }
+    }
+}
