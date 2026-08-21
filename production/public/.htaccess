@@ -1,3 +1,6 @@
+# Set React app as default index
+DirectoryIndex build/index.html index.php index.html
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
@@ -11,9 +14,6 @@
     # Serve existing directories
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
-
-    # Root: serve React frontend
-    RewriteRule ^$ build/index.html [L]
 
     # Laravel API
     RewriteRule ^api(?:/.*)?$ index.php [L]
