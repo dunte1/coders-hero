@@ -12,6 +12,12 @@ Method: every feature verified against actual routes, controllers, models/migrat
 | Missing | 11 |
 | **Checked** | **73** |
 
+### Phase completion
+- Phase 1: 5/5 ✅
+- Phase 2: 6/9 (6 completed, 3 remaining: lesson materials, version labels, source-code upload)
+- Phase 3: 5/8 (5 completed, 3 remaining: announcements-in-portal, reports wiring, portfolio)
+- Phase 4: 1/7 (1 completed, 6 remaining: CRM, WhatsApp, procurement, expenses, contracts, live-classes)
+
 ---
 
 ## Status table (condensed; per-feature detail in the matching gap doc)
@@ -121,35 +127,35 @@ Partial: upload lessons/materials → docs/gaps/teacher-lesson-materials-authori
 ## Phase plan
 
 ### Phase 1 — Foundations (unblock everything else) ~10 items
-1. `student_projects` foundation model + CRUD (lab-project-foundation) — unblocks B*, marketplace, portfolio, parent projects
-2. Publish/unpublish flag + toggle (lab-publish-toggle)
-3. Student exam engine: exam_questions/attempts models + student routes (lms-exams-student-online-taking) — unblocks C/D/E exam visibility
-4. Role-gate bug fixes batch: school_admin users/course UI access (school-admin-teachers-ui-access, school-admin-course-create-access), parent-chat teacher role fix (parent-teacher-comments), teacher included in lesson authoring (teacher-lesson-materials-authoring)
-5. Nav wiring fixes: Progress/achievements links, My Finance group visibility for student/parent (dash-nav-flow-progress-link)
+1. `student_projects` foundation model + CRUD (lab-project-foundation) ✅
+2. Publish/unpublish flag + toggle (lab-publish-toggle) ✅
+3. Student exam engine: exam_questions/attempts models + student routes (lms-exams-student-online-taking) ✅
+4. Role-gate bug fixes batch: school_admin users/course UI access (school-admin-teachers-ui-access, school-admin-course-create-access), parent-chat teacher role fix (parent-teacher-comments), teacher included in lesson authoring (teacher-lesson-materials-authoring) ✅
+5. Nav wiring fixes: Progress/achievements links, My Finance group visibility for student/parent (dash-nav-flow-progress-link) ✅
 
 ### Phase 2 — Core teaching/learning flow ~9 items
-6. Innovation Lab UX: media uploads, tech-stack field, feedback display, score rollup (lab-images-videos-upload, lab-technologies-used, lab-teacher-feedback, lab-project-score)
-7. Draft auto-save for assignments (schema already has draft status)
-8. Student exam-taking UI (reuse QuizTakerPage)
+6. Innovation Lab UX: media uploads, tech-stack field, feedback display, score rollup (lab-images-videos-upload, lab-technologies-used, lab-teacher-feedback, lab-project-score) ✅
+7. Draft auto-save for assignments — "Continue Later" ✅ (saveDraft endpoint + UI button on StudentAssignmentDetailPage)
+8. Student exam-taking UI (reuse QuizTakerPage) ✅
 9. Lesson material upload UI + downloads (teacher-pdf-material-upload)
-10. My Classes + My Lessons student pages (dash-nav-flow-my-classes)
-11. Game development module content (lms-game-development-module)
+10. My Classes + My Lessons student pages (dash-nav-flow-my-classes) ✅
+11. Game development module content (lms-game-development-module) ✅
 12. Version labels for project submissions (lab-version-history)
 13. Source-code zip upload (lab-source-code-upload-link)
-14. School admin dashboard page (school-admin-dashboard-page)
+14. School admin dashboard page (school-admin-dashboard-page) ✅
 
 ### Phase 3 — Portals on top of Phase 1–2 data ~8 items
-15. Parent: assignments view (parent-assignments-view)
-16. Parent: projects view (parent-projects-view)
-17. Parent: competitions participation (parent-competition-participation)
-18. Parent: child certificates (parent-certificates-child-scoped)
-19. Parent: courses list (parent-courses-view)
+15. Parent: assignments view (parent-assignments-view) ✅
+16. Parent: projects view (parent-projects-view) ✅
+17. Parent: competitions participation (parent-competition-participation) ✅
+18. Parent: child certificates (parent-certificates-child-scoped) ✅
+19. Parent: courses list (parent-courses-view) ✅
 20. Parent: announcements inside portal (parent-announcements-in-portal)
 21. Generated/downloadable reports wiring (downloadable-generated-reports-wiring)
 22. Student portfolio public page (portfolio-page)
 
 ### Phase 4 — Marketplace & ERP/business (independent shippable) ~7 items
-23. Innovation Marketplace public hub (marketplace-public-hub) — needs Phase 1 #1+#2
+23. Innovation Marketplace public hub (marketplace-public-hub) ✅
 24. CRM pipeline (crm-pipeline)
 25. WhatsApp channel (whatsapp-channel)
 26. Procurement domain (procurement-domain)
