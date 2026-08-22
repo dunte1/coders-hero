@@ -97,7 +97,7 @@ export default function RoleDetailPage() {
     {
       key: 'date_joined',
       header: 'Joined',
-      render: (item) => formatDate(item.date_joined),
+      render: (item) => formatDate(item.date_joined ?? ''),
     },
   ];
 

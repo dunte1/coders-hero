@@ -15,7 +15,7 @@ export default function UsersPage() {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
-  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const { data, isLoading } = useUsers({ page, search, page_size: 10 });
   const deleteUser = useDeleteUser();

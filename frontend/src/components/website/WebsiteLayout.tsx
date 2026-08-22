@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 import { ChatWidget } from './ChatWidget';
+import { PopupAd } from './PopupAd';
 
 export function WebsiteLayout({ children }: { children: ReactNode }) {
   return (
@@ -10,6 +11,7 @@ export function WebsiteLayout({ children }: { children: ReactNode }) {
       <main className="flex-1">{children}</main>
       <Footer />
       <ChatWidget />
+      <PopupAd />
     </div>
   );
 }

@@ -155,7 +155,7 @@ export default function ProgramDetailPage() {
           <div className="mx-auto max-w-3xl space-y-5 px-4 sm:px-6 lg:px-8">
             <h2 className="font-display text-2xl font-bold text-slate-900">About this program</h2>
             <div
-              className="prose prose-slate max-w-none prose-p:text-base prose-p:leading-relaxed prose-p:text-slate-600 prose-headings:font-display prose-headings:text-slate-900 prose-a:text-brand-600 prose-img:rounded-2xl"
+              className="prose prose-slate max-w-none overflow-hidden prose-p:text-base prose-p:leading-relaxed prose-p:text-slate-600 prose-headings:font-display prose-headings:text-slate-900 prose-a:text-brand-600 prose-img:rounded-2xl prose-img:max-w-full"
               dangerouslySetInnerHTML={{ __html: program.long_description }}
             />
           </div>

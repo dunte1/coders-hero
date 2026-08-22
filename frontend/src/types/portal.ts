@@ -29,6 +29,7 @@ export interface PortalStudent {
   branch: string | null;
   status: string;
   photo_url: string | null;
+  last_login_at?: string;
   outstanding_fees?: number;
 }
 

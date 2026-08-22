@@ -22,6 +22,7 @@ class UpdateCertificateTemplateRequest extends FormRequest
             'logo' => ['nullable', 'image', 'max:2048'],
             'signature_name' => ['nullable', 'string', 'max:255'],
             'signature_title' => ['nullable', 'string', 'max:255'],
+            'signature_image' => ['nullable', 'image', 'mimes:png,jpg,jpeg,svg', 'max:2048'],
             'is_default' => ['sometimes', 'boolean'],
             'is_active' => ['sometimes', 'boolean'],
         ];

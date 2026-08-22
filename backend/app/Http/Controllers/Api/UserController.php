@@ -153,4 +153,48 @@ class UserController extends Controller
             'User status toggled successfully.'
         );
     }
+
+    public function resetPassword(Request $request, string $id): JsonResponse
+    {
+        $user = $this->userService->findById($id);
+
+        if (!$user) {
+            return $this->notFoundResponse('User not found.');
+        }
+
+        $this->authorize('resetPassword', $user);
+
+        $validated = $request->validate([
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user = $this->userService->updatePassword($id, $validated['password']);
+
+        return $this->successResponse(
+            new UserResource($user),
+            'User password updated successfully.'
+        );
+    }
+
+    public function uploadAvatar(Request $request, string $id): JsonResponse
+    {
+        $user = $this->userService->findById($id);
+
+        if (!$user) {
+            return $this->notFoundResponse('User not found.');
+        }
+
+        $this->authorize('update', $user);
+
+        $request->validate([
+            'photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ]);
+
+        $user = $this->userService->updatePhoto($user, $request->file('photo'));
+
+        return $this->successResponse(
+            new UserResource($user),
+            'Avatar updated successfully.'
+        );
+    }
 }

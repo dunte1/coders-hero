@@ -80,6 +80,21 @@ export const parentApi = {
   markAllNotificationsRead: () =>
     api.post<{ data: null }>('/parent/notifications/read-all').then(() => undefined),
 
+  assignments: () =>
+    api.get<{ data: any[] }>('/parent/assignments').then(unwrap<any[]>),
+
+  courses: () =>
+    api.get<{ data: any[] }>('/parent/courses').then(unwrap<any[]>),
+
+  projects: () =>
+    api.get<{ data: any[] }>('/parent/projects').then(unwrap<any[]>),
+
+  competitions: () =>
+    api.get<{ data: any[] }>('/parent/competitions').then(unwrap<any[]>),
+
+  certificates: () =>
+    api.get<{ data: any[] }>('/parent/certificates').then(unwrap<any[]>),
+
   receiptPdf: async (id: number) => {
     const res = await api.get<Blob>(`/parent/payments/${id}/pdf`, { responseType: 'blob' });
     const disposition = res.headers['content-disposition'] ?? '';

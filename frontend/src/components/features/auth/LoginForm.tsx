@@ -3,9 +3,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
+import { AuthLogo } from '@/components/features/auth/AuthLogo';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Rocket, Eye, EyeOff, ArrowRight, Shield, BookOpen, Users, AlertTriangle, Info } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, Shield, BookOpen, Users, AlertTriangle, Info } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 const loginSchema = z.object({
@@ -45,12 +46,7 @@ export function LoginForm() {
       {/* Left panel - Branding */}
       <div className="hidden w-1/2 items-center justify-center bg-gradient-to-br from-brand-600 via-brand-700 to-indigo-800 lg:flex">
         <div className="max-w-md px-8">
-          <Link to="/" className="mb-10 flex items-center gap-3">
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 text-white backdrop-blur-sm">
-              <Rocket className="h-6 w-6" />
-            </span>
-            <span className="font-display text-2xl font-bold text-white">Coder's Hero</span>
-          </Link>
+          <AuthLogo variant="dark" className="mb-10" />
           <h2 className="font-display text-3xl font-bold text-white leading-tight hero-fade-up hero-fade-up-delay-1">
             Welcome to the future of education
           </h2>
@@ -79,12 +75,7 @@ export function LoginForm() {
         <div className="w-full max-w-md auth-entrance">
           {/* Mobile logo */}
           <div className="mb-8 text-center lg:hidden">
-            <Link to="/" className="inline-flex items-center gap-2">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 text-white">
-                <Rocket className="h-5 w-5" />
-              </span>
-              <span className="font-display text-xl font-bold text-slate-900">Coder's Hero</span>
-            </Link>
+            <AuthLogo variant="light" size="sm" />
           </div>
 
           {/* Session Expired / Signed Out Banners */}
@@ -184,3 +175,4 @@ export function LoginForm() {
     </div>
   );
 }
+

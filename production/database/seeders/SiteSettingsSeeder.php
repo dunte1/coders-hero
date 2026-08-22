@@ -37,6 +37,14 @@ class SiteSettingsSeeder extends Seeder
             ['chat.primary_color', 'chat', '#00C8D7'],
             ['chat.enabled', 'chat', '1'],
 
+            ['popup.enabled', 'popup', '1'],
+            ['popup.title', 'popup', 'Free Trial Class Available!'],
+            ['popup.body', 'popup', 'Give your child a head start in coding and robotics. Book a free trial class today!'],
+            ['popup.button_text', 'popup', 'Book Free Trial'],
+            ['popup.button_url', 'popup', '/free-trial'],
+            ['popup.image', 'popup', ''],
+            ['popup.delay_seconds', 'popup', '3'],
+
             ['branding.logo', 'branding', ''],
             ['branding.logo_wide', 'branding', ''],
             ['branding.logo_icon', 'branding', ''],

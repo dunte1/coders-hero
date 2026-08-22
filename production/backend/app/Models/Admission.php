@@ -18,6 +18,8 @@ class Admission extends Model
         'student_id',
         'first_name',
         'last_name',
+        'email',
+        'phone',
         'date_of_birth',
         'gender',
         'guardian_name',
@@ -27,9 +29,11 @@ class Admission extends Model
         'grade',
         'preferred_branch',
         'status',
+        'source',
         'applied_at',
         'decided_at',
         'notes',
+        'address',
     ];
 
     protected function casts(): array

@@ -27,6 +27,7 @@ import type { CertificateTemplate, TemplateInput } from '@/types/certificates';
 
 interface TemplateForm extends TemplateInput {
   name: string;
+  signature_image_file?: File | null;
 }
 
 const emptyForm: TemplateForm = {
@@ -78,21 +79,30 @@ export default function CertificateTemplatesPage() {
 
   const handleSave = () => {
     setSaving(true);
-    const payload = {
-      ...form,
-      description: form.description || null,
-      body_html: form.body_html || null,
-      signature_name: form.signature_name || null,
-      signature_title: form.signature_title || null,
-    };
+    const fd = new FormData();
+    fd.append('name', form.name);
+    if (form.description) fd.append('description', form.description);
+    if (form.body_html) fd.append('body_html', form.body_html);
+    if (form.accent_color) fd.append('accent_color', form.accent_color);
+    if (form.font_family) fd.append('font_family', form.font_family);
+    if (form.signature_name) fd.append('signature_name', form.signature_name);
+    if (form.signature_title) fd.append('signature_title', form.signature_title);
+    fd.append('is_default', form.is_default ? '1' : '0');
+    fd.append('is_active', form.is_active ? '1' : '0');
+
+    if (form.signature_image_file instanceof File) {
+      fd.append('signature_image', form.signature_image_file);
+    }
+
     const onSettled = () => {
       setSaving(false);
       setDialogOpen(false);
     };
     if (editing) {
-      updateTemplate.mutate({ id: editing.id, data: payload }, { onSettled });
+      fd.append('_method', 'PUT');
+      updateTemplate.mutate({ id: editing.id, data: fd as unknown as Partial<CertificateTemplate> }, { onSettled });
     } else {
-      createTemplate.mutate(payload, { onSettled });
+      createTemplate.mutate(fd as unknown as CertificateTemplate, { onSettled });
     }
   };
 
@@ -236,6 +246,23 @@ export default function CertificateTemplatesPage() {
                 <Label htmlFor="tpl-sig-title">Signature Title</Label>
                 <Input id="tpl-sig-title" value={form.signature_title ?? ''} onChange={(e) => setForm({ ...form, signature_title: e.target.value })} />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Signature Image</Label>
+              <p className="text-xs text-slate-500">Upload a signature image (PNG, JPG, or SVG). If no image is uploaded, the signature name will be displayed as text.</p>
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/jpg,image/svg+xml"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) setForm({ ...form, signature_image_file: file });
+                }}
+                className="block w-full text-sm text-slate-700 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700 hover:file:bg-brand-100"
+              />
+              {editing && (form as TemplateForm).signature_image_file === undefined && (form as TemplateForm).signature_name && (
+                <p className="text-xs text-slate-400 mt-1">Current: text signature only. Upload an image to replace.</p>
+              )}
             </div>
 
             <div className="flex items-center gap-6">

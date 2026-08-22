@@ -483,6 +483,44 @@ class CourseSeeder extends Seeder
                     ],
                 ],
             ],
+            [
+                'title' => 'Game Development Fundamentals',
+                'description' => 'Learn to build games from scratch using JavaScript and HTML5 Canvas.',
+                'objectives' => ['Understand game design principles', 'Build games with HTML5 Canvas', 'Implement player input and collision detection', 'Create complete browser games'],
+                'prerequisites' => ['JavaScript basics', 'HTML fundamentals'],
+                'category' => 'Web Development',
+                'instructor_index' => 0,
+                'level' => 'intermediate',
+                'duration_hours' => 20.0,
+                'price' => 89.99,
+                'is_featured' => true,
+                'status' => 'published',
+                'modules' => [
+                    [
+                        'title' => 'Game Design Basics',
+                        'lessons' => [
+                            ['title' => 'Introduction to Game Design', 'content' => "Game design is the art of creating interactive experiences.\n\n## Core Concepts\n- **Game Loop**: The heartbeat of your game\n- **Player Input**: How the player interacts\n- **Game State**: What's happening in the game\n- **Win/Lose Conditions**: Goals and failure states\n\n## Types of Games\n- Platformers (Super Mario)\n- Puzzle (Tetris)\n- RPG (Final Fantasy)\n- Strategy (Chess)", 'type' => 'video', 'duration_minutes' => 30, 'is_free' => true],
+                            ['title' => 'Setting Up Your Game Engine', 'content' => "We'll use HTML5 Canvas with vanilla JavaScript.\n\n## Canvas Setup\n```html\n<canvas id=\"gameCanvas\" width=\"800\" height=\"600\"></canvas>\n```\n\n```javascript\nconst canvas = document.getElementById('gameCanvas');\nconst ctx = canvas.getContext('2d');\n\n// Game loop\nfunction gameLoop() {\n  ctx.clearRect(0, 0, canvas.width, canvas.height);\n  // Update and draw here\n  requestAnimationFrame(gameLoop);\n}\n\ngameLoop();\n```", 'type' => 'video', 'duration_minutes' => 40],
+                            ['title' => 'Game Design Basics Quiz', 'content' => 'Test your knowledge of game design fundamentals.', 'type' => 'quiz', 'duration_minutes' => 15],
+                        ],
+                    ],
+                    [
+                        'title' => 'Building Your First Game',
+                        'lessons' => [
+                            ['title' => 'Game Objects and Sprites', 'content' => "Every game has objects that move and interact.\n\n## Game Object Class\n```javascript\nclass GameObject {\n  constructor(x, y, width, height, color) {\n    this.x = x;\n    this.y = y;\n    this.width = width;\n    this.height = height;\n    this.color = color;\n  }\n\n  draw(ctx) {\n    ctx.fillStyle = this.color;\n    ctx.fillRect(this.x, this.y, this.width, this.height);\n  }\n\n  update() {\n    // Override in subclasses\n  }\n}\n\nconst player = new GameObject(100, 300, 50, 50, '#3b82f6');\nplayer.draw(ctx);\n```", 'type' => 'video', 'duration_minutes' => 45],
+                            ['title' => 'Player Movement', 'content' => "Handle keyboard input to move the player.\n\n```javascript\nconst keys = {};\n\ndocument.addEventListener('keydown', (e) => {\n  keys[e.key] = true;\n});\n\ndocument.addEventListener('keyup', (e) => {\n  keys[e.key] = false;\n});\n\nfunction updatePlayer() {\n  if (keys['ArrowLeft']) player.x -= 5;\n  if (keys['ArrowRight']) player.x += 5;\n  if (keys['ArrowUp']) player.y -= 5;\n  if (keys['ArrowDown']) player.y += 5;\n\n  // Keep player in bounds\n  player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));\n  player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));\n}\n```", 'type' => 'video', 'duration_minutes' => 45],
+                            ['title' => 'Collision Detection', 'content' => "Detect when game objects collide.\n\n## AABB Collision\n```javascript\nfunction checkCollision(a, b) {\n  return a.x < b.x + b.width &&\n         a.x + a.width > b.x &&\n         a.y < b.y + b.height &&\n         a.y + a.height > b.y;\n}\n\n// Check player vs enemy\nenemies.forEach(enemy => {\n  if (checkCollision(player, enemy)) {\n    // Handle collision\n    gameOver = true;\n  }\n});\n```", 'type' => 'video', 'duration_minutes' => 40],
+                            ['title' => 'Building Games Quiz', 'content' => 'Test your knowledge of game objects, movement, and collision detection.', 'type' => 'quiz', 'duration_minutes' => 15],
+                        ],
+                    ],
+                    [
+                        'title' => 'Game Project',
+                        'lessons' => [
+                            ['title' => 'Build a Complete Game', 'content' => 'Apply everything you learned to build your own game! Choose from: platformer, puzzle, or space shooter. Implement player movement, enemies, scoring, and win/lose conditions.', 'type' => 'assignment', 'duration_minutes' => 120],
+                        ],
+                    ],
+                ],
+            ],
         ];
 
         foreach ($courses as $courseData) {

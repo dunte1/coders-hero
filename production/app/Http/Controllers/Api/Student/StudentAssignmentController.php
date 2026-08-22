@@ -224,4 +224,87 @@ class StudentAssignmentController extends Controller
 
         return $this->paginatedResponse($submissions, 'Submissions retrieved successfully.');
     }
+
+    public function saveDraft(Request $request, int $id): JsonResponse
+    {
+        try {
+            $user = auth()->user();
+            $student = Student::where('user_id', $user->id)->first();
+
+            if (!$student) {
+                return $this->forbiddenResponse('No student profile found.');
+            }
+
+            $classIds = $student->schoolClasses()->pluck('classes.id');
+            $assignment = Assignment::published()
+                ->whereIn('class_id', $classIds)
+                ->find($id);
+
+            if (!$assignment) {
+                return $this->notFoundResponse('Assignment not found.');
+            }
+
+            $request->validate([
+                'content' => 'nullable|string|max:10000',
+                'file' => 'nullable|file|max:10240|mimes:pdf,doc,docx,txt,zip',
+            ]);
+
+            $existing = AssignmentSubmission::where('assignment_id', $id)
+                ->where('student_id', $student->id)
+                ->first();
+
+            $filePath = null;
+            $fileName = null;
+
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                $fileName = $file->getClientOriginalName();
+                $filePath = $file->store('assignments/' . $id, 'public');
+            }
+
+            if ($existing && $existing->status === 'draft') {
+                $existing->update([
+                    'content' => $request->input('content', $existing->content),
+                    'file_path' => $filePath ?? $existing->file_path,
+                    'file_name' => $fileName ?? $existing->file_name,
+                ]);
+                $submission = $existing;
+            } else {
+                $submission = AssignmentSubmission::create([
+                    'assignment_id' => $id,
+                    'student_id' => $student->id,
+                    'content' => $request->input('content'),
+                    'file_path' => $filePath,
+                    'file_name' => $fileName,
+                    'status' => 'draft',
+                ]);
+            }
+
+            return $this->successResponse($submission, 'Draft saved successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return $this->validationErrorResponse($e->errors());
+        } catch (\Exception $e) {
+            return $this->errorResponse('Failed to save draft: ' . $e->getMessage(), 500);
+        }
+    }
+
+    public function classes(): JsonResponse
+    {
+        try {
+            $user = auth()->user();
+            $student = Student::where('user_id', $user->id)->first();
+
+            if (!$student) {
+                return $this->forbiddenResponse('No student profile found.');
+            }
+
+            $classes = $student->schoolClasses()
+                ->with(['teacher', 'course', 'classStudents'])
+                ->get();
+
+            return $this->successResponse($classes, 'Classes retrieved successfully.');
+        } catch (\Exception $e) {
+            return $this->errorResponse('Failed to retrieve classes: ' . $e->getMessage(), 500);
+        }
+    }
 }

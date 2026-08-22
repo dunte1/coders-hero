@@ -122,7 +122,7 @@ export default function BlogDetailPage() {
       <section className="bg-white py-12">
         <div className="mx-auto max-w-3xl space-y-5 px-4 sm:px-6 lg:px-8">
           <div
-            className="prose prose-slate max-w-none prose-headings:font-display prose-headings:text-slate-900 prose-p:text-base prose-p:leading-relaxed prose-p:text-slate-700 prose-a:text-brand-600 prose-a:no-underline hover:prose-a:underline prose-img:rounded-2xl"
+            className="prose prose-slate max-w-none overflow-hidden prose-headings:font-display prose-headings:text-slate-900 prose-p:text-base prose-p:leading-relaxed prose-p:text-slate-700 prose-a:text-brand-600 prose-a:no-underline hover:prose-a:underline prose-img:rounded-2xl prose-img:max-w-full"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
 

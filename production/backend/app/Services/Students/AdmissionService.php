@@ -3,6 +3,9 @@
 namespace App\Services\Students;
 
 use App\Models\Admission;
+use App\Models\User;
+use App\Notifications\AdmissionStatusNotification;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class AdmissionService
@@ -77,18 +80,38 @@ class AdmissionService
             'decided_at' => now()->toDateString(),
         ]);
 
+        $this->notifyApplicantStatusChange($admission, 'admitted');
+
         return $admission->fresh('student');
     }
 
-    public function reject(int $id): Admission
+    public function reject(int $id, ?string $reason = null): Admission
     {
         $admission = Admission::findOrFail($id);
         $admission->update([
             'status' => 'rejected',
             'decided_at' => now()->toDateString(),
+            'notes' => $reason ? trim(($admission->notes ? $admission->notes . "\n\n" : '') . "Rejection reason: {$reason}") : $admission->notes,
         ]);
 
+        $this->notifyApplicantStatusChange($admission, 'rejected', $reason);
+
         return $admission->fresh('student');
+    }
+
+    private function notifyApplicantStatusChange(Admission $admission, string $status, ?string $reason = null): void
+    {
+        if (!$admission->email) {
+            return;
+        }
+
+        try {
+            \Illuminate\Support\Facades\Mail::to($admission->email)->send(
+                new AdmissionStatusNotification($admission, $status, $reason)
+            );
+        } catch (\Throwable $e) {
+            Log::error("Failed to send admission status email to {$admission->email}: {$e->getMessage()}");
+        }
     }
 
     public function generateApplicationNumber(): string

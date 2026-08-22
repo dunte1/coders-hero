@@ -309,3 +309,22 @@ export function useMpesaTransactions(params?: { page?: number; status?: string; 
 export function useMpesaTransaction(id: number) {
   return useQuery({ queryKey: ['finance', 'mpesa', 'item', id], queryFn: () => financeApi.mpesaTransaction(id), enabled: !!id });
 }
+
+// Stripe
+export function useStripeCheckout() {
+  return useMutation({
+    mutationFn: (invoiceId: number) => financeApi.stripeCheckout(invoiceId),
+    onSuccess: (result) => {
+      window.location.href = result.url;
+    },
+    onError: (error: unknown) => toast.error(getErrorMessage(error)),
+  });
+}
+
+export function useStripeStatus(sessionId: string | null) {
+  return useQuery({
+    queryKey: ['finance', 'stripe-status', sessionId],
+    queryFn: () => financeApi.stripeStatus(sessionId!),
+    enabled: !!sessionId,
+  });
+}

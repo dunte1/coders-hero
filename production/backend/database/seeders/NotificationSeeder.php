@@ -84,6 +84,33 @@ class NotificationSeeder extends Seeder
                 'body' => '{{message}}',
                 'channels' => ['in_app', 'email'],
             ],
+            [
+                'event' => 'admission.submitted',
+                'name' => 'Admission Submitted',
+                'description' => 'Confirms to the applicant that their admission application has been received.',
+                'category' => 'admissions',
+                'subject' => 'Application received: {{application_number}}',
+                'body' => 'Hello {{applicant_name}}, your application ({{application_number}}) to {{site_name}} has been received. Our team will review it shortly.',
+                'channels' => ['in_app', 'email'],
+            ],
+            [
+                'event' => 'admission.approved',
+                'name' => 'Admission Approved',
+                'description' => 'Notifies the applicant that their admission has been approved.',
+                'category' => 'admissions',
+                'subject' => 'Application approved: {{application_number}}',
+                'body' => 'Congratulations {{applicant_name}}! Your application ({{application_number}}) to {{site_name}} has been approved.',
+                'channels' => ['in_app', 'email'],
+            ],
+            [
+                'event' => 'admission.rejected',
+                'name' => 'Admission Rejected',
+                'description' => 'Notifies the applicant that their admission has not been approved.',
+                'category' => 'admissions',
+                'subject' => 'Application update: {{application_number}}',
+                'body' => 'Hello {{applicant_name}}, we regret to inform you that your application ({{application_number}}) could not be approved at this time.',
+                'channels' => ['in_app', 'email'],
+            ],
         ];
 
         foreach ($templates as $template) {

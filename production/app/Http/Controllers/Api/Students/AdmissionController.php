@@ -137,7 +137,9 @@ class AdmissionController extends Controller
 
         $this->authorize('update', $admission);
 
-        $admission = $this->admissionService->reject($id);
+        $reason = request()->input('reason');
+
+        $admission = $this->admissionService->reject($id, $reason);
 
         return $this->successResponse($admission, 'Admission rejected.');
     }

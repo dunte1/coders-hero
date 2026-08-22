@@ -110,7 +110,7 @@ export const STAFF_ROLES: NavRole[] = [
   'accountant',
 ];
 
-export const ADMIN_ROLES: NavRole[] = ['super_admin', 'admin'];
+export const ADMIN_ROLES: NavRole[] = ['super_admin', 'admin', 'school_admin'];
 
 const ACADEMICS_ROLES: NavRole[] = ['super_admin', 'admin', 'director', 'branch_manager', 'school_admin', 'teacher', 'instructor'];
 const TEACHER_ROLES: NavRole[] = ['super_admin', 'admin', 'director', 'school_admin', 'teacher', 'instructor'];
@@ -179,6 +179,11 @@ export const navigation: NavEntry[] = [
       { label: 'Receipts', href: '/parent/receipts', icon: Receipt },
       { label: 'Appointments', href: '/parent/appointments', icon: CalendarCheck },
       { label: 'Notifications', href: '/parent/notifications', icon: Bell },
+      { label: 'Assignments', href: '/parent/assignments', icon: ClipboardList },
+      { label: 'Courses', href: '/parent/courses', icon: BookOpen },
+      { label: 'Projects', href: '/parent/projects', icon: FolderKanban },
+      { label: 'Competitions', href: '/parent/competitions', icon: Trophy },
+      { label: 'Certificates', href: '/parent/certificates', icon: Award },
     ],
   },
 
@@ -215,11 +220,17 @@ export const navigation: NavEntry[] = [
     roles: LEARNER_ROLES,
     children: [
       { label: 'My Courses', href: '/my-courses', icon: GraduationCap },
+      { label: 'My Classes', href: '/student/classes', icon: BookOpen, roles: ['student'] },
       { label: 'My Assignments', href: '/student/assignments', icon: ClipboardList, roles: ['student'] },
+      { label: 'My Projects', href: '/student/projects', icon: FolderKanban, roles: ['student'] },
+      { label: 'My Exams', href: '/student/exams', icon: FileText, roles: ['student'] },
+      { label: 'My Progress', href: '/lms/analytics', icon: BarChart3, roles: ['student'] },
+      { label: 'My Certificates', href: '/certificates', icon: Award, roles: ['student'] },
       { label: 'Quizzes', href: '/quizzes', icon: FileText },
       { label: 'Forum', href: '/lms/forum', icon: MessageSquare },
       { label: 'Bookmarks', href: '/lms/bookmarks', icon: BookOpen },
       { label: 'AI Tutor', href: '/lms/ai-tutor', icon: Bot },
+      { label: 'Marketplace', href: '/marketplace', icon: Globe, roles: ['student'] },
     ],
   },
 

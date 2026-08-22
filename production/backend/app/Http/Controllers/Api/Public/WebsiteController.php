@@ -25,6 +25,7 @@ use App\Models\Program;
 use App\Models\Service;
 use App\Models\SiteSection;
 use App\Models\Testimonial;
+use App\Services\Students\AdmissionService;
 use App\Services\Website\ChatService;
 use App\Services\Website\WebsiteService;
 use App\Traits\ApiResponse;
@@ -38,7 +39,8 @@ class WebsiteController extends Controller
 
     public function __construct(
         private WebsiteService $websiteService,
-        private ChatService $chatService
+        private ChatService $chatService,
+        private AdmissionService $admissionService
     ) {}
 
     public function home(): JsonResponse
@@ -285,7 +287,7 @@ class WebsiteController extends Controller
 
         $data = $validator->validated();
 
-        $admission = \App\Models\Admission::create([
+        $admission = $this->admissionService->create([
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'email' => $data['email'],
@@ -293,17 +295,21 @@ class WebsiteController extends Controller
             'date_of_birth' => $data['date_of_birth'],
             'gender' => $data['gender'],
             'grade' => $data['grade'],
-            'parent_name' => $data['parent_name'],
-            'parent_phone' => $data['parent_phone'],
-            'parent_email' => $data['parent_email'] ?? null,
+            'guardian_name' => $data['parent_name'],
+            'guardian_phone' => $data['parent_phone'],
+            'guardian_email' => $data['parent_email'] ?? null,
             'address' => $data['address'] ?? null,
             'notes' => $data['notes'] ?? null,
-            'status' => 'pending',
             'source' => 'online',
+            'status' => 'new',
         ]);
 
+        \App\Jobs\SendAdmissionConfirmationJob::dispatch($admission);
+
+        \App\Jobs\NotifyAdminsNewApplicationJob::dispatch($admission);
+
         return $this->createdResponse(
-            ['id' => $admission->id],
+            ['id' => $admission->id, 'application_number' => $admission->application_number],
             'Your application has been submitted successfully. We will review it and contact you soon.'
         );
     }

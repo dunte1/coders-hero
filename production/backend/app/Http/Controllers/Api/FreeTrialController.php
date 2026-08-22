@@ -22,6 +22,9 @@ class FreeTrialController extends Controller
         ]);
 
         $booking = FreeTrialBooking::create($validated);
+
+        \App\Jobs\SendFreeTrialConfirmationJob::dispatch($booking);
+
         return $this->createdResponse($booking, 'Free trial booking submitted successfully');
     }
 

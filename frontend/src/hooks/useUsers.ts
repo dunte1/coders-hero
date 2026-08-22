@@ -10,7 +10,7 @@ export function useUsers(params?: Record<string, string | number | boolean>) {
   });
 }
 
-export function useUser(id: number) {
+export function useUser(id: string | number) {
   return useQuery({
     queryKey: ['user', id],
     queryFn: () => usersApi.getUser(id),
@@ -35,7 +35,7 @@ export function useCreateUser() {
 export function useUpdateUser() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UserUpdate }) =>
+    mutationFn: ({ id, data }: { id: string | number; data: UserUpdate }) =>
       usersApi.updateUser(id, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
@@ -51,7 +51,7 @@ export function useUpdateUser() {
 export function useDeleteUser() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: number) => usersApi.deleteUser(id),
+    mutationFn: (id: string | number) => usersApi.deleteUser(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast.success('User deleted successfully');
@@ -65,7 +65,7 @@ export function useDeleteUser() {
 export function useToggleUserStatus() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (userId: number) => usersApi.toggleStatus(userId),
+    mutationFn: (userId: string | number) => usersApi.toggleStatus(userId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast.success('User status updated');

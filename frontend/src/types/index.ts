@@ -1,5 +1,5 @@
 export interface User {
-  id: number;
+  id: string;
   email: string;
   name: string;
   first_name?: string;
@@ -482,6 +482,7 @@ export interface DashboardAttendanceSummary {
   present: number;
   late: number;
   absent: number;
+  excused?: number;
   total: number;
 }
 
@@ -747,4 +748,76 @@ export interface ResetTokenValidation {
   valid: boolean;
   email?: string;
   message?: string;
+}
+
+export interface StudentProject {
+  id: number;
+  student_id: string;
+  user_id: string;
+  title: string;
+  slug: string;
+  problem_statement?: string;
+  description?: string;
+  technologies?: string[];
+  repo_url?: string;
+  demo_url?: string;
+  source_path?: string;
+  final_score?: number;
+  is_published: boolean;
+  published_at?: string;
+  status: 'planning' | 'in_progress' | 'completed' | 'archived';
+  media?: ProjectMedia[];
+  reviews?: ProjectReview[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProjectMedia {
+  id: number;
+  type: 'image' | 'video';
+  path: string;
+  original_name?: string;
+  sort_order: number;
+}
+
+export interface ProjectReview {
+  id: number;
+  reviewer_id: string;
+  score?: number;
+  feedback?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  reviewer?: User;
+  created_at: string;
+}
+
+export interface ExamQuestion {
+  id: number;
+  exam_id: number;
+  question: string;
+  options: string[];
+  correct_answer: string;
+  points: number;
+  sort_order: number;
+}
+
+export interface ExamAttempt {
+  id: number;
+  exam_id: number;
+  student_id: string;
+  user_id: string;
+  score?: number;
+  total_points: number;
+  earned_points: number;
+  answers?: Record<number, string>;
+  started_at?: string;
+  submitted_at?: string;
+  status: 'in_progress' | 'submitted' | 'graded';
+  exam?: {
+    id: number;
+    title: string;
+    type: string;
+    total_marks: number;
+    duration_minutes: number;
+  };
+  created_at: string;
 }

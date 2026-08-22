@@ -5,7 +5,10 @@ namespace App\Services;
 use App\Jobs\SendWelcomeEmailJob;
 use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class UserService
 {
@@ -70,6 +73,32 @@ class UserService
     public function toggleStatus(string $userId): User
     {
         return $this->userRepository->toggleStatus($userId);
+    }
+
+    public function updatePassword(string $userId, string $password): User
+    {
+        $user = $this->userRepository->findById($userId);
+        $user->forceFill([
+            'password' => Hash::make($password),
+        ])->save();
+
+        return $user->fresh()->load('roles.permissions');
+    }
+
+    public function updatePhoto(User $user, UploadedFile $photo): User
+    {
+        $extension = $photo->getClientOriginalExtension() ?: $photo->extension();
+        $filename = $user->id . '-' . Str::random(20) . '.' . $extension;
+
+        $path = $photo->storeAs('avatars', $filename, 'public');
+
+        if ($user->avatar) {
+            Storage::disk('public')->delete($user->avatar);
+        }
+
+        $user->update(['avatar' => $path]);
+
+        return $user->fresh()->load('roles.permissions');
     }
 
     public function search(?string $term, int $perPage = 15)

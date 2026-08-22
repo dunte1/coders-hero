@@ -18,7 +18,7 @@ trait HasActivity
             ->logAll()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn (string $eventName): string => "Model has been {$eventName}")
+            ->setDescriptionForEvent(fn (string $eventName): string => class_basename(static::class) . ' ' . strtolower($eventName))
             ->useLogName('activity');
     }
 }

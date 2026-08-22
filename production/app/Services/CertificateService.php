@@ -254,6 +254,15 @@ class CertificateService
             'font_family' => 'DejaVu Sans',
         ]), $certificate);
 
+        $signatureImage = null;
+        if ($template && $template->signature_image) {
+            $sigPath = $template->signature_image;
+            if (str_starts_with($sigPath, '/')) {
+                $sigPath = url($sigPath);
+            }
+            $signatureImage = $sigPath;
+        }
+
         $html = view('certificates.pdf', [
             'certificate' => $certificate,
             'bodyHtml' => $bodyHtml,
@@ -262,6 +271,7 @@ class CertificateService
             'qrCode' => $this->generateQrSvg($certificate->verification_code),
             'signatureName' => $template?->signature_name ?? $certificate->digital_signature,
             'signatureTitle' => $template?->signature_title,
+            'signatureImage' => $signatureImage,
             'siteName' => SiteSetting::siteName(),
             'siteLogo' => SiteSetting::siteLogo(),
         ])->render();

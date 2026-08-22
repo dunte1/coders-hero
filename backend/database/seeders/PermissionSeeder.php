@@ -16,6 +16,7 @@ class PermissionSeeder extends Seeder
                 ['name' => 'create_users', 'display_name' => 'Create Users', 'description' => 'Create new user accounts.'],
                 ['name' => 'update_users', 'display_name' => 'Update Users', 'description' => 'Edit user profiles and details.'],
                 ['name' => 'delete_users', 'display_name' => 'Delete Users', 'description' => 'Delete user accounts.'],
+                ['name' => 'reset_passwords', 'display_name' => 'Reset Passwords', 'description' => 'Set or reset other users account passwords.'],
             ],
             'courses' => [
                 ['name' => 'view_courses', 'display_name' => 'View Courses', 'description' => 'View course listings.'],
@@ -207,6 +208,68 @@ class PermissionSeeder extends Seeder
                 ['name' => 'view_notification_deliveries', 'display_name' => 'View Notification Deliveries', 'description' => 'View delivery logs, statuses and retry failures.'],
                 ['name' => 'manage_push_tokens', 'display_name' => 'Manage Push Tokens', 'description' => 'Register and revoke push notification devices.'],
             ],
+            'website' => [
+                ['name' => 'manage_blog_posts', 'display_name' => 'Manage Blog Posts', 'description' => 'Create, edit, publish and delete blog posts.'],
+                ['name' => 'manage_gallery_items', 'display_name' => 'Manage Gallery', 'description' => 'Upload, edit and remove gallery items.'],
+                ['name' => 'manage_testimonials', 'display_name' => 'Manage Testimonials', 'description' => 'Create, edit and delete testimonials.'],
+                ['name' => 'manage_faqs', 'display_name' => 'Manage FAQs', 'description' => 'Create, edit and delete frequently asked questions.'],
+                ['name' => 'manage_programs_services', 'display_name' => 'Manage Programs & Services', 'description' => 'Create, edit and delete public programs and services.'],
+                ['name' => 'manage_partner_schools', 'display_name' => 'Manage Partner Schools', 'description' => 'Create, edit and remove partner schools.'],
+                ['name' => 'manage_site_content', 'display_name' => 'Manage Site Content', 'description' => 'Edit public website sections and content blocks.'],
+                ['name' => 'manage_contact_messages', 'display_name' => 'Manage Contact Messages', 'description' => 'View, reply to and archive contact form messages.'],
+                ['name' => 'manage_chat_widget', 'display_name' => 'Manage Chat Widget', 'description' => 'Configure the website chat widget settings.'],
+                ['name' => 'manage_popup_ads', 'display_name' => 'Manage Popup Ads', 'description' => 'Configure the website popup announcement/ad.'],
+                ['name' => 'manage_events', 'display_name' => 'Manage Events', 'description' => 'Create, edit and publish events.'],
+                ['name' => 'view_website_analytics', 'display_name' => 'View Website Analytics', 'description' => 'View public website traffic analytics.'],
+            ],
+            'system_operations' => [
+                ['name' => 'view_system_logs', 'display_name' => 'View System Logs', 'description' => 'View application system logs.'],
+                ['name' => 'view_audit_logs', 'display_name' => 'View Audit Logs', 'description' => 'View audit trail of user actions.'],
+                ['name' => 'view_system_health', 'display_name' => 'View System Health', 'description' => 'View system health checks and diagnostics.'],
+                ['name' => 'manage_backups', 'display_name' => 'Manage Backups', 'description' => 'Create, download and delete backups.'],
+                ['name' => 'restore_backups', 'display_name' => 'Restore Backups', 'description' => 'Restore the system from a backup.'],
+                ['name' => 'toggle_maintenance_mode', 'display_name' => 'Toggle Maintenance Mode', 'description' => 'Enable or disable application maintenance mode.'],
+                ['name' => 'view_login_history', 'display_name' => 'View Login History', 'description' => 'View user login history and sessions.'],
+            ],
+            'lms' => [
+                ['name' => 'access_lms', 'display_name' => 'Access LMS', 'description' => 'Access the learning management system features.'],
+                ['name' => 'manage_coding_exercises', 'display_name' => 'Manage Coding Exercises', 'description' => 'Create and manage coding exercises and playground content.'],
+                ['name' => 'manage_forums', 'display_name' => 'Manage Forums', 'description' => 'Moderate forum threads and posts.'],
+                ['name' => 'manage_gamification', 'display_name' => 'Manage Gamification', 'description' => 'Manage badges, streaks and points configuration.'],
+            ],
+            'appointments' => [
+                ['name' => 'view_appointments', 'display_name' => 'View Appointments', 'description' => 'View appointment bookings.'],
+                ['name' => 'manage_appointments', 'display_name' => 'Manage Appointments', 'description' => 'Confirm, reschedule and cancel appointments.'],
+            ],
+            'organization' => [
+                ['name' => 'manage_branches', 'display_name' => 'Manage Branches', 'description' => 'Create, edit and deactivate branches.'],
+                ['name' => 'manage_academic_years', 'display_name' => 'Manage Academic Years', 'description' => 'Create and manage academic years and terms.'],
+            ],
+            'academics' => [
+                ['name' => 'view_student_attendance', 'display_name' => 'View Student Attendance', 'description' => 'View student attendance records and reports.'],
+                ['name' => 'manage_student_attendance', 'display_name' => 'Manage Student Attendance', 'description' => 'Record and edit student attendance.'],
+                ['name' => 'manage_exams', 'display_name' => 'Manage Exams', 'description' => 'Create, schedule and grade exams.'],
+                ['name' => 'manage_gradebook', 'display_name' => 'Manage Gradebook', 'description' => 'Record and update student grades.'],
+                ['name' => 'manage_assignments', 'display_name' => 'Manage Assignments', 'description' => 'Create assignments and grade submissions.'],
+                ['name' => 'manage_report_cards', 'display_name' => 'Manage Report Cards', 'description' => 'Generate and publish student report cards.'],
+            ],
+            'student_projects' => [
+                ['name' => 'view_student_projects', 'display_name' => 'View Student Projects', 'description' => 'View student project listings.'],
+                ['name' => 'create_student_projects', 'display_name' => 'Create Student Projects', 'description' => 'Create new student projects.'],
+                ['name' => 'update_student_projects', 'display_name' => 'Update Student Projects', 'description' => 'Edit student project details.'],
+                ['name' => 'delete_student_projects', 'display_name' => 'Delete Student Projects', 'description' => 'Delete student projects.'],
+                ['name' => 'publish_student_projects', 'display_name' => 'Publish Student Projects', 'description' => 'Publish and unpublish student projects.'],
+                ['name' => 'review_student_projects', 'display_name' => 'Review Student Projects', 'description' => 'Review and score student projects.'],
+                ['name' => 'view_public_projects', 'display_name' => 'View Public Projects', 'description' => 'View publicly published student projects.'],
+            ],
+            'student_exams' => [
+                ['name' => 'view_available_exams', 'display_name' => 'View Available Exams', 'description' => 'View available exams for enrollment.'],
+                ['name' => 'take_exams', 'display_name' => 'Take Exams', 'description' => 'Start and submit exam attempts.'],
+                ['name' => 'view_exam_results', 'display_name' => 'View Exam Results', 'description' => 'View own exam results and attempts.'],
+            ],
+            'id_cards' => [
+                ['name' => 'generate_id_cards', 'display_name' => 'Generate ID Cards', 'description' => 'Generate student and staff ID cards.'],
+            ],
         ];
 
         foreach ($permissions as $group => $items) {
@@ -256,6 +319,7 @@ class PermissionSeeder extends Seeder
             'view_competition_leaderboard', 'view_competition_results',
             'use_ai_assistants',
             'view_notifications', 'manage_notification_preferences',
+            'review_student_projects',
         ]);
 
         $teacher?->syncPermissions([
@@ -275,6 +339,7 @@ class PermissionSeeder extends Seeder
             'manage_competition_teams', 'verify_competition_scores',
             'view_competition_leaderboard', 'view_competition_results',
             'view_notifications', 'manage_notification_preferences',
+            'review_student_projects',
         ]);
 
         $employee?->syncPermissions([
@@ -314,6 +379,9 @@ class PermissionSeeder extends Seeder
             'view_library', 'library_download',
             'use_ai_assistants',
             'view_notifications', 'manage_notification_preferences',
+            'view_student_projects', 'create_student_projects', 'update_student_projects',
+            'delete_student_projects', 'publish_student_projects', 'view_public_projects',
+            'view_available_exams', 'take_exams', 'view_exam_results',
         ]);
 
         $judge?->syncPermissions([
@@ -416,6 +484,51 @@ class PermissionSeeder extends Seeder
 
         $teacher?->syncPermissions(array_merge($teacher?->getPermissionNames()->all() ?? [], [
             'view_certificates', 'issue_certificates',
+        ]));
+
+        // Extended permissions (CMS, system ops, LMS, academics, appointments, organization, ID cards).
+        $schoolAdmin?->syncPermissions(array_merge($schoolAdmin?->getPermissionNames()->all() ?? [], [
+            'reset_passwords',
+            'manage_blog_posts', 'manage_gallery_items', 'manage_testimonials', 'manage_faqs',
+            'manage_programs_services', 'manage_partner_schools', 'manage_site_content',
+            'manage_contact_messages', 'manage_chat_widget', 'manage_popup_ads', 'manage_events',
+            'view_website_analytics',
+            'view_appointments', 'manage_appointments',
+            'view_student_attendance', 'manage_student_attendance',
+            'manage_exams', 'manage_gradebook', 'manage_assignments', 'manage_report_cards',
+            'generate_id_cards',
+            'manage_academic_years',
+            'access_lms',
+        ]));
+
+        $teacher?->syncPermissions(array_merge($teacher?->getPermissionNames()->all() ?? [], [
+            'view_student_attendance', 'manage_student_attendance',
+            'manage_exams', 'manage_gradebook', 'manage_assignments', 'manage_report_cards',
+            'access_lms',
+        ]));
+
+        $instructor?->syncPermissions(array_merge($instructor?->getPermissionNames()->all() ?? [], [
+            'access_lms', 'manage_coding_exercises', 'manage_forums',
+        ]));
+
+        $student?->syncPermissions(array_merge($student?->getPermissionNames()->all() ?? [], [
+            'access_lms',
+        ]));
+
+        $employee?->syncPermissions(array_merge($employee?->getPermissionNames()->all() ?? [], [
+            'access_lms',
+        ]));
+
+        $parent?->syncPermissions(array_merge($parent?->getPermissionNames()->all() ?? [], [
+            'access_lms', 'view_student_attendance',
+        ]));
+
+        $director?->syncPermissions(array_merge($director?->getPermissionNames()->all() ?? [], [
+            'view_appointments', 'view_student_attendance', 'view_website_analytics',
+        ]));
+
+        $branchManager?->syncPermissions(array_merge($branchManager?->getPermissionNames()->all() ?? [], [
+            'view_appointments', 'view_student_attendance',
         ]));
     }
 }

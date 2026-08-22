@@ -67,7 +67,7 @@ class NotificationTest extends TestCase
         $this->getJson('/api/notification-preferences')
             ->assertOk()
             ->assertJsonPath('data.0.category', 'attendance')
-            ->assertJsonCount(7, 'data');
+            ->assertJsonCount(8, 'data');
     }
 
     public function test_user_can_update_preferences(): void

@@ -31,8 +31,12 @@ class ParentController extends Controller
 
     public function teachers(): JsonResponse
     {
-        $teachers = User::role('instructor')
-            ->select(['id', 'name', 'email', 'phone', 'avatar'])
+        $teachers = User::whereIn('id', function ($query) {
+            $query->select('model_id')
+                ->from('model_has_roles')
+                ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+                ->whereIn('roles.name', ['teacher', 'instructor']);
+        })->select(['id', 'name', 'email', 'phone', 'avatar'])
             ->orderBy('name')
             ->get();
 

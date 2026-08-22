@@ -147,7 +147,7 @@ export const routes: RouteConfig[] = [
   {
     path: '/courses/create',
     element: React.lazy(() => import('@/pages/CourseCreatePage')),
-    meta: { title: 'Create Course', roles: ['admin', 'instructor'] },
+    meta: { title: 'Create Course', roles: ['admin', 'instructor', 'school_admin'] },
   },
   {
     path: '/courses/:id',
@@ -157,7 +157,7 @@ export const routes: RouteConfig[] = [
   {
     path: '/courses/:id/edit',
     element: React.lazy(() => import('@/pages/CourseEditPage')),
-    meta: { title: 'Edit Course', roles: ['admin', 'instructor'] },
+    meta: { title: 'Edit Course', roles: ['admin', 'instructor', 'school_admin'] },
   },
 
   // My Courses
@@ -171,22 +171,22 @@ export const routes: RouteConfig[] = [
   {
     path: '/users',
     element: React.lazy(() => import('@/pages/UsersPage')),
-    meta: { title: 'Users', roles: ['admin'] },
+    meta: { title: 'Users', roles: ['admin', 'school_admin'] },
   },
   {
     path: '/users/create',
     element: React.lazy(() => import('@/pages/UserCreatePage')),
-    meta: { title: 'Create User', roles: ['admin'] },
+    meta: { title: 'Create User', roles: ['admin', 'school_admin'] },
   },
   {
     path: '/users/:id',
     element: React.lazy(() => import('@/pages/UserDetailPage')),
-    meta: { title: 'User Detail', roles: ['admin'] },
+    meta: { title: 'User Detail', roles: ['admin', 'school_admin'] },
   },
   {
     path: '/users/:id/edit',
     element: React.lazy(() => import('@/pages/UserEditPage')),
-    meta: { title: 'Edit User', roles: ['admin'] },
+    meta: { title: 'Edit User', roles: ['admin', 'school_admin'] },
   },
 
   // Tasks
@@ -1073,6 +1073,88 @@ export const routes: RouteConfig[] = [
     path: '/student/assignments/:id',
     element: React.lazy(() => import('@/pages/student/StudentAssignmentDetailPage')),
     meta: { title: 'Assignment Detail', roles: ['student'] },
+  },
+
+  // Student Projects
+  {
+    path: '/student/projects',
+    element: React.lazy(() => import('@/pages/student/StudentProjectsPage')),
+    meta: { title: 'My Projects', roles: ['student'] },
+  },
+  {
+    path: '/student/projects/create',
+    element: React.lazy(() => import('@/pages/student/StudentProjectFormPage')),
+    meta: { title: 'New Project', roles: ['student'] },
+  },
+  {
+    path: '/student/projects/:id',
+    element: React.lazy(() => import('@/pages/student/StudentProjectDetailPage')),
+    meta: { title: 'Project', roles: ['student'] },
+  },
+  {
+    path: '/student/projects/:id/edit',
+    element: React.lazy(() => import('@/pages/student/StudentProjectFormPage')),
+    meta: { title: 'Edit Project', roles: ['student'] },
+  },
+
+  // Student Exams
+  {
+    path: '/student/exams',
+    element: React.lazy(() => import('@/pages/student/StudentExamsPage')),
+    meta: { title: 'My Exams', roles: ['student'] },
+  },
+  {
+    path: '/student/exams/:id/take',
+    element: React.lazy(() => import('@/pages/student/StudentExamTakerPage')),
+    meta: { title: 'Take Exam', roles: ['student'] },
+  },
+
+  // Student Classes
+  {
+    path: '/student/classes',
+    element: React.lazy(() => import('@/pages/student/StudentClassesPage')),
+    meta: { title: 'My Classes', roles: ['student'] },
+  },
+
+  // Parent Portal extensions
+  {
+    path: '/parent/assignments',
+    element: React.lazy(() => import('@/pages/parent/ParentAssignmentsPage')),
+    meta: { title: 'Assignments', roles: ['parent'] },
+  },
+  {
+    path: '/parent/courses',
+    element: React.lazy(() => import('@/pages/parent/ParentCoursesPage')),
+    meta: { title: 'Courses', roles: ['parent'] },
+  },
+  {
+    path: '/parent/projects',
+    element: React.lazy(() => import('@/pages/parent/ParentProjectsPage')),
+    meta: { title: 'Projects', roles: ['parent'] },
+  },
+  {
+    path: '/parent/competitions',
+    element: React.lazy(() => import('@/pages/parent/ParentCompetitionsPage')),
+    meta: { title: 'Competitions', roles: ['parent'] },
+  },
+  {
+    path: '/parent/certificates',
+    element: React.lazy(() => import('@/pages/parent/ParentCertificatesPage')),
+    meta: { title: 'Certificates', roles: ['parent'] },
+  },
+
+  // Innovation Marketplace
+  {
+    path: '/marketplace',
+    element: React.lazy(() => import('@/pages/public/MarketplacePage')),
+    meta: { title: 'Innovation Marketplace' },
+  },
+
+  // School Admin Dashboard
+  {
+    path: '/school',
+    element: React.lazy(() => import('@/pages/school/SchoolDashboardPage')),
+    meta: { title: 'School Dashboard', roles: ['school_admin', 'admin', 'super_admin'] },
   },
 
   // Robotics Lab

@@ -23,6 +23,7 @@ class CertificateTemplate extends Model
         'logo_path',
         'signature_name',
         'signature_title',
+        'signature_image',
         'is_default',
         'is_active',
         'created_by_user_id',

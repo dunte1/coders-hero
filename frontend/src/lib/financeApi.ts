@@ -164,6 +164,13 @@ export const financeApi = {
 
   mpesaTransaction: (id: number) =>
     api.get<{ data: MpesaTransaction }>(`/finance/mpesa/transactions/${id}`).then(unwrap<MpesaTransaction>),
+
+  // Stripe
+  stripeCheckout: (invoiceId: number) =>
+    api.post<{ data: { url: string; session_id: string } }>('/stripe/checkout', { invoice_id: invoiceId }).then(unwrap<{ url: string; session_id: string }>),
+
+  stripeStatus: (sessionId: string) =>
+    api.get<{ data: { status: string; payment_status: string | null; amount_total: number; currency: string } }>('/stripe/status', { params: { session_id: sessionId } }).then(unwrap<{ status: string; payment_status: string | null; amount_total: number; currency: string }>),
 };
 
 export { getErrorMessage } from '@/lib/studentsApi';

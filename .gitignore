@@ -26,6 +26,19 @@ backend/vendor/
 backend/.phpunit.cache/
 backend/storage/
 
-# Production zips
+# Production - ignore runtime/generated files only
+production/*/vendor/
+production/*/storage/logs/*
+production/*/storage/framework/cache/*
+production/*/storage/framework/sessions/*
+production/*/storage/framework/views/*
+production/*/bootstrap/cache/*
+production/.env
+production/backend/vendor/
+production/backend/storage/logs/*
+production/backend/storage/framework/cache/*
+production/backend/storage/framework/sessions/*
+production/backend/storage/framework/views/*
+production/backend/bootstrap/cache/*
 production/coders-hero-frontend.zip
 production/coders-hero-backend.zip

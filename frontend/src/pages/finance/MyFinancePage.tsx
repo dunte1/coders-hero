@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useMyInvoices, useMyOutstanding, useStkPush } from '@/hooks/useFinance';
+import { useMyInvoices, useMyOutstanding, useStkPush, useStripeCheckout } from '@/hooks/useFinance';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageSpinner } from '@/components/ui/Spinner';
 import { Button } from '@/components/ui/Button';
@@ -16,7 +16,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/Dialog';
-import { Smartphone, Wallet } from 'lucide-react';
+import { Smartphone, Wallet, CreditCard } from 'lucide-react';
 
 const formatKsh = (v: number | string | undefined) =>
   'KSh ' + Number(v ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -25,6 +25,7 @@ export default function MyFinancePage() {
   const { data: invoices, isLoading: invoicesLoading } = useMyInvoices();
   const { data: outstanding, isLoading: outstandingLoading } = useMyOutstanding();
   const stkPush = useStkPush();
+  const stripeCheckout = useStripeCheckout();
 
   const [payFor, setPayFor] = useState<{ id: number; label: string; amount: number } | null>(null);
   const [phone, setPhone] = useState('');
@@ -102,9 +103,14 @@ export default function MyFinancePage() {
                       <td className="py-2 text-right text-slate-500">{invoice.due_date ?? '—'}</td>
                       <td className="py-2 text-right">
                         {!['paid', 'void', 'draft'].includes(invoice.status) && Number(invoice.balance) > 0 && (
-                          <Button size="sm" onClick={() => { setPayFor({ id: invoice.id, label: invoice.invoice_no, amount: Number(invoice.balance) }); setPhone(''); }}>
-                            <Smartphone className="h-4 w-4 mr-1" /> Pay
-                          </Button>
+                          <div className="flex justify-end gap-1">
+                            <Button size="sm" variant="outline" onClick={() => stripeCheckout.mutate(invoice.id)} loading={stripeCheckout.isPending}>
+                              <CreditCard className="h-4 w-4 mr-1" /> Card
+                            </Button>
+                            <Button size="sm" onClick={() => { setPayFor({ id: invoice.id, label: invoice.invoice_no, amount: Number(invoice.balance) }); setPhone(''); }}>
+                              <Smartphone className="h-4 w-4 mr-1" /> M-Pesa
+                            </Button>
+                          </div>
                         )}
                       </td>
                     </tr>

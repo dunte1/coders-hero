@@ -30,6 +30,7 @@ return [
         'exams' => 'Exam Notifications',
         'competitions' => 'Competition Notifications',
         'certificates' => 'Certificate Notifications',
+        'admissions' => 'Admission Notifications',
         'system' => 'System Notifications',
     ],
 

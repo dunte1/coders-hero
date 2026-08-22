@@ -104,7 +104,7 @@ function buildAttendanceSlices(stats: DashboardStats): { name: string; value: nu
     { name: 'present', value: s.present },
     { name: 'late', value: s.late },
     { name: 'absent', value: s.absent },
-    { name: 'excused', value: Number((s as Record<string, unknown>).excused ?? 0) },
+    { name: 'excused', value: s.excused ?? 0 },
   ].filter((d) => d.value > 0);
 }
 

@@ -242,3 +242,39 @@ export function useDeleteAdminAppointment() {
     onError: (error: unknown) => toast.error(getErrorMessage(error)),
   });
 }
+
+// Parent Portal – child data hooks
+export function useParentAssignments() {
+  return useQuery({
+    queryKey: ['parent', 'assignments'],
+    queryFn: () => parentApi.assignments(),
+  });
+}
+
+export function useParentCourses() {
+  return useQuery({
+    queryKey: ['parent', 'courses'],
+    queryFn: () => parentApi.courses(),
+  });
+}
+
+export function useParentProjects() {
+  return useQuery({
+    queryKey: ['parent', 'projects'],
+    queryFn: () => parentApi.projects(),
+  });
+}
+
+export function useParentCompetitions() {
+  return useQuery({
+    queryKey: ['parent', 'competitions'],
+    queryFn: () => parentApi.competitions(),
+  });
+}
+
+export function useParentCertificates() {
+  return useQuery({
+    queryKey: ['parent', 'certificates'],
+    queryFn: () => parentApi.certificates(),
+  });
+}

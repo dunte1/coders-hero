@@ -53,7 +53,7 @@ class WebsiteService
 
     public function submitContact(array $data, Request $request): ContactMessage
     {
-        return ContactMessage::create([
+        $message = ContactMessage::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
@@ -63,6 +63,10 @@ class WebsiteService
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
+
+        \App\Jobs\NotifyAdminsNewContactMessageJob::dispatch($message);
+
+        return $message;
     }
 
     public function recordPageView(Request $request, string $path): void

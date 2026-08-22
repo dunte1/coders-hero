@@ -15,6 +15,7 @@ export interface TeacherDashboardSummary {
   today_present: number;
   today_absent: number;
   today_unmarked: number;
+  today_class_id?: number;
   ungraded_submissions: number;
   upcoming_assignments: Assignment[];
   upcoming_exams: Exam[];

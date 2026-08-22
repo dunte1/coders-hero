@@ -85,7 +85,11 @@
 
         <div class="footer">
             <div class="signature">
-                <div class="signature-line"></div>
+                @if (!empty($signatureImage))
+                    <img src="{{ $signatureImage }}" alt="Signature" style="max-height: 60px; max-width: 200px; margin: 0 auto; display: block;">
+                @else
+                    <div class="signature-line"></div>
+                @endif
                 @if ($signatureName)
                     <div class="name">{{ $signatureName }}</div>
                     @if ($signatureTitle)

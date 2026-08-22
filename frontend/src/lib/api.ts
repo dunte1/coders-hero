@@ -57,6 +57,9 @@ import type {
   VerifyTwoFactorRequest,
   EmailVerificationResponse,
   ResetTokenValidation,
+  StudentProject,
+  ExamQuestion,
+  ExamAttempt,
 } from '@/types';
 
 const handleResponse = <T>(response: { data: T }): T => {
@@ -99,7 +102,7 @@ interface RawRole {
 }
 
 interface RawUser {
-  id: number;
+  id: string;
   name: string;
   email: string;
   avatar?: string | null;
@@ -245,20 +248,29 @@ export const loginHistoryApi = {
 export const usersApi = {
   getUsers: (params?: Record<string, string | number | boolean>) =>
     api.get(`/admin/users`, { params }).then((r) => unwrapPage<User>(r)),
-  getUser: (id: number) =>
+  getUser: (id: string | number) =>
     api.get(`/admin/users/${id}`).then((r) => handleResponse<User>(r)),
   createUser: (data: UserCreate) =>
     api.post('/admin/users', data).then((r) => handleResponse<User>(r)),
-  updateUser: (id: number, data: UserUpdate) =>
+  updateUser: (id: string | number, data: UserUpdate) =>
     api.put(`/admin/users/${id}`, data).then((r) => handleResponse<User>(r)),
-  deleteUser: (id: number) =>
+  deleteUser: (id: string | number) =>
     api.delete(`/admin/users/${id}`).then(handleResponse),
-  assignRole: (userId: number, roleName: string) =>
+  assignRole: (userId: string | number, roleName: string) =>
     api.post(`/admin/users/${userId}/assign-role`, { role: roleName }).then(handleResponse),
-  removeRole: (userId: number, roleName: string) =>
+  removeRole: (userId: string | number, roleName: string) =>
     api.delete(`/admin/users/${userId}/remove-role`, { data: { role: roleName } }).then(handleResponse),
-  toggleStatus: (userId: number) =>
+  toggleStatus: (userId: string | number) =>
     api.post(`/admin/users/${userId}/toggle-status`).then(handleResponse),
+  resetPassword: (userId: string | number, data: { password: string; password_confirmation: string }) =>
+    api.put(`/admin/users/${userId}/password`, data).then(handleResponse),
+  uploadAvatar: (userId: string | number, file: File) => {
+    const formData = new FormData();
+    formData.append('photo', file);
+    return api.post(`/admin/users/${userId}/avatar`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((r) => handleResponse<User>(r));
+  },
 };
 
 // Courses
@@ -519,6 +531,49 @@ export const studentAssignmentsApi = {
     }).then(unwrap),
   mySubmissions: (params?: Record<string, string | number | boolean>) =>
     api.get('/student/assignments/my-submissions', { params }).then(unwrapPage),
+};
+
+// Student Projects
+export const studentProjectsApi = {
+  getAll: (params?: Record<string, string | number | boolean>) =>
+    api.get<PaginatedResponse<StudentProject>>('/student/projects', { params }).then(r => unwrapPage<StudentProject>(r)),
+  get: (id: number) =>
+    api.get(`/student/projects/${id}`).then(r => handleResponse<StudentProject>(r)),
+  create: (data: Partial<StudentProject>) =>
+    api.post('/student/projects', data).then(r => handleResponse<StudentProject>(r)),
+  update: (id: number, data: Partial<StudentProject>) =>
+    api.put(`/student/projects/${id}`, data).then(r => handleResponse<StudentProject>(r)),
+  delete: (id: number) =>
+    api.delete(`/student/projects/${id}`).then(handleResponse),
+  publish: (id: number) =>
+    api.post(`/student/projects/${id}/publish`).then(r => handleResponse<StudentProject>(r)),
+  unpublish: (id: number) =>
+    api.post(`/student/projects/${id}/unpublish`).then(r => handleResponse<StudentProject>(r)),
+  uploadMedia: (id: number, file: File) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    return api.post(`/student/projects/${id}/media`, fd, { headers: { 'Content-Type': 'multipart/form-data' } }).then(r => handleResponse(r));
+  },
+  deleteMedia: (id: number, mediaId: number) =>
+    api.delete(`/student/projects/${id}/media/${mediaId}`).then(handleResponse),
+  review: (projectId: number, data: { score: number; feedback?: string; status: string }) =>
+    api.post(`/projects/${projectId}/reviews`, data).then(r => handleResponse(r)),
+  publicList: (params?: Record<string, string | number | boolean>) =>
+    api.get<PaginatedResponse<StudentProject>>('/public/projects', { params }).then(r => unwrapPage<StudentProject>(r)),
+};
+
+// Student Exams
+export const studentExamsApi = {
+  getAvailable: (params?: Record<string, string | number | boolean>) =>
+    api.get<PaginatedResponse<ExamAttempt>>('/student/exams', { params }).then(r => unwrapPage<ExamAttempt>(r)),
+  getExam: (id: number) =>
+    api.get(`/student/exams/${id}`).then(r => handleResponse<{id:number;title:string;questions:ExamQuestion[];duration_minutes:number;total_marks:number}>(r)),
+  startAttempt: (id: number) =>
+    api.post(`/student/exams/${id}/start`).then(r => handleResponse<ExamAttempt>(r)),
+  submitAttempt: (id: number, answers: Record<number, string>) =>
+    api.post(`/student/exams/${id}/submit`, { answers }).then(r => handleResponse<ExamAttempt>(r)),
+  getAttempts: () =>
+    api.get<PaginatedResponse<ExamAttempt>>('/student/exams/attempts').then(r => unwrapPage<ExamAttempt>(r)),
 };
 
 // Search

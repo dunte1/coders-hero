@@ -58,6 +58,19 @@ class UserPolicy
         return $user->hasRole('super_admin');
     }
 
+    public function resetPassword(User $user, User $model): bool
+    {
+        if ($user->id === $model->id) {
+            return false;
+        }
+
+        if ($model->hasRole('super_admin')) {
+            return false;
+        }
+
+        return $user->hasPermissionTo('reset_passwords') || $user->isAdmin();
+    }
+
     public function restore(User $user, User $model): bool
     {
         return $user->hasRole('super_admin');

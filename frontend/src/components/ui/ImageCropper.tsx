@@ -154,8 +154,8 @@ export function ImageCropper({
             src={value}
             alt=""
             className={cn(
-              'w-full object-cover',
-              circular ? 'aspect-square rounded-full' : 'aspect-video'
+              'object-contain',
+              circular ? 'aspect-square max-w-[140px] rounded-full' : 'h-28 w-full bg-white'
             )}
           />
           <Button
@@ -174,7 +174,7 @@ export function ImageCropper({
           onClick={() => inputRef.current?.click()}
           className={cn(
             'flex w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 text-slate-500 transition-colors hover:border-brand-500 hover:text-brand-600',
-            circular ? 'aspect-square max-w-[200px]' : 'aspect-video'
+            circular ? 'aspect-square max-w-[140px]' : 'h-24'
           )}
         >
           {reading ? (
