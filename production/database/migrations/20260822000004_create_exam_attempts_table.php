@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('exam_attempts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('exam_id')->constrained()->cascadeOnDelete();
-            $table->foreignUuid('student_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
             $table->foreignUuid('user_id')->constrained()->cascadeOnDelete();
             $table->decimal('score', 8, 2)->nullable();
             $table->unsignedInteger('total_points')->default(0);

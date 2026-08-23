@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('student_projects', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('student_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
             $table->foreignUuid('user_id')->constrained()->cascadeOnDelete();
             $table->string('title');
             $table->string('slug')->unique();
