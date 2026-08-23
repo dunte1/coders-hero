@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Plus, Trash2, CalendarDays, Clock, MapPin } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { Plus, Trash2, CalendarDays, Clock, MapPin, Video, ExternalLink } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -11,6 +12,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Spinner } from '@/components/ui/Spinner';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { formatDateTime } from '@/lib/utils';
+import { classSessionsApi } from '@/lib/api';
 import { useCalendarEvents, useCreateCalendarEvent, useDeleteCalendarEvent, useTeacherClasses } from '@/hooks/useTeacher';
 import type { CalendarEvent, CalendarEventInput, EventType } from '@/types/teacher';
 
@@ -27,6 +29,10 @@ const eventTypes: { value: EventType; label: string }[] = [
 export default function TeacherCalendarPage() {
   const { data, isLoading } = useCalendarEvents();
   const { data: classesData } = useTeacherClasses({ per_page: 100 });
+  const { data: sessionsData, isLoading: sessionsLoading } = useQuery({
+    queryKey: ['teacher', 'class-sessions'],
+    queryFn: () => classSessionsApi.getTeacherSessions({ per_page: 20 }),
+  });
   const createEvent = useCreateCalendarEvent();
   const deleteEvent = useDeleteCalendarEvent();
   const [open, setOpen] = useState(false);
@@ -123,6 +129,56 @@ export default function TeacherCalendarPage() {
             <div className="space-y-3">
               {sorted.map((ev) => (
                 <EventRow key={ev.id} event={ev} onDelete={() => deleteEvent.mutate(ev.id)} />
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Video className="h-5 w-5" /> Live Sessions
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {sessionsLoading ? (
+            <Spinner />
+          ) : (sessionsData?.results ?? []).length === 0 ? (
+            <EmptyState title="No live sessions" description="Upcoming class sessions will appear here." />
+          ) : (
+            <div className="space-y-3">
+              {(sessionsData?.results ?? []).map((session: any) => (
+                <div key={session.id} className="flex items-center justify-between rounded-lg border border-slate-200 p-4">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-50">
+                      <Video className="h-5 w-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-slate-900">{session.title}</h3>
+                      <div className="mt-1 flex flex-wrap items-center gap-4 text-xs text-slate-500">
+                        {session.scheduled_at && (
+                          <span className="inline-flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {formatDateTime(session.scheduled_at)}
+                          </span>
+                        )}
+                        {session.class_name && <span>{session.class_name}</span>}
+                        {session.duration_minutes && <span>{session.duration_minutes} min</span>}
+                      </div>
+                    </div>
+                  </div>
+                  {session.join_url && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(session.join_url, '_blank')}
+                      className="gap-1"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" /> Join
+                    </Button>
+                  )}
+                </div>
               ))}
             </div>
           )}

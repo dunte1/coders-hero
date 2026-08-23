@@ -77,6 +77,11 @@ class SchoolClass extends Model
         return $this->hasMany(CalendarEvent::class, 'class_id');
     }
 
+    public function classSessions(): HasMany
+    {
+        return $this->hasMany(ClassSession::class, 'class_id');
+    }
+
     public function getStudentCountAttribute(): int
     {
         return $this->students()->count();

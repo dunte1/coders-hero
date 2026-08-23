@@ -182,6 +182,11 @@ class User extends Authenticatable
         return $this->hasMany(CalendarEvent::class);
     }
 
+    public function classSessions(): HasMany
+    {
+        return $this->hasMany(ClassSession::class, 'teacher_id');
+    }
+
     public function forumThreads(): HasMany
     {
         return $this->hasMany(ForumThread::class);

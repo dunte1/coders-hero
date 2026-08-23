@@ -115,7 +115,7 @@ class NotificationDispatcher
             $notification = $this->createInApp($user, $template, $category, $payload, $link, false);
         }
 
-        foreach (['email', 'sms', 'push'] as $channel) {
+        foreach (['email', 'sms', 'push', 'whatsapp'] as $channel) {
             if (!in_array($channel, $activeChannels, true)) {
                 continue;
             }
@@ -173,7 +173,7 @@ class NotificationDispatcher
             ->first();
 
         $pref = $preference
-            ? $preference->only(['email', 'sms', 'push', 'in_app'])
+            ? $preference->only(['email', 'sms', 'push', 'in_app', 'whatsapp'])
             : config('notifications.default_preferences');
 
         return array_keys(array_filter($pref, fn ($enabled) => (bool) $enabled));
@@ -190,6 +190,7 @@ class NotificationDispatcher
             'email' => filter_var($user->email, FILTER_VALIDATE_EMAIL) !== false,
             'sms' => is_string($user->phone) && trim($user->phone) !== '',
             'push' => $user->fcmTokens()->active()->exists(),
+            'whatsapp' => is_string($user->phone) && trim($user->phone) !== '',
             default => true,
         };
     }
@@ -223,6 +224,7 @@ class NotificationDispatcher
                 'sms' => $row ? $row->sms : $defaults['sms'],
                 'push' => $row ? $row->push : $defaults['push'],
                 'in_app' => $row ? $row->in_app : $defaults['in_app'],
+                'whatsapp' => $row ? $row->whatsapp : $defaults['whatsapp'],
             ];
         }
 
@@ -239,7 +241,7 @@ class NotificationDispatcher
                 continue;
             }
 
-            $booleanKeys = Arr::only($channels, ['email', 'sms', 'push', 'in_app']);
+            $booleanKeys = Arr::only($channels, ['email', 'sms', 'push', 'in_app', 'whatsapp']);
 
             $row = NotificationPreference::firstOrNew([
                 'user_id' => $user->id,

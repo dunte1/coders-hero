@@ -14,6 +14,7 @@ return [
         'email' => env('NOTIFICATION_CHANNEL_EMAIL', true),
         'sms' => env('NOTIFICATION_CHANNEL_SMS', false),
         'push' => env('NOTIFICATION_CHANNEL_PUSH', false),
+        'whatsapp' => env('NOTIFICATION_CHANNEL_WHATSAPP', false),
     ],
 
     /*
@@ -45,6 +46,7 @@ return [
         'sms' => false,
         'push' => true,
         'in_app' => true,
+        'whatsapp' => false,
     ],
 
     /*

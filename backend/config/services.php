@@ -47,6 +47,12 @@ return [
     | level. See docs/CODE_RUNNER_ARCHITECTURE.md.
     |
     */
+    'whatsapp' => [
+        'token' => env('WHATSAPP_TOKEN'),
+        'phone_number_id' => env('WHATSAPP_PHONE_NUMBER_ID'),
+        'from_number' => env('WHATSAPP_FROM_NUMBER'),
+    ],
+
     'code_runner' => [
         'enabled' => env('CODE_RUNNER_ENABLED', false),
         'url' => env('CODE_RUNNER_URL'),

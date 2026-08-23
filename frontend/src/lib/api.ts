@@ -609,6 +609,20 @@ export const reportsGeneratedApi = {
     api.get('/admin/reports/generated', { params }).then(r => unwrapPage(r)),
 };
 
+// Class Sessions (Live Classes)
+export const classSessionsApi = {
+  getTeacherSessions: (params?: Record<string, string | number | boolean>) =>
+    api.get<PaginatedResponse<any>>('/teacher/class-sessions', { params }).then(r => unwrapPage(r)),
+  createSession: (data: any) =>
+    api.post('/teacher/class-sessions', data).then(r => handleResponse(r)),
+  updateSession: (id: number, data: any) =>
+    api.put(`/teacher/class-sessions/${id}`, data).then(r => handleResponse(r)),
+  deleteSession: (id: number) =>
+    api.delete(`/teacher/class-sessions/${id}`).then(handleResponse),
+  getStudentSessions: (params?: Record<string, string | number | boolean>) =>
+    api.get<PaginatedResponse<any>>('/student/class-sessions', { params }).then(r => unwrapPage(r)),
+};
+
 // Public Portfolio
 export const publicPortfolioApi = {
   getStudent: (studentId: string) =>

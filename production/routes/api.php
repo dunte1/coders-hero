@@ -675,6 +675,11 @@ Route::middleware('role:student')->prefix('student/exams')->group(function () {
     Route::post('/{id}/submit', [StudentExamController::class, 'submitAttempt']);
 });
 
+// Student class sessions routes
+Route::middleware('role:student')->prefix('student/class-sessions')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Api\Student\StudentClassSessionController::class, 'index']);
+});
+
 Route::middleware('role:instructor|teacher|admin')->prefix('instructor')->group(function () {
 
         Route::get('/courses', [CourseController::class, 'instructorCourses']);
@@ -848,6 +853,12 @@ Route::middleware('role:instructor|teacher|admin')->prefix('instructor')->group(
         Route::get('/reports/summary', [TeacherReportController::class, 'summary']);
         Route::get('/reports/classes/{classId}', [TeacherReportController::class, 'classReport']);
         Route::get('/reports/classes/{classId}/students/{studentId}', [TeacherReportController::class, 'studentReport']);
+
+        Route::get('/class-sessions', [\App\Http\Controllers\Api\Teacher\ClassSessionController::class, 'index']);
+        Route::post('/class-sessions', [\App\Http\Controllers\Api\Teacher\ClassSessionController::class, 'store']);
+        Route::get('/class-sessions/{id}', [\App\Http\Controllers\Api\Teacher\ClassSessionController::class, 'show']);
+        Route::put('/class-sessions/{id}', [\App\Http\Controllers\Api\Teacher\ClassSessionController::class, 'update']);
+        Route::delete('/class-sessions/{id}', [\App\Http\Controllers\Api\Teacher\ClassSessionController::class, 'destroy']);
     });
 
     // LMS interactive features (any authenticated user)

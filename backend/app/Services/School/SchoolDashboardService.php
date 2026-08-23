@@ -39,6 +39,7 @@ class SchoolDashboardService
             'total_students' => $totalStudents,
             'total_teachers' => $totalTeachers,
             'active_courses' => $activeCourses,
+            'attendance_today' => $todayAttendance,
             'attendance_rate' => $attendancePercent,
             'total_enrollments' => $totalEnrollments,
             'active_enrollments' => $activeEnrollments,

@@ -7,6 +7,7 @@ use App\Services\Notifications\Channels\EmailChannel;
 use App\Services\Notifications\Channels\InAppChannel;
 use App\Services\Notifications\Channels\PushChannel;
 use App\Services\Notifications\Channels\SmsChannel;
+use App\Services\Notifications\Channels\WhatsAppChannel;
 use App\Services\Notifications\Contracts\NotificationChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -89,6 +90,7 @@ class SendChannelNotificationJob implements ShouldQueue, ShouldBeUnique
             'email' => app(EmailChannel::class),
             'sms' => app(SmsChannel::class),
             'push' => app(PushChannel::class),
+            'whatsapp' => app(WhatsAppChannel::class),
             default => app(InAppChannel::class),
         };
     }

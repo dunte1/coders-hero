@@ -16,6 +16,7 @@ class NotificationPreference extends Model
         'sms',
         'push',
         'in_app',
+        'whatsapp',
     ];
 
     protected function casts(): array
@@ -25,6 +26,7 @@ class NotificationPreference extends Model
             'sms' => 'boolean',
             'push' => 'boolean',
             'in_app' => 'boolean',
+            'whatsapp' => 'boolean',
         ];
     }
 

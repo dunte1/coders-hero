@@ -67,7 +67,8 @@ class PayrollService
 
             foreach ($employees as $employee) {
                 $gross = $this->grossFor($employee);
-                $deductions = $this->deductionsFor($employee, $gross);
+                $breakdown = $this->deductionsBreakdown($gross);
+                $deductions = $breakdown['total_deductions'];
                 $net = max(0, $gross - $deductions);
 
                 $grossTotal += $gross;
@@ -79,7 +80,12 @@ class PayrollService
                     'gross_amount' => $gross,
                     'deductions_amount' => $deductions,
                     'net_amount' => $net,
-                    'deductions_breakdown' => $deductions > 0 ? ['statutory' => round($deductions, 2)] : null,
+                    'gross_salary' => $gross,
+                    'net_salary' => $net,
+                    'nssf' => $breakdown['nssf'],
+                    'shif' => $breakdown['shif'],
+                    'paye' => $breakdown['paye'],
+                    'deductions_breakdown' => $breakdown,
                     'allowances_breakdown' => null,
                     'status' => 'pending',
                 ]);
@@ -173,7 +179,56 @@ class PayrollService
 
     public function deductionsFor(Employee $employee, float $gross): float
     {
-        return 0.0;
+        $breakdown = $this->deductionsBreakdown($gross);
+
+        return $breakdown['total_deductions'];
+    }
+
+    private function deductionsBreakdown(float $gross): array
+    {
+        $tierILimit = 7000;
+        $tierIILimit = 36000;
+        $nssf = min($gross, $tierILimit) * 0.06;
+        if ($gross > $tierILimit) {
+            $nssf += min($gross - $tierILimit, $tierIILimit - $tierILimit) * 0.06;
+        }
+        $nssf = min($nssf, 2160);
+
+        $shif = match (true) {
+            $gross <= 8000 => 0,
+            $gross <= 12000 => 300,
+            $gross <= 15000 => 400,
+            $gross <= 20000 => 500,
+            $gross <= 25000 => 600,
+            $gross <= 30000 => 750,
+            $gross <= 35000 => 850,
+            $gross <= 40000 => 950,
+            $gross <= 45000 => 1050,
+            $gross <= 50000 => 1150,
+            $gross <= 60000 => 1250,
+            $gross <= 70000 => 1350,
+            $gross <= 80000 => 1500,
+            $gross <= 90000 => 1650,
+            $gross <= 100000 => 1800,
+            default => 2000,
+        };
+
+        $taxable = max(0, $gross - $nssf);
+        $paye = match (true) {
+            $taxable <= 24000 => $taxable * 0.1,
+            $taxable <= 32333 => 24000 * 0.1 + ($taxable - 24000) * 0.25,
+            $taxable <= 500000 => 24000 * 0.1 + 8333 * 0.25 + ($taxable - 32333) * 0.30,
+            $taxable <= 800000 => 24000 * 0.1 + 8333 * 0.25 + 467667 * 0.30 + ($taxable - 500000) * 0.325,
+            default => 24000 * 0.1 + 8333 * 0.25 + 467667 * 0.30 + 300000 * 0.325 + ($taxable - 800000) * 0.35,
+        };
+        $paye = max(0, $paye - 2400);
+
+        return [
+            'nssf' => round($nssf, 2),
+            'shif' => round($shif, 2),
+            'paye' => round($paye, 2),
+            'total_deductions' => round($nssf + $shif + $paye, 2),
+        ];
     }
 
     private function generatePayrollNo(string $month): string

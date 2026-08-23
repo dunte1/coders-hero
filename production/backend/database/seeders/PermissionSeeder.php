@@ -285,6 +285,13 @@ class PermissionSeeder extends Seeder
             'contracts' => [
                 ['name' => 'manage_contracts', 'display_name' => 'Manage Contracts', 'description' => 'Create, edit and delete school contracts.'],
             ],
+            'class_sessions' => [
+                ['name' => 'manage_class_sessions', 'display_name' => 'Manage Class Sessions', 'description' => 'Create, edit and delete live class sessions.'],
+                ['name' => 'view_class_sessions', 'display_name' => 'View Class Sessions', 'description' => 'View class session details.'],
+            ],
+            'whatsapp' => [
+                ['name' => 'send_whatsapp', 'display_name' => 'Send WhatsApp Notifications', 'description' => 'Send notifications via WhatsApp channel.'],
+            ],
         ];
 
         foreach ($permissions as $group => $items) {
@@ -503,6 +510,8 @@ class PermissionSeeder extends Seeder
 
         $teacher?->syncPermissions(array_merge($teacher?->getPermissionNames()->all() ?? [], [
             'view_certificates', 'issue_certificates',
+            'manage_class_sessions', 'view_class_sessions',
+            'send_whatsapp',
         ]));
 
         // Extended permissions (CMS, system ops, LMS, academics, appointments, organization, ID cards).
@@ -528,10 +537,13 @@ class PermissionSeeder extends Seeder
 
         $instructor?->syncPermissions(array_merge($instructor?->getPermissionNames()->all() ?? [], [
             'access_lms', 'manage_coding_exercises', 'manage_forums',
+            'manage_class_sessions', 'view_class_sessions',
+            'send_whatsapp',
         ]));
 
         $student?->syncPermissions(array_merge($student?->getPermissionNames()->all() ?? [], [
             'access_lms',
+            'view_class_sessions',
         ]));
 
         $employee?->syncPermissions(array_merge($employee?->getPermissionNames()->all() ?? [], [
