@@ -31,6 +31,7 @@ import {
   Library,
   Mail,
   MapPin,
+  Megaphone,
   MessageSquare,
   Newspaper,
   Package,
@@ -38,8 +39,10 @@ import {
   Save,
   Settings,
   Shield,
+  ShoppingCart,
   Smartphone,
   Star,
+  Target,
   Trophy,
   UserCheck,
   UserRound,
@@ -148,6 +151,7 @@ export const navigation: NavEntry[] = [
       { label: 'Branches', href: '/organization/branches', icon: Building2 },
       { label: 'Partner Schools', href: '/organization/partner-schools', icon: GraduationCap },
       { label: 'Academic Years', href: '/organization/academic-years', icon: CalendarCheck },
+      { label: 'Contracts', href: '/organization/contracts', icon: FileText },
     ],
   },
 
@@ -184,6 +188,7 @@ export const navigation: NavEntry[] = [
       { label: 'Projects', href: '/parent/projects', icon: FolderKanban },
       { label: 'Competitions', href: '/parent/competitions', icon: Trophy },
       { label: 'Certificates', href: '/parent/certificates', icon: Award },
+      { label: 'Announcements', href: '/parent/announcements', icon: Megaphone },
     ],
   },
 
@@ -326,6 +331,8 @@ export const navigation: NavEntry[] = [
       { label: 'Maintenance', href: '/inventory/maintenance', icon: Wrench, permission: 'manage_asset_maintenance' },
       { label: 'Categories', href: '/inventory/categories', icon: Boxes, permission: 'manage_asset_categories' },
       { label: 'Locations', href: '/inventory/locations', icon: MapPin, permission: 'manage_locations' },
+      { label: 'Suppliers', href: '/inventory/suppliers', icon: Users },
+      { label: 'Purchase Orders', href: '/inventory/purchase-orders', icon: ShoppingCart },
     ],
   },
 
@@ -436,6 +443,7 @@ export const navigation: NavEntry[] = [
       { label: 'System Health', href: '/admin/system-health', icon: ActivityIcon, roles: ['super_admin'] },
       { label: 'Backups', href: '/admin/backups', icon: Save, roles: ['super_admin'] },
       { label: 'System Logs', href: '/admin/system-logs', icon: FileText, roles: ['super_admin'] },
+      { label: 'CRM', href: '/crm/leads', icon: Target },
     ],
   },
 

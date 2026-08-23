@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Textarea } from '@/components/ui/Textarea';
 import { formatDate } from '@/lib/utils';
 import { toast } from 'sonner';
+import { Upload, FileCheck, AlertCircle } from 'lucide-react';
 
 interface AssignmentDetail {
   id: number;
@@ -43,6 +44,7 @@ export default function StudentAssignmentDetailPage() {
   const queryClient = useQueryClient();
   const [content, setContent] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
 
   const { data: assignment, isLoading } = useQuery({
     queryKey: ['student-assignment', id],
@@ -52,15 +54,18 @@ export default function StudentAssignmentDetailPage() {
 
   const submitMutation = useMutation({
     mutationFn: (formData: FormData) => studentAssignmentsApi.submit(Number(id), formData),
+    onMutate: () => { setUploadProgress('uploading'); },
     onSuccess: () => {
       toast.success('Assignment submitted successfully!');
       queryClient.invalidateQueries({ queryKey: ['student-assignment', id] });
       queryClient.invalidateQueries({ queryKey: ['student-assignments'] });
       setContent('');
       setFile(null);
+      setUploadProgress('success');
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to submit assignment');
+      setUploadProgress('error');
     },
   });
 
@@ -157,17 +162,56 @@ export default function StudentAssignmentDetailPage() {
                   onChange={(e) => setContent(e.target.value)}
                   rows={6}
                 />
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Attach a file (optional)
-                  </label>
+
+                <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 text-center hover:border-blue-300 transition-colors">
                   <input
                     type="file"
-                    onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                    className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                    accept=".pdf,.doc,.docx,.txt,.zip"
+                    id="file-upload"
+                    onChange={(e) => {
+                      setFile(e.target.files?.[0] ?? null);
+                      setUploadProgress('idle');
+                    }}
+                    className="hidden"
+                    accept=".pdf,.doc,.docx,.txt,.zip,.png,.jpg,.jpeg"
                   />
+                  <label htmlFor="file-upload" className="cursor-pointer">
+                    <div className="flex flex-col items-center gap-2">
+                      {uploadProgress === 'uploading' ? (
+                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
+                      ) : uploadProgress === 'success' ? (
+                        <FileCheck className="h-10 w-10 text-emerald-500" />
+                      ) : uploadProgress === 'error' ? (
+                        <AlertCircle className="h-10 w-10 text-red-500" />
+                      ) : (
+                        <Upload className="h-10 w-10 text-slate-400" />
+                      )}
+                      <div>
+                        <p className="text-sm font-medium text-slate-700">
+                          {file ? file.name : 'Click to upload or drag and drop'}
+                        </p>
+                        <p className="text-xs text-slate-400 mt-1">
+                          PDF, DOC, TXT, ZIP, PNG, JPG (max 10MB)
+                        </p>
+                      </div>
+                    </div>
+                  </label>
                 </div>
+
+                {file && (
+                  <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 p-3 rounded-md">
+                    <FileCheck className="h-4 w-4 text-blue-500" />
+                    <span>{file.name}</span>
+                    <span className="text-slate-400">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                    <button
+                      type="button"
+                      onClick={() => { setFile(null); setUploadProgress('idle'); }}
+                      className="ml-auto text-red-500 hover:text-red-700 text-xs"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
+
                 <Button
                   onClick={handleSubmit}
                   disabled={submitMutation.isPending || (!content.trim() && !file)}

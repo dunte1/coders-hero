@@ -113,6 +113,10 @@ export interface Expense {
   expense_date: string;
   receipt_ref: string | null;
   notes: string | null;
+  approval_status?: 'pending' | 'approved' | 'rejected';
+  approved_by?: { id: string; name: string } | null;
+  approved_at?: string | null;
+  rejection_reason?: string | null;
   recorded_by_user_id: string | null;
   recorded_by?: { id: string; name: string } | null;
   created_at?: string;

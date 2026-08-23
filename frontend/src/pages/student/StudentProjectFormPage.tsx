@@ -8,12 +8,16 @@ import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Badge } from '@/components/ui/Badge';
 import { useStudentProject, useCreateStudentProject, useUpdateStudentProject } from '@/hooks/useMyProjects';
-import { X } from 'lucide-react';
+import { studentProjectSourceApi } from '@/lib/api';
+import { X, Upload, FileArchive, CheckCircle } from 'lucide-react';
+import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function StudentProjectFormPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEdit = !!id;
+  const queryClient = useQueryClient();
 
   const { data: existingProject, isLoading: loadingProject } = useStudentProject(Number(id));
   const createMutation = useCreateStudentProject();
@@ -27,6 +31,9 @@ export default function StudentProjectFormPage() {
   const [repoUrl, setRepoUrl] = useState('');
   const [demoUrl, setDemoUrl] = useState('');
   const [status, setStatus] = useState<'planning' | 'in_progress' | 'completed' | 'archived'>('planning');
+  const [sourceFile, setSourceFile] = useState<File | null>(null);
+  const [sourceUploading, setSourceUploading] = useState(false);
+  const [sourceUploaded, setSourceUploaded] = useState(false);
 
   useEffect(() => {
     if (existingProject) {
@@ -58,7 +65,7 @@ export default function StudentProjectFormPage() {
     setTechnologies(technologies.filter((t) => t !== tech));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const payload = {
       title,
@@ -70,14 +77,37 @@ export default function StudentProjectFormPage() {
       status,
     };
 
+    const afterSave = async (projectId: number) => {
+      if (sourceFile && projectId) {
+        setSourceUploading(true);
+        try {
+          await studentProjectSourceApi.uploadSource(projectId, sourceFile);
+          toast.success('Source code uploaded');
+          setSourceUploaded(true);
+          queryClient.invalidateQueries({ queryKey: ['student-projects'] });
+        } catch {
+          toast.error('Project saved but source upload failed');
+        }
+        setSourceUploading(false);
+      }
+    };
+
     if (isEdit) {
       updateMutation.mutate(
         { id: Number(id), data: payload },
-        { onSuccess: () => navigate('/student/projects') }
+        {
+          onSuccess: async () => {
+            await afterSave(Number(id));
+            navigate('/student/projects');
+          },
+        }
       );
     } else {
       createMutation.mutate(payload as any, {
-        onSuccess: () => navigate('/student/projects'),
+        onSuccess: async (created: any) => {
+          await afterSave(created?.id ?? Number(id));
+          navigate('/student/projects');
+        },
       });
     }
   };
@@ -188,6 +218,32 @@ export default function StudentProjectFormPage() {
                 <option value="completed">Completed</option>
                 <option value="archived">Archived</option>
               </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Source Code (zip/rar/tar.gz, max 50MB)
+              </label>
+              <input
+                type="file"
+                accept=".zip,.rar,.tar.gz"
+                onChange={(e) => {
+                  setSourceFile(e.target.files?.[0] ?? null);
+                  setSourceUploaded(false);
+                }}
+                className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+              {sourceFile && (
+                <div className="mt-2 flex items-center gap-2 text-sm text-slate-600 bg-slate-50 p-2 rounded-md">
+                  <FileArchive className="h-4 w-4 text-blue-500" />
+                  <span>{sourceFile.name}</span>
+                  <span className="text-slate-400">({(sourceFile.size / 1024 / 1024).toFixed(2)} MB)</span>
+                  {sourceUploaded && <CheckCircle className="h-4 w-4 text-emerald-500" />}
+                </div>
+              )}
+              {sourceUploading && (
+                <p className="mt-1 text-xs text-blue-600">Uploading source code...</p>
+              )}
             </div>
 
             <div className="flex items-center gap-3 pt-2">

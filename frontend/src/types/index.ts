@@ -762,6 +762,7 @@ export interface StudentProject {
   repo_url?: string;
   demo_url?: string;
   source_path?: string;
+  version_number?: number;
   final_score?: number;
   is_published: boolean;
   published_at?: string;

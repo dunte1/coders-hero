@@ -576,6 +576,111 @@ export const studentExamsApi = {
     api.get<PaginatedResponse<ExamAttempt>>('/student/exams/attempts').then(r => unwrapPage<ExamAttempt>(r)),
 };
 
+// Student Assignments — upload source
+export const studentAssignmentUploadApi = {
+  submitWithFile: (id: number, formData: FormData) =>
+    api.post(`/student/assignments/${id}/submit`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then(unwrap),
+};
+
+// Student Projects — source zip upload
+export const studentProjectSourceApi = {
+  uploadSource: (id: number, file: File) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    return api.post(`/student/projects/${id}/source`, fd, { headers: { 'Content-Type': 'multipart/form-data' } }).then(r => handleResponse(r));
+  },
+};
+
+// Parent Announcements
+export const parentAnnouncementsApi = {
+  getAll: (params?: Record<string, string | number | boolean>) =>
+    api.get('/parent/announcements', { params }).then(r => unwrapPage(r)),
+};
+
+// Reports — generated
+export const reportsGeneratedApi = {
+  generateReport: (data: { month: number; year: number }) =>
+    api.post('/admin/reports/generated', data).then(r => handleResponse(r)),
+  downloadReport: (id: number) =>
+    api.get(`/reports/download/${id}`, { responseType: 'blob' }).then(r => r.data),
+  listGenerated: (params?: Record<string, string | number | boolean>) =>
+    api.get('/admin/reports/generated', { params }).then(r => unwrapPage(r)),
+};
+
+// Public Portfolio
+export const publicPortfolioApi = {
+  getStudent: (studentId: string) =>
+    api.get(`/public/portfolio/${studentId}`).then(r => handleResponse(r)),
+};
+
+// CRM Leads
+export const leadsApi = {
+  getAll: (params?: Record<string, string | number | boolean>) =>
+    api.get('/crm/leads', { params }).then(r => unwrapPage(r)),
+  get: (id: number) =>
+    api.get(`/crm/leads/${id}`).then(r => handleResponse(r)),
+  create: (data: Record<string, unknown>) =>
+    api.post('/crm/leads', data).then(r => handleResponse(r)),
+  update: (id: number, data: Record<string, unknown>) =>
+    api.put(`/crm/leads/${id}`, data).then(r => handleResponse(r)),
+  delete: (id: number) =>
+    api.delete(`/crm/leads/${id}`).then(handleResponse),
+  changeStatus: (id: number, status: string) =>
+    api.put(`/crm/leads/${id}/status`, { status }).then(r => handleResponse(r)),
+};
+
+// Finance — expense approval
+export const expenseApprovalApi = {
+  approve: (id: number) =>
+    api.post(`/finance/expenses/${id}/approve`).then(r => handleResponse(r)),
+  reject: (id: number, reason: string) =>
+    api.post(`/finance/expenses/${id}/reject`, { reason }).then(r => handleResponse(r)),
+};
+
+// Organization — School Contracts
+export const contractsApi = {
+  getAll: (params?: Record<string, string | number | boolean>) =>
+    api.get('/organization/contracts', { params }).then(r => unwrapPage(r)),
+  get: (id: number) =>
+    api.get(`/organization/contracts/${id}`).then(r => handleResponse(r)),
+  create: (data: Record<string, unknown>) =>
+    api.post('/organization/contracts', data).then(r => handleResponse(r)),
+  update: (id: number, data: Record<string, unknown>) =>
+    api.put(`/organization/contracts/${id}`, data).then(r => handleResponse(r)),
+  delete: (id: number) =>
+    api.delete(`/organization/contracts/${id}`).then(handleResponse),
+};
+
+// Inventory — Suppliers
+export const suppliersApi = {
+  getAll: (params?: Record<string, string | number | boolean>) =>
+    api.get('/inventory/suppliers', { params }).then(r => unwrapPage(r)),
+  get: (id: number) =>
+    api.get(`/inventory/suppliers/${id}`).then(r => handleResponse(r)),
+  create: (data: Record<string, unknown>) =>
+    api.post('/inventory/suppliers', data).then(r => handleResponse(r)),
+  update: (id: number, data: Record<string, unknown>) =>
+    api.put(`/inventory/suppliers/${id}`, data).then(r => handleResponse(r)),
+  delete: (id: number) =>
+    api.delete(`/inventory/suppliers/${id}`).then(handleResponse),
+};
+
+// Inventory — Purchase Orders
+export const purchaseOrdersApi = {
+  getAll: (params?: Record<string, string | number | boolean>) =>
+    api.get('/inventory/purchase-orders', { params }).then(r => unwrapPage(r)),
+  get: (id: number) =>
+    api.get(`/inventory/purchase-orders/${id}`).then(r => handleResponse(r)),
+  create: (data: Record<string, unknown>) =>
+    api.post('/inventory/purchase-orders', data).then(r => handleResponse(r)),
+  update: (id: number, data: Record<string, unknown>) =>
+    api.put(`/inventory/purchase-orders/${id}`, data).then(r => handleResponse(r)),
+  updateStatus: (id: number, status: string) =>
+    api.put(`/inventory/purchase-orders/${id}/status`, { status }).then(r => handleResponse(r)),
+};
+
 // Search
 export const searchApi = {
   search: (params: { q: string; type?: string }) =>

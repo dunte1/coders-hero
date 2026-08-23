@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useExpenses, useCreateExpense, useUpdateExpense, useDeleteExpense } from '@/hooks/useFinance';
+import { expenseApprovalApi } from '@/lib/api';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageSpinner } from '@/components/ui/Spinner';
 import { Button } from '@/components/ui/Button';
@@ -9,6 +10,7 @@ import { SearchInput } from '@/components/ui/SearchInput';
 import { Pagination } from '@/components/ui/Pagination';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
+import { Badge } from '@/components/ui/Badge';
 import {
   DialogRoot,
   DialogContent,
@@ -17,7 +19,9 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/Dialog';
-import { Plus, Pencil, Trash2, Receipt } from 'lucide-react';
+import { Plus, Pencil, Trash2, Receipt, CheckCircle, XCircle } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import type { Expense, ExpenseInput } from '@/types/finance';
 
 const emptyForm: ExpenseInput = {
@@ -35,6 +39,10 @@ export default function ExpensesPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Expense | null>(null);
   const [form, setForm] = useState<ExpenseInput>(emptyForm);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [rejectExpenseId, setRejectExpenseId] = useState<number | null>(null);
+  const [rejectReason, setRejectReason] = useState('');
+  const queryClient = useQueryClient();
 
   const { data, isLoading } = useExpenses({ page, search: search || undefined });
   const createExpense = useCreateExpense();
@@ -73,6 +81,41 @@ export default function ExpensesPage() {
     } else {
       createExpense.mutate(payload, { onSuccess: () => setDialogOpen(false) });
     }
+  };
+
+  const handleApprove = async (expenseId: number) => {
+    try {
+      await expenseApprovalApi.approve(expenseId);
+      toast.success('Expense approved');
+      queryClient.invalidateQueries({ queryKey: ['finance', 'expenses'] });
+    } catch {
+      toast.error('Failed to approve expense');
+    }
+  };
+
+  const openRejectDialog = (expenseId: number) => {
+    setRejectExpenseId(expenseId);
+    setRejectReason('');
+    setRejectDialogOpen(true);
+  };
+
+  const handleReject = async () => {
+    if (!rejectExpenseId || !rejectReason.trim()) return;
+    try {
+      await expenseApprovalApi.reject(rejectExpenseId, rejectReason);
+      toast.success('Expense rejected');
+      queryClient.invalidateQueries({ queryKey: ['finance', 'expenses'] });
+      setRejectDialogOpen(false);
+    } catch {
+      toast.error('Failed to reject expense');
+    }
+  };
+
+  const approvalBadge = (status?: string) => {
+    if (!status || status === 'pending') return <Badge variant="warning">Pending</Badge>;
+    if (status === 'approved') return <Badge variant="success">Approved</Badge>;
+    if (status === 'rejected') return <Badge variant="destructive">Rejected</Badge>;
+    return <Badge variant="secondary">{status}</Badge>;
   };
 
   return (
@@ -122,6 +165,34 @@ export default function ExpensesPage() {
                     <span className="text-xs text-slate-500">{expense.expense_date}</span>
                   </div>
                   {expense.receipt_ref && <p className="mt-1 text-xs text-slate-400">{expense.receipt_ref}</p>}
+                  <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
+                    <div>{approvalBadge(expense.approval_status)}</div>
+                    {(!expense.approval_status || expense.approval_status === 'pending') && (
+                      <div className="flex gap-1">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 gap-1 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
+                          onClick={() => handleApprove(expense.id)}
+                        >
+                          <CheckCircle className="h-3 w-3" /> Approve
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 gap-1 text-red-600 hover:bg-red-50 hover:text-red-700"
+                          onClick={() => openRejectDialog(expense.id)}
+                        >
+                          <XCircle className="h-3 w-3" /> Reject
+                        </Button>
+                      </div>
+                    )}
+                    {expense.approval_status === 'rejected' && expense.rejection_reason && (
+                      <p className="text-xs text-red-500 max-w-[140px] truncate" title={expense.rejection_reason}>
+                        {expense.rejection_reason}
+                      </p>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -178,6 +249,36 @@ export default function ExpensesPage() {
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
             <Button onClick={submit} loading={createExpense.isPending || updateExpense.isPending}>
               {editing ? 'Save Changes' : 'Record'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </DialogRoot>
+
+      {/* Reject Dialog */}
+      <DialogRoot open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reject Expense</DialogTitle>
+            <DialogDescription>Provide a reason for rejecting this expense.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Reason</Label>
+              <Input
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                placeholder="Enter rejection reason..."
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRejectDialogOpen(false)}>Cancel</Button>
+            <Button
+              variant="destructive"
+              onClick={handleReject}
+              disabled={!rejectReason.trim()}
+            >
+              Reject
             </Button>
           </DialogFooter>
         </DialogContent>

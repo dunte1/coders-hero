@@ -17,7 +17,7 @@ class StudentProject extends Model
     protected $fillable = [
         'student_id', 'user_id', 'title', 'slug', 'problem_statement',
         'description', 'technologies', 'repo_url', 'demo_url', 'source_path',
-        'final_score', 'is_published', 'published_at', 'status',
+        'final_score', 'is_published', 'published_at', 'status', 'version_number',
     ];
 
     protected function casts(): array

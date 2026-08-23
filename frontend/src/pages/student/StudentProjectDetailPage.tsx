@@ -21,6 +21,7 @@ import {
   Trash2,
   FileText,
   Award,
+  Hash,
 } from 'lucide-react';
 import type { StudentProject, ProjectMedia } from '@/types';
 
@@ -117,6 +118,11 @@ export default function StudentProjectDetailPage() {
                 <Badge variant={statusVariant[p.status] ?? 'outline'}>
                   {p.status.replace('_', ' ')}
                 </Badge>
+                {p.version_number != null && p.version_number > 0 && (
+                  <Badge variant="secondary" className="gap-1">
+                    <Hash className="h-3 w-3" /> Version {p.version_number}
+                  </Badge>
+                )}
                 {p.is_published && (
                   <Badge variant="default" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
                     <Globe className="h-3 w-3 mr-1" /> Published

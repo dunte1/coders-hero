@@ -21,6 +21,7 @@ class StoreStudentProjectRequest extends FormRequest
             'repo_url' => ['nullable', 'url', 'max:500'],
             'demo_url' => ['nullable', 'url', 'max:500'],
             'status' => ['sometimes', 'in:planning,in_progress,completed'],
+            'version_number' => ['sometimes', 'integer', 'min:1'],
         ];
     }
 }

@@ -22,7 +22,7 @@ class ExpenseController extends Controller
     public function index(Request $request): JsonResponse
     {
         return $this->paginatedResponse(
-            $this->financeService->expenses($request->only(['category', 'from', 'to', 'search', 'per_page', 'page'])),
+            $this->financeService->expenses($request->only(['category', 'approval_status', 'from', 'to', 'search', 'per_page', 'page'])),
             'Expenses retrieved successfully.'
         );
     }
@@ -72,5 +72,43 @@ class ExpenseController extends Controller
         $expense->delete();
 
         return $this->noContentResponse('Expense deleted.');
+    }
+
+    public function approve(int $id): JsonResponse
+    {
+        $expense = Expense::find($id);
+
+        if (!$expense) {
+            return $this->notFoundResponse('Expense not found.');
+        }
+
+        $expense->update([
+            'approval_status' => 'approved',
+            'approved_by' => auth()->id(),
+            'approved_at' => now(),
+        ]);
+
+        return $this->successResponse($expense->fresh(['recordedBy', 'submitter', 'approver']), 'Expense approved.');
+    }
+
+    public function reject(Request $request, int $id): JsonResponse
+    {
+        $validated = $request->validate([
+            'rejection_reason' => ['required', 'string', 'max:500'],
+        ]);
+
+        $expense = Expense::find($id);
+
+        if (!$expense) {
+            return $this->notFoundResponse('Expense not found.');
+        }
+
+        $expense->update([
+            'approval_status' => 'rejected',
+            'approved_by' => auth()->id(),
+            'rejection_reason' => $validated['rejection_reason'],
+        ]);
+
+        return $this->successResponse($expense->fresh(['recordedBy', 'submitter', 'approver']), 'Expense rejected.');
     }
 }

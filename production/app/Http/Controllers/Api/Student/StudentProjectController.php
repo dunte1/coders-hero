@@ -257,4 +257,32 @@ class StudentProjectController extends Controller
             return $this->errorResponse('Failed to retrieve projects: ' . $e->getMessage(), 500);
         }
     }
+
+    public function uploadSource(Request $request, int $id): JsonResponse
+    {
+        try {
+            $user = Auth::user();
+            $student = Student::where('user_id', $user->id)->first();
+
+            if (!$student) {
+                return $this->forbiddenResponse('No student profile found.');
+            }
+
+            $request->validate([
+                'file' => ['required', 'file', 'mimes:zip,rar,tar.gz', 'max:51200'],
+            ]);
+
+            $project = $this->projectService->uploadSource($student, $id, $request->file('file'));
+
+            if (!$project) {
+                return $this->notFoundResponse('Project not found.');
+            }
+
+            return $this->successResponse($project, 'Source code uploaded successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return $this->validationErrorResponse($e->errors(), 'Validation failed.');
+        } catch (\Exception $e) {
+            return $this->errorResponse('Failed to upload source code: ' . $e->getMessage(), 500);
+        }
+    }
 }

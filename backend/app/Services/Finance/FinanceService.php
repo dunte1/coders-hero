@@ -157,8 +157,9 @@ class FinanceService
     public function expenses(array $filters): LengthAwarePaginator
     {
         $query = Expense::query()
-            ->with('recordedBy')
+            ->with(['recordedBy', 'submitter', 'approver'])
             ->when(($filters['category'] ?? null) && ($filters['category'] !== 'all'), fn ($q, $v) => $q->where('category', $v))
+            ->when(($filters['approval_status'] ?? null) && ($filters['approval_status'] !== 'all'), fn ($q, $v) => $q->where('approval_status', $v))
             ->when(($filters['from'] ?? null), fn ($q, $v) => $q->whereDate('expense_date', '>=', $v))
             ->when(($filters['to'] ?? null), fn ($q, $v) => $q->whereDate('expense_date', '<=', $v))
             ->when(($filters['search'] ?? null), fn ($q, $v) => $q->where('title', 'like', "%{$v}%"))

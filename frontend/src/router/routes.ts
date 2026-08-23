@@ -1142,6 +1142,44 @@ export const routes: RouteConfig[] = [
     element: React.lazy(() => import('@/pages/parent/ParentCertificatesPage')),
     meta: { title: 'Certificates', roles: ['parent'] },
   },
+  {
+    path: '/parent/announcements',
+    element: React.lazy(() => import('@/pages/parent/ParentAnnouncementsPage')),
+    meta: { title: 'Announcements', roles: ['parent'] },
+  },
+
+  // Public Portfolio (no auth)
+  {
+    path: '/portfolio/:studentId',
+    element: React.lazy(() => import('@/pages/public/PortfolioPage')),
+    meta: { title: 'Student Portfolio', public: true },
+  },
+
+  // CRM Leads
+  {
+    path: '/crm/leads',
+    element: React.lazy(() => import('@/pages/admin/CrmLeadsPage')),
+    meta: { title: 'CRM Leads', roles: ['admin', 'super_admin', 'director'] },
+  },
+
+  // Organization — School Contracts
+  {
+    path: '/organization/contracts',
+    element: React.lazy(() => import('@/pages/organization/SchoolContractsPage')),
+    meta: { title: 'School Contracts', roles: ['admin', 'super_admin', 'director'] },
+  },
+
+  // Inventory — Suppliers & Purchase Orders
+  {
+    path: '/inventory/suppliers',
+    element: React.lazy(() => import('@/pages/inventory/SuppliersPage')),
+    meta: { title: 'Suppliers', roles: ['admin', 'super_admin', 'inventory_officer'] },
+  },
+  {
+    path: '/inventory/purchase-orders',
+    element: React.lazy(() => import('@/pages/inventory/PurchaseOrdersPage')),
+    meta: { title: 'Purchase Orders', roles: ['admin', 'super_admin', 'inventory_officer'] },
+  },
 
   // Innovation Marketplace
   {

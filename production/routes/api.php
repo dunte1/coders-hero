@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\Admin\SystemAdminController;
 use App\Http\Controllers\Api\AnalyticsDashboardController;
 use App\Http\Controllers\Api\Organization\AcademicYearController;
 use App\Http\Controllers\Api\Organization\BranchController;
+use App\Http\Controllers\Api\Organization\ContractController as SchoolContractController;
 use App\Http\Controllers\Api\Organization\PartnerSchoolController;
 use App\Http\Controllers\Api\AnnouncementController;
 use App\Http\Controllers\Api\AuthController;
@@ -82,6 +83,8 @@ use App\Http\Controllers\Api\Parent\ParentPaymentController;
 use App\Http\Controllers\Api\Parent\ParentProgressController;
 use App\Http\Controllers\Api\Parent\ParentProjectController;
 use App\Http\Controllers\Api\Parent\ParentReportCardController;
+use App\Http\Controllers\Api\Parent\ParentAnnouncementController;
+use App\Http\Controllers\Api\Student\StudentPortfolioController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DepartmentController;
@@ -105,11 +108,14 @@ use App\Http\Controllers\Api\Hr\MyHrController;
 use App\Http\Controllers\Api\Hr\PayrollController;
 use App\Http\Controllers\Api\Hr\PerformanceController;
 use App\Http\Controllers\Api\Hr\StaffAttendanceController;
+use App\Http\Controllers\Api\Crm\LeadController;
 use App\Http\Controllers\Api\Inventory\AssetCategoryController;
 use App\Http\Controllers\Api\Inventory\AssetController;
 use App\Http\Controllers\Api\Inventory\AssetMaintenanceController;
 use App\Http\Controllers\Api\Inventory\InventoryItemController;
 use App\Http\Controllers\Api\Inventory\InventoryReportController;
+use App\Http\Controllers\Api\Inventory\PurchaseOrderController;
+use App\Http\Controllers\Api\Inventory\SupplierController;
 use App\Http\Controllers\Api\Library\LibraryAuthorController;
 use App\Http\Controllers\Api\Library\LibraryBorrowingController;
 use App\Http\Controllers\Api\Library\LibraryCategoryController;
@@ -163,6 +169,7 @@ Route::prefix('public')->group(function () {
     Route::post('/certificates/verify', [CertificateController::class, 'verify'])->middleware('throttle:30,1');
     Route::get('/certificates/qr/{verificationCode}', [CertificateController::class, 'qrCode']);
     Route::get('/projects', [StudentProjectController::class, 'publicIndex']);
+    Route::get('/portfolio/{studentId}', [StudentPortfolioController::class, 'show']);
 });
 
 Route::post('/free-trial', [\App\Http\Controllers\Api\FreeTrialController::class, 'store']);
@@ -422,6 +429,16 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/{id}/approve', [\App\Http\Controllers\Api\Finance\RefundController::class, 'approve']);
             Route::post('/{id}/reject', [\App\Http\Controllers\Api\Finance\RefundController::class, 'reject']);
         });
+
+        // CRM - Leads
+        Route::middleware('role:admin|super_admin|director')->prefix('crm/leads')->group(function () {
+            Route::get('/', [LeadController::class, 'index']);
+            Route::post('/', [LeadController::class, 'store']);
+            Route::get('/{id}', [LeadController::class, 'show']);
+            Route::put('/{id}', [LeadController::class, 'update']);
+            Route::delete('/{id}', [LeadController::class, 'destroy']);
+            Route::put('/{id}/status', [LeadController::class, 'changeStatus']);
+        });
     });
 
     Route::middleware('role:admin|super_admin')->prefix('admin')->group(function () {
@@ -539,6 +556,16 @@ Route::middleware('role:admin|super_admin|director|branch_manager|school_admin')
     Route::put('/academic-years/{id}', [AcademicYearController::class, 'update']);
     Route::delete('/academic-years/{id}', [AcademicYearController::class, 'destroy']);
     Route::put('/academic-years/{id}/set-current', [AcademicYearController::class, 'setCurrent']);
+
+    // School Contracts
+    Route::middleware('role:admin|super_admin')->prefix('contracts')->group(function () {
+        Route::get('/', [SchoolContractController::class, 'index']);
+        Route::post('/', [SchoolContractController::class, 'store']);
+        Route::get('/{id}', [SchoolContractController::class, 'show']);
+        Route::put('/{id}', [SchoolContractController::class, 'update']);
+        Route::delete('/{id}', [SchoolContractController::class, 'destroy']);
+        Route::post('/{id}/document', [SchoolContractController::class, 'uploadDocument']);
+    });
 });
 
 Route::middleware('role:admin|super_admin|director|branch_manager|school_admin')->prefix('students')->group(function () {
@@ -631,6 +658,7 @@ Route::middleware('role:student')->prefix('student/projects')->group(function ()
     Route::post('/{id}/unpublish', [StudentProjectController::class, 'unpublish']);
     Route::post('/{id}/media', [StudentProjectController::class, 'uploadMedia']);
     Route::delete('/{id}/media/{mediaId}', [StudentProjectController::class, 'deleteMedia']);
+    Route::post('/{id}/source', [StudentProjectController::class, 'uploadSource']);
 });
 
 // Project reviews (teacher/instructor/admin)
@@ -707,6 +735,7 @@ Route::middleware('role:instructor|teacher|admin')->prefix('instructor')->group(
         Route::get('/projects', [ParentProjectController::class, 'index']);
         Route::get('/competitions', [ParentCompetitionController::class, 'index']);
         Route::get('/courses', [ParentCourseController::class, 'index']);
+        Route::get('/announcements', [ParentAnnouncementController::class, 'index']);
     });
 
     // Parent-teacher chat
@@ -1025,6 +1054,8 @@ Route::put('/lessons/{lessonId}/video-progress', [VideoProgressController::class
         Route::get('/expenses/{id}', [ExpenseController::class, 'show']);
         Route::put('/expenses/{id}', [ExpenseController::class, 'update']);
         Route::delete('/expenses/{id}', [ExpenseController::class, 'destroy']);
+        Route::post('/expenses/{id}/approve', [ExpenseController::class, 'approve']);
+        Route::post('/expenses/{id}/reject', [ExpenseController::class, 'reject']);
 
         Route::get('/budgets', [BudgetController::class, 'index']);
         Route::post('/budgets', [BudgetController::class, 'store']);
@@ -1166,6 +1197,21 @@ Route::put('/lessons/{lessonId}/video-progress', [VideoProgressController::class
         Route::get('/movements', [StockMovementController::class, 'index']);
         Route::get('/movements/for-item/{itemId}', [StockMovementController::class, 'forItem']);
         Route::post('/items/{itemId}/movements', [StockMovementController::class, 'store']);
+
+        // Procurement - Suppliers
+        Route::get('/suppliers', [SupplierController::class, 'index']);
+        Route::post('/suppliers', [SupplierController::class, 'store']);
+        Route::get('/suppliers/{id}', [SupplierController::class, 'show']);
+        Route::put('/suppliers/{id}', [SupplierController::class, 'update']);
+        Route::delete('/suppliers/{id}', [SupplierController::class, 'destroy']);
+
+        // Procurement - Purchase Orders
+        Route::get('/purchase-orders', [PurchaseOrderController::class, 'index']);
+        Route::post('/purchase-orders', [PurchaseOrderController::class, 'store']);
+        Route::get('/purchase-orders/{id}', [PurchaseOrderController::class, 'show']);
+        Route::put('/purchase-orders/{id}', [PurchaseOrderController::class, 'update']);
+        Route::delete('/purchase-orders/{id}', [PurchaseOrderController::class, 'destroy']);
+        Route::put('/purchase-orders/{id}/status', [PurchaseOrderController::class, 'changeStatus']);
     });
 
     // Digital Library

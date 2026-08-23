@@ -31,6 +31,7 @@ class StudentProjectService
             'repo_url' => $data['repo_url'] ?? null,
             'demo_url' => $data['demo_url'] ?? null,
             'status' => $data['status'] ?? 'planning',
+            'version_number' => $data['version_number'] ?? 1,
         ]);
     }
 
@@ -49,6 +50,8 @@ class StudentProjectService
             return null;
         }
 
+        unset($data['version_number']);
+        $project->increment('version_number');
         $project->update($data);
 
         return $project;
@@ -160,6 +163,24 @@ class StudentProjectService
         }
 
         return $review;
+    }
+
+    public function uploadSource(Student $student, int $id, \Illuminate\Http\UploadedFile $file): ?StudentProject
+    {
+        $project = StudentProject::byStudent($student->id)->find($id);
+
+        if (!$project) {
+            return null;
+        }
+
+        if ($project->source_path) {
+            Storage::disk('public')->delete($project->source_path);
+        }
+
+        $path = $file->store('projects/source/' . $project->id, 'public');
+        $project->update(['source_path' => $path]);
+
+        return $project->fresh();
     }
 
     public function publicIndex()

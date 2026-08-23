@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { useMyProjects, useDeleteStudentProject, usePublishStudentProject, useUnpublishStudentProject } from '@/hooks/useMyProjects';
-import { FolderKanban, Plus, Pencil, Trash2, Eye, Globe, Lock, ExternalLink } from 'lucide-react';
+import { FolderKanban, Plus, Pencil, Trash2, Eye, Globe, Lock, ExternalLink, Hash } from 'lucide-react';
 import type { StudentProject } from '@/types';
 
 const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
@@ -63,6 +63,11 @@ export default function StudentProjectsPage() {
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <h3 className="font-semibold text-slate-900 line-clamp-2">{project.title}</h3>
                   <div className="flex items-center gap-1 shrink-0">
+                    {project.version_number != null && project.version_number > 0 && (
+                      <Badge variant="secondary" className="gap-1">
+                        <Hash className="h-3 w-3" /> v{project.version_number}
+                      </Badge>
+                    )}
                     <Badge variant={statusVariant[project.status] ?? 'outline'}>
                       {project.status.replace('_', ' ')}
                     </Badge>

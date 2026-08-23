@@ -262,6 +262,10 @@ class PermissionSeeder extends Seeder
                 ['name' => 'review_student_projects', 'display_name' => 'Review Student Projects', 'description' => 'Review and score student projects.'],
                 ['name' => 'view_public_projects', 'display_name' => 'View Public Projects', 'description' => 'View publicly published student projects.'],
             ],
+            'parent_portal' => [
+                ['name' => 'view_announcements', 'display_name' => 'View Announcements', 'description' => 'View parent portal announcements.'],
+                ['name' => 'view_portfolio', 'display_name' => 'View Student Portfolio', 'description' => 'View student portfolio and public project listings.'],
+            ],
             'student_exams' => [
                 ['name' => 'view_available_exams', 'display_name' => 'View Available Exams', 'description' => 'View available exams for enrollment.'],
                 ['name' => 'take_exams', 'display_name' => 'Take Exams', 'description' => 'Start and submit exam attempts.'],
@@ -269,6 +273,17 @@ class PermissionSeeder extends Seeder
             ],
             'id_cards' => [
                 ['name' => 'generate_id_cards', 'display_name' => 'Generate ID Cards', 'description' => 'Generate student and staff ID cards.'],
+            ],
+            'crm' => [
+                ['name' => 'manage_leads', 'display_name' => 'Manage Leads', 'description' => 'Create, edit and delete leads.'],
+                ['name' => 'view_leads', 'display_name' => 'View Leads', 'description' => 'View lead listings and details.'],
+            ],
+            'procurement' => [
+                ['name' => 'manage_suppliers', 'display_name' => 'Manage Suppliers', 'description' => 'Create, edit and delete suppliers.'],
+                ['name' => 'manage_purchase_orders', 'display_name' => 'Manage Purchase Orders', 'description' => 'Create, edit and manage purchase orders.'],
+            ],
+            'contracts' => [
+                ['name' => 'manage_contracts', 'display_name' => 'Manage Contracts', 'description' => 'Create, edit and delete school contracts.'],
             ],
         ];
 
@@ -395,6 +410,7 @@ class PermissionSeeder extends Seeder
             'view_inventory', 'manage_asset_categories', 'manage_locations',
             'manage_assets', 'assign_assets', 'manage_asset_maintenance',
             'manage_inventory_items', 'record_stock_movements',
+            'manage_suppliers', 'manage_purchase_orders',
             'view_dashboard', 'view_announcements', 'view_reports',
         ]);
 
@@ -427,6 +443,8 @@ class PermissionSeeder extends Seeder
             'view_library',
             'view_certificates', 'view_competitions',
             'view_notifications', 'manage_notification_preferences',
+            'view_leads', 'manage_leads',
+            'manage_contracts',
         ]);
 
         // Branch Manager: branch-scoped oversight
@@ -475,6 +493,7 @@ class PermissionSeeder extends Seeder
             'view_competitions', 'view_competition_leaderboard', 'view_competition_results',
             'view_library', 'library_download',
             'use_ai_assistants',
+            'view_portfolio',
         ]);
 
         // Certificate management permissions for admin-adjacent roles.
