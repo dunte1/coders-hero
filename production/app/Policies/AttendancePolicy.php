@@ -21,7 +21,7 @@ class AttendancePolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->hasAnyPermissionTo(['view_attendance', 'view_own_attendance']) || $user->isAdmin();
+        return $user->hasAnyPermission(['view_attendance', 'view_own_attendance']) || $user->isAdmin();
     }
 
     public function view(User $user, Attendance $attendance): bool
@@ -35,16 +35,16 @@ class AttendancePolicy
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('manage_attendance') || $user->isAdmin();
+        return $user->hasAnyPermission(['manage_attendance', 'manage_student_attendance']) || $user->isAdmin();
     }
 
     public function update(User $user, Attendance $attendance): bool
     {
-        return $user->hasPermissionTo('manage_attendance') || $user->isAdmin();
+        return $user->hasAnyPermission(['manage_attendance', 'manage_student_attendance']) || $user->isAdmin();
     }
 
     public function delete(User $user, Attendance $attendance): bool
     {
-        return $user->hasPermissionTo('manage_attendance') || $user->isAdmin();
+        return $user->hasAnyPermission(['manage_attendance', 'manage_student_attendance']) || $user->isAdmin();
     }
 }

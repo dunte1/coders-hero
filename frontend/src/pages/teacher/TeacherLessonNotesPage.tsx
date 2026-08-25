@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { Download, Paperclip, Plus, Trash2 } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -11,7 +11,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Spinner } from '@/components/ui/Spinner';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { formatDate, truncate } from '@/lib/utils';
-import { useLessonNotes, useCreateLessonNote, useDeleteLessonNote, useTeacherClasses } from '@/hooks/useTeacher';
+import { useLessonNotes, useCreateLessonNote, useDeleteLessonNote, useAttachLessonNoteFile, useTeacherClasses } from '@/hooks/useTeacher';
 import type { LessonNote, LessonNoteInput } from '@/types/teacher';
 
 export default function TeacherLessonNotesPage() {
@@ -22,6 +22,7 @@ export default function TeacherLessonNotesPage() {
   const { data: classesData } = useTeacherClasses({ per_page: 100 });
   const createNote = useCreateLessonNote();
   const deleteNote = useDeleteLessonNote();
+  const attachFile = useAttachLessonNoteFile();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<LessonNoteInput>({ title: '', content: '', note_date: new Date().toISOString().slice(0, 10) });
 
@@ -97,7 +98,13 @@ export default function TeacherLessonNotesPage() {
           ) : (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {notes.map((n) => (
-                <NoteCard key={n.id} note={n} onDelete={() => deleteNote.mutate(n.id)} />
+                <NoteCard
+                  key={n.id}
+                  note={n}
+                  onDelete={() => deleteNote.mutate(n.id)}
+                  onAttach={(file) => attachFile.mutate({ id: n.id, file })}
+                  attaching={attachFile.isPending}
+                />
               ))}
             </div>
           )}
@@ -107,7 +114,19 @@ export default function TeacherLessonNotesPage() {
   );
 }
 
-function NoteCard({ note, onDelete }: { note: LessonNote; onDelete: () => void }) {
+function NoteCard({
+  note,
+  onDelete,
+  onAttach,
+  attaching,
+}: {
+  note: LessonNote;
+  onDelete: () => void;
+  onAttach: (file: File) => void;
+  attaching?: boolean;
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardContent className="p-5">
@@ -116,9 +135,30 @@ function NoteCard({ note, onDelete }: { note: LessonNote; onDelete: () => void }
             <h3 className="font-semibold text-slate-900">{note.title}</h3>
             <p className="text-xs text-slate-500">{formatDate(note.note_date)}</p>
           </div>
-          <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={onDelete}>
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              title="Attach material (PDF, doc, image...)"
+              disabled={attaching}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Paperclip className="h-4 w-4" />
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) onAttach(file);
+                e.target.value = '';
+              }}
+            />
+            <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={onDelete}>
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         {note.school_class && (
           <div className="mt-2">
@@ -128,6 +168,22 @@ function NoteCard({ note, onDelete }: { note: LessonNote; onDelete: () => void }
         <p className="mt-3 text-sm text-slate-600">{truncate(note.content, 180)}</p>
         {note.lesson && (
           <p className="mt-2 text-xs text-slate-400">Lesson: {note.lesson.title}</p>
+        )}
+        {(note.attachments?.length ?? 0) > 0 && (
+          <div className="mt-3 space-y-1.5 border-t border-slate-100 pt-3">
+            {note.attachments!.map((a, i) => (
+              <a
+                key={`${note.id}-${i}`}
+                href={a.url ?? '#'}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-2 text-xs text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                <Download className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{a.name ?? 'attachment'}</span>
+              </a>
+            ))}
+          </div>
         )}
       </CardContent>
     </Card>

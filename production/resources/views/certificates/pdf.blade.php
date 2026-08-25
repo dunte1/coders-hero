@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8">
     <style>
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        @page { size: A4 landscape; margin: 0; }
         body {
             font-family: {{ $fontFamily }}, 'DejaVu Sans', sans-serif;
             color: #1e293b;
@@ -11,54 +12,56 @@
             padding: 0;
         }
         .certificate {
-            border: 14px solid {{ $accentColor }};
-            border-radius: 12px;
-            padding: 40px 50px;
-            min-height: 100%;
+            border: 4px solid {{ $accentColor }};
+            border-radius: 8px;
+            padding: 18px 30px 12px;
+            width: 100%;
+            height: 100%;
             position: relative;
+            overflow: hidden;
         }
         .certificate::before {
             content: '';
             position: absolute;
-            inset: 10px;
-            border: 2px solid {{ $accentColor }};
-            border-radius: 6px;
-            opacity: 0.35;
+            inset: 4px;
+            border: 1px solid {{ $accentColor }};
+            border-radius: 4px;
+            opacity: 0.3;
             pointer-events: none;
         }
-        .header { text-align: center; margin-bottom: 24px; }
+        .header { text-align: center; margin-bottom: 12px; }
         .badge { font-size: 16px; letter-spacing: 6px; text-transform: uppercase; color: {{ $accentColor }}; font-weight: bold; }
-        .title { font-size: 34px; font-weight: bold; margin: 8px 0 4px; color: #0f172a; }
+        .title { font-size: 34px; font-weight: bold; margin: 4px 0 2px; color: #0f172a; }
         .subtitle { font-size: 14px; color: #64748b; }
-        .body { text-align: center; margin: 28px 0; }
-        .body p { font-size: 15px; color: #475569; margin: 10px 0; }
+        .body { text-align: center; margin: 14px 0; }
+        .body p { font-size: 15px; color: #475569; margin: 6px 0; }
         .holder {
             font-size: 30px;
             font-weight: bold;
             color: #0f172a;
-            margin: 16px 0;
+            margin: 8px 0;
             border-bottom: 2px solid {{ $accentColor }};
             display: inline-block;
-            padding: 0 30px 10px;
+            padding: 0 28px 6px;
         }
-        .course-name { font-size: 22px; font-weight: bold; color: {{ $accentColor }}; margin-top: 6px; }
-        .details { margin-top: 26px; font-size: 12px; color: #64748b; }
+        .course-name { font-size: 22px; font-weight: bold; color: {{ $accentColor }}; margin-top: 4px; }
+        .details { margin-top: 10px; font-size: 12px; color: #64748b; }
         .details strong { color: #334155; }
         .footer {
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            margin-top: 34px;
+            margin-top: 16px;
         }
         .signature { text-align: center; }
-        .signature .name { font-weight: bold; font-size: 14px; color: #0f172a; margin-top: 4px; }
+        .signature .name { font-weight: bold; font-size: 14px; color: #0f172a; margin-top: 3px; }
         .signature .title { font-size: 11px; color: #64748b; font-weight: normal; }
-        .signature-line { border-top: 1.5px solid #334155; width: 200px; margin: 0 auto; }
+        .signature-line { border-top: 1.5px solid #334155; width: 180px; margin: 0 auto; }
         .qr { text-align: center; }
-        .qr svg { width: 90px; height: 90px; }
+        .qr svg { width: 80px; height: 80px; }
         .qr-code-label { font-size: 10px; color: #64748b; margin-top: 2px; }
-        .verification-note { font-size: 10px; color: #94a3b8; text-align: center; margin-top: 8px; }
-        .site-logo { max-height: 56px; max-width: 160px; margin: 0 auto 6px; object-fit: contain; }
+        .verification-note { font-size: 10px; color: #94a3b8; text-align: center; margin-top: 4px; }
+        .site-logo { max-height: 50px; max-width: 140px; margin: 0 auto 4px; object-fit: contain; }
     </style>
 </head>
 <body>
@@ -78,7 +81,7 @@
             <p>for successfully completing the course</p>
             <div class="course-name">{{ $certificate->course->title ?? 'Course' }}</div>
             <div class="details">
-                Certificate Number: <strong>{{ $certificate->certificate_number }}</strong><br>
+                Certificate Number: <strong>{{ $certificate->certificate_number }}</strong> &nbsp;&bull;&nbsp;
                 Issued on <strong>{{ $certificate->issued_at?->format('j F Y') ?? now()->format('j F Y') }}</strong>
             </div>
         </div>
@@ -86,7 +89,7 @@
         <div class="footer">
             <div class="signature">
                 @if (!empty($signatureImage))
-                    <img src="{{ $signatureImage }}" alt="Signature" style="max-height: 60px; max-width: 200px; margin: 0 auto; display: block;">
+                    <img src="{{ $signatureImage }}" alt="Signature" style="max-height: 50px; max-width: 160px; margin: 0 auto; display: block;">
                 @else
                     <div class="signature-line"></div>
                 @endif
@@ -107,7 +110,7 @@
         </div>
 
         <div class="verification-note">
-            Verify this certificate at {{ url('/verify-certificate/' . $certificate->verification_code) }}
+            Verify at {{ url('/verify-certificate/' . $certificate->verification_code) }}
         </div>
     </div>
 </body>

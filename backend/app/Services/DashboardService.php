@@ -262,12 +262,34 @@ class DashboardService
         return $levels->toArray();
     }
 
-    private function getEnrollmentByMonth(int $months): array
+    /**
+     * Year/month extraction expressions that work on both MySQL (production)
+     * and SQLite (tests).
+     */
+    private function yearExpr(string $column): string
     {
-        $start = now()->subMonths($months)->startOfMonth();
+        return $this->isSqlite()
+            ? "CAST(strftime('%Y', {$column}) AS INTEGER)"
+            : "YEAR({$column})";
+    }
+
+    private function monthExpr(string $column): string
+    {
+        return $this->isSqlite()
+            ? "CAST(strftime('%m', {$column}) AS INTEGER)"
+            : "MONTH({$column})";
+    }
+
+    private function isSqlite(): bool
+    {
+        return \DB::connection()->getDriverName() === 'sqlite';
+    }
+
+    private function getEnrollmentByMonth(int $months): array
+    {        $start = now()->subMonths($months)->startOfMonth();
 
         return Enrollment::where('enrolled_at', '>=', $start)
-            ->selectRaw('YEAR(enrolled_at) as year, MONTH(enrolled_at) as month, count(*) as count')
+            ->selectRaw("{$this->yearExpr('enrolled_at')} as year, {$this->monthExpr('enrolled_at')} as month, count(*) as count")
             ->groupBy('year', 'month')
             ->orderBy('year')
             ->orderBy('month')
@@ -281,7 +303,7 @@ class DashboardService
         $start = now()->subMonths($months)->startOfMonth();
 
         return Payment::where('created_at', '>=', $start)
-            ->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, sum(amount) as total')
+            ->selectRaw("{$this->yearExpr('created_at')} as year, {$this->monthExpr('created_at')} as month, sum(amount) as total")
             ->groupBy('year', 'month')
             ->orderBy('year')
             ->orderBy('month')

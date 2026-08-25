@@ -7,6 +7,7 @@ use App\Http\Requests\Quiz\StoreQuizRequest;
 use App\Http\Requests\Quiz\SubmitQuizRequest;
 use App\Http\Requests\Quiz\UpdateQuizRequest;
 use App\Http\Resources\QuizAttemptResource;
+use App\Http\Resources\QuizQuestionResource;
 use App\Http\Resources\QuizResource;
 use App\Services\QuizService;
 use App\Traits\ApiResponse;
@@ -50,6 +51,20 @@ class QuizController extends Controller
         return $this->successResponse(
             new QuizResource($quiz),
             'Quiz retrieved successfully.'
+        );
+    }
+
+    public function questions(int $id): JsonResponse
+    {
+        $quiz = $this->quizService->getById($id);
+
+        if (!$quiz) {
+            return $this->notFoundResponse('Quiz not found.');
+        }
+
+        return $this->successResponse(
+            QuizQuestionResource::collection($quiz->questions),
+            'Quiz questions retrieved successfully.'
         );
     }
 

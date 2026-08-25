@@ -10,7 +10,7 @@ import { Pagination } from '@/components/ui/Pagination';
 import { DialogRoot, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/Dialog';
 import { Award, Download, QrCode, ShieldCheck, ShieldX } from 'lucide-react';
 import type { Certificate } from '@/types/certificates';
-import { formatDate } from '@/lib/utils';
+import { formatDate, downloadFile } from '@/lib/utils';
 import { certificatesApi } from '@/lib/certificatesApi';
 
 export default function MyCertificatesPage() {
@@ -87,7 +87,10 @@ export default function MyCertificatesPage() {
                       size="sm"
                       className="flex-1"
                       disabled={cert.is_revoked}
-                      onClick={() => window.open(certificatesApi.downloadUrl(cert.certificate_number), '_blank')}
+                      onClick={() => downloadFile(
+                        `/certificates/${cert.certificate_number}/download`,
+                        `certificate-${cert.certificate_number}.pdf`
+                      ).catch(() => {})}
                     >
                       <Download className="h-4 w-4 mr-1" /> PDF
                     </Button>

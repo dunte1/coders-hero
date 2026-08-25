@@ -37,7 +37,13 @@ export default function CertificatesPage() {
             <CertificateCard
               key={cert.id}
               certificate={cert}
-              onDownload={(c) => downloadFile(`/api/certificates/${c.id}/download/`, `certificate-${c.certificate_id}.pdf`)}
+              onDownload={async (c) => {
+                try {
+                  await downloadFile(`/api/certificates/${c.certificate_number}/download`, `certificate-${c.certificate_number}.pdf`);
+                } catch (e) {
+                  console.error('Download failed:', e);
+                }
+              }}
             />
           ))}
         </div>

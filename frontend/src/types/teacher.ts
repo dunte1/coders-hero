@@ -183,6 +183,13 @@ export interface ClassGradeSummary {
   passed_count: number;
 }
 
+export interface LessonNoteAttachment {
+  name?: string;
+  size?: number | null;
+  path?: string;
+  url?: string;
+}
+
 export interface LessonNote {
   id: number;
   teacher_user_id?: string;
@@ -190,7 +197,7 @@ export interface LessonNote {
   class_id: number | null;
   title: string;
   content: string;
-  attachments: unknown[] | null;
+  attachments: LessonNoteAttachment[] | null;
   note_date: string;
   school_class?: { id: number; name: string } | null;
   lesson?: { id: number; title: string } | null;

@@ -316,7 +316,7 @@ export interface QuizSubmission {
 
 export interface Certificate {
   id: number;
-  certificate_id: string;
+  certificate_number: string;
   student: User;
   course: Course;
   issued_at: string;

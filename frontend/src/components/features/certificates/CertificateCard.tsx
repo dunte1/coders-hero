@@ -28,7 +28,7 @@ export function CertificateCard({ certificate, onDownload }: CertificateCardProp
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-slate-500">Certificate ID</span>
-            <span className="font-mono text-xs text-slate-700">{certificate.certificate_id}</span>
+            <span className="font-mono text-xs text-slate-700">{certificate.certificate_number}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-slate-500">Issued Date</span>

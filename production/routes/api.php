@@ -147,6 +147,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+// Named "login" route — sanctum redirects unauthenticated requests here
+Route::get('/login', fn () => response()->json(['message' => 'Unauthenticated.'], 401))->name('login');
 
 Route::prefix('public')->group(function () {
     Route::get('/site', [WebsiteController::class, 'home']);
@@ -278,6 +280,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/quizzes', [QuizController::class, 'index']);
     Route::post('/quizzes', [QuizController::class, 'store']);
     Route::get('/quizzes/{id}', [QuizController::class, 'show']);
+    Route::get('/quizzes/{id}/questions', [QuizController::class, 'questions']);
     Route::put('/quizzes/{id}', [QuizController::class, 'update']);
     Route::delete('/quizzes/{id}', [QuizController::class, 'destroy']);
     Route::post('/quizzes/{id}/submit', [QuizController::class, 'submit']);
@@ -439,6 +442,10 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/{id}', [LeadController::class, 'destroy']);
             Route::put('/{id}/status', [LeadController::class, 'changeStatus']);
         });
+
+        // Admin notifications (alias to generic endpoint)
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::get('/notifications/unread', [NotificationController::class, 'unread']);
     });
 
     Route::middleware('role:admin|super_admin')->prefix('admin')->group(function () {
@@ -680,6 +687,11 @@ Route::middleware('role:student')->prefix('student/class-sessions')->group(funct
     Route::get('/', [\App\Http\Controllers\Api\Student\StudentClassSessionController::class, 'index']);
 });
 
+// Student lesson notes & downloadable materials
+Route::middleware('role:student')->prefix('student/lesson-notes')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Api\Student\StudentLessonNoteController::class, 'index']);
+});
+
 Route::middleware('role:instructor|teacher|admin')->prefix('instructor')->group(function () {
 
         Route::get('/courses', [CourseController::class, 'instructorCourses']);
@@ -711,6 +723,7 @@ Route::middleware('role:instructor|teacher|admin')->prefix('instructor')->group(
 
         Route::get('/summary', [ParentController::class, 'summary']);
         Route::get('/children', [ParentController::class, 'children']);
+        Route::get('/children/{id}', [ParentController::class, 'show']);
         Route::get('/teachers', [ParentController::class, 'teachers']);
 
         Route::get('/attendance', [ParentAttendanceController::class, 'index']);
@@ -744,7 +757,7 @@ Route::middleware('role:instructor|teacher|admin')->prefix('instructor')->group(
     });
 
     // Parent-teacher chat
-    Route::middleware('role:parent|teacher|instructor|admin|super_admin')->prefix('chat')->group(function () {
+    Route::middleware('role:parent|teacher|instructor|student|admin|super_admin')->prefix('chat')->group(function () {
 
         Route::get('/', [ChatController::class, 'index']);
         Route::post('/', [ChatController::class, 'store']);
@@ -859,6 +872,10 @@ Route::middleware('role:instructor|teacher|admin')->prefix('instructor')->group(
         Route::get('/class-sessions/{id}', [\App\Http\Controllers\Api\Teacher\ClassSessionController::class, 'show']);
         Route::put('/class-sessions/{id}', [\App\Http\Controllers\Api\Teacher\ClassSessionController::class, 'update']);
         Route::delete('/class-sessions/{id}', [\App\Http\Controllers\Api\Teacher\ClassSessionController::class, 'destroy']);
+
+        // Teacher notifications (alias to generic endpoint)
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::get('/notifications/unread', [NotificationController::class, 'unread']);
     });
 
     // LMS interactive features (any authenticated user)
@@ -886,6 +903,15 @@ Route::middleware('role:instructor|teacher|admin')->prefix('instructor')->group(
         Route::post('/coding-exercises/{id}/submit', [CodingExerciseController::class, 'submit']);
         Route::get('/coding-exercises/{id}/submissions', [CodingExerciseController::class, 'submissions']);
         Route::get('/courses/{courseId}/coding-progress', [CodingExerciseController::class, 'progress']);
+
+        // Quizzes (via /lms prefix to match Flutter app)
+        Route::get('/quizzes', [QuizController::class, 'index']);
+        Route::get('/quizzes/{id}', [QuizController::class, 'show']);
+        Route::get('/quizzes/{id}/questions', [QuizController::class, 'questions']);
+        Route::post('/quizzes/{id}/submit', [QuizController::class, 'submit']);
+        Route::get('/quizzes/{id}/attempts', [QuizController::class, 'attempts']);
+        Route::get('/quizzes/{id}/statistics', [QuizController::class, 'statistics']);
+        Route::get('/courses/{courseId}/quizzes', [QuizController::class, 'byCourse']);
 
         Route::get('/ai-tutor/conversations', [AiTutorController::class, 'index']);
         Route::post('/ai-tutor/conversations', [AiTutorController::class, 'store']);

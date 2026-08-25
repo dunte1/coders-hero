@@ -57,6 +57,8 @@ class StudentPaymentController extends Controller
 
         if ($paidTotal >= $fee->amount) {
             $fee->update(['status' => 'paid']);
+        } else {
+            $fee->update(['status' => 'partial']);
         }
 
         return $this->createdResponse($payment->load('paidBy:id,name'), 'Payment recorded successfully.');

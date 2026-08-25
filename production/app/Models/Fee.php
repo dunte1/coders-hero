@@ -42,4 +42,11 @@ class Fee extends Model
     {
         return $this->status === 'paid';
     }
+
+    public function outstandingBalance(): float
+    {
+        $paid = (float) $this->payments()->sum('amount');
+
+        return max(0, (float) $this->amount - $paid);
+    }
 }

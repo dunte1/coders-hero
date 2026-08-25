@@ -389,4 +389,97 @@ class ParentPortalTest extends TestCase
         $this->getJson('/api/parent/summary')->assertStatus(403);
         $this->getJson('/api/parent/fees')->assertStatus(403);
     }
+
+    public function test_parent_can_make_partial_payment_on_fee(): void
+    {
+        $this->actingAsParent();
+
+        $fee = Fee::where('status', 'pending')->firstOrFail();
+
+        $response = $this->postJson("/api/parent/fees/{$fee->id}/pay", [
+            'amount' => $fee->amount / 2,
+            'method' => 'card',
+            'reference' => 'PARTIAL001',
+        ])
+            ->assertCreated()
+            ->assertJsonStructure(['data' => ['id', 'receipt_no', 'amount', 'method', 'fee']]);
+
+        $this->assertEquals(number_format($fee->amount / 2, 2, '.', ''), $response->json('data.amount'));
+        $this->assertSame('partial', $fee->fresh()->status);
+
+        $paidTotal = \App\Models\Payment::where('fee_id', $fee->id)->sum('amount');
+        $this->assertEquals(number_format($fee->amount / 2, 2, '.', ''), number_format((float) $paidTotal, 2, '.', ''));
+    }
+
+    public function test_second_partial_payment_completes_fee(): void
+    {
+        $this->actingAsParent();
+
+        $fee = Fee::where('status', 'pending')->firstOrFail();
+        $half = $fee->amount / 2;
+
+        $this->postJson("/api/parent/fees/{$fee->id}/pay", [
+            'amount' => $half,
+            'method' => 'card',
+        ])->assertCreated();
+
+        $this->assertSame('partial', $fee->fresh()->status);
+
+        $response = $this->postJson("/api/parent/fees/{$fee->id}/pay", [
+            'amount' => $half,
+            'method' => 'card',
+        ])->assertCreated();
+
+        $this->assertSame('paid', $fee->fresh()->status);
+    }
+
+    public function test_full_payment_without_amount_still_works(): void
+    {
+        $this->actingAsParent();
+
+        $fee = Fee::where('status', 'pending')->firstOrFail();
+
+        $response = $this->postJson("/api/parent/fees/{$fee->id}/pay", [
+            'method' => 'bank_transfer',
+            'reference' => 'FULLPAY001',
+        ])
+            ->assertCreated();
+
+        $this->assertSame('paid', $fee->fresh()->status);
+        $this->assertEquals(number_format($fee->amount, 2, '.', ''), $response->json('data.amount'));
+    }
+
+    public function test_partial_payment_rejects_amount_exceeding_balance(): void
+    {
+        $this->actingAsParent();
+
+        $fee = Fee::where('status', 'pending')->firstOrFail();
+
+        $this->postJson("/api/parent/fees/{$fee->id}/pay", [
+            'amount' => $fee->amount + 1,
+        ])->assertStatus(422);
+    }
+
+    public function test_partial_payment_rejects_zero_amount(): void
+    {
+        $this->actingAsParent();
+
+        $fee = Fee::where('status', 'pending')->firstOrFail();
+
+        $this->postJson("/api/parent/fees/{$fee->id}/pay", [
+            'amount' => 0,
+        ])->assertStatus(422);
+    }
+
+    public function test_cannot_pay_already_paid_fee(): void
+    {
+        $this->actingAsParent();
+
+        $fee = Fee::where('status', 'pending')->firstOrFail();
+
+        $this->postJson("/api/parent/fees/{$fee->id}/pay", ['method' => 'card'])->assertCreated();
+
+        $this->postJson("/api/parent/fees/{$fee->id}/pay", ['method' => 'card'])
+            ->assertStatus(422);
+    }
 }

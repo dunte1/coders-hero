@@ -325,6 +325,18 @@ export function useDeleteLessonNote() {
   });
 }
 
+export function useAttachLessonNoteFile() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, file }: { id: number; file: File }) => teacherApi.attachLessonNoteFile(id, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['teacher', 'lesson-notes'] });
+      toast.success('Material attached');
+    },
+    onError: (error: unknown) => toast.error(getErrorMessage(error)),
+  });
+}
+
 // Calendar
 export function useCalendarEvents(params?: { from?: string; to?: string; class_id?: number; event_type?: string }) {
   return useQuery({

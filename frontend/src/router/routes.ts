@@ -801,14 +801,14 @@ export const routes: RouteConfig[] = [
   {
     path: '/chat',
     element: React.lazy(() => import('@/pages/parent/ChatPage')),
-    meta: { title: 'Messages', roles: ['parent', 'teacher', 'admin', 'super_admin'] },
+    meta: { title: 'Messages', roles: ['parent', 'teacher', 'instructor', 'admin', 'super_admin'] },
   },
 
   // Appointments management (admin)
   {
     path: '/appointments',
     element: React.lazy(() => import('@/pages/parent/AdminAppointmentsPage')),
-    meta: { title: 'Appointments', roles: ['admin', 'super_admin'] },
+    meta: { title: 'Appointments', roles: ['admin', 'super_admin', 'director', 'branch_manager', 'school_admin'] },
   },
 
   // Human Resources

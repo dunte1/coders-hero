@@ -1,0 +1,294 @@
+=============================================
+CODER'S HERO — PRODUCTION TESTING CHECKLIST
+=============================================
+Date: 2026-08-25
+APK: coders-hero-release.apk (60.1MB)
+Server: coderhero.duncowebsolutions.co.ke
+
+=============================================
+1. LOGIN TESTS (all roles)
+=============================================
+
+Test each account logs in successfully:
+
+  Student:  alex@example.com / password
+  Parent:   parent@codershero.com / password
+  Teacher:  teacher@codershero.com / password
+  Instructor: emily@codershero.com / password
+  Admin:    admin@codershero.com / password
+  Super Admin: superadmin@codershero.com / password
+
+For each login verify:
+  [ ] Login succeeds with token
+  [ ] Correct dashboard loads for the role
+  [ ] Drawer menu shows correct items for the role
+  [ ] Bottom navigation shows correct tabs
+
+=============================================
+2. STUDENT ROLE (alex@example.com)
+=============================================
+
+Dashboard:
+  [ ] Stats load (courses, assignments, etc.)
+  [ ] Notifications icon shows count
+  [ ] Quick action tiles navigate correctly
+
+Drawer Menu:
+  [ ] My Classes → loads class list (not "Failed to load")
+  [ ] My Projects → loads project list
+  [ ] My Exams → loads exam list
+  [ ] Learning → landing page with tiles
+  [ ] Learning > My Courses → loads enrolled courses
+  [ ] Learning > Quizzes → loads quiz list
+  [ ] Learning > Forum → opens course picker
+  [ ] Learning > Bookmarks → loads bookmarks
+  [ ] Learning > Progress → opens course picker
+  [ ] Coding Lab → landing page with tiles
+  [ ] Coding Lab > Playground → loads
+  [ ] Coding Lab > Exercises → loads exercise list
+  [ ] Coding Lab > Leaderboard → loads
+  [ ] Robotics Lab > Equipment → loads equipment
+  [ ] Robotics Lab > Assignments → loads
+  [ ] Competitions → loads competition list
+  [ ] Library → landing page
+  [ ] Library > Browse → loads catalog
+  [ ] Library > My Borrowings → loads borrowings
+  [ ] AI Platform → loads AI dashboard
+  [ ] Certificates → loads certificate list
+  [ ] Messages → loads inbox (not "Failed to load")
+  [ ] Notifications → loads notification list
+  [ ] Settings/Profile → opens STUDENT profile (not parent/teacher profile)
+
+Bottom Nav:
+  [ ] Dashboard tab works
+  [ ] Students tab → opens My Courses
+  [ ] Messages tab → opens inbox
+  [ ] More tab → opens drawer
+
+Specific Features:
+  [ ] Tap a course → course detail loads
+  [ ] Tap a quiz → opens quiz taking screen (NOT "no routes" error)
+  [ ] Tap a class → class detail loads
+  [ ] Tap an assignment → detail loads with submit button
+  [ ] Submit assignment with file attachment → success
+  [ ] Take an exam → questions load, submit works
+  [ ] Download certificate → PDF opens on device
+  [ ] Upload profile photo → avatar shows after upload
+  [ ] New message (floating icon) → opens conversation screen
+  [ ] Send a message → appears in chat
+
+=============================================
+3. PARENT ROLE (parent@codershero.com)
+=============================================
+
+Dashboard:
+  [ ] Children list loads
+  [ ] Stats/cards show real data
+
+Drawer Menu:
+  [ ] Parents > Assignments → loads parent assignments
+  [ ] Parents > Courses → loads parent courses
+  [ ] Parents > Projects → loads parent projects
+  [ ] Parents > Competitions → loads
+  [ ] Parents > Announcements → loads
+  [ ] Parents > Certificates → loads
+  [ ] Learning → landing page
+  [ ] Library → landing page
+  [ ] AI Platform → loads
+  [ ] Settings/Profile → opens PARENT profile (not student profile)
+  [ ] Children list → tapping child shows detail
+  [ ] Attendance → loads child attendance
+  [ ] Progress → loads academic progress
+  [ ] Report Cards → loads report cards
+  [ ] Fees → loads fee list
+  [ ] Fee detail → shows payment options
+  [ ] Pay fee → payment records successfully
+  [ ] Notifications → loads parent notifications
+
+=============================================
+4. TEACHER ROLE (teacher@codershero.com)
+=============================================
+
+Dashboard:
+  [ ] Stats load (classes, students, etc.)
+
+Drawer Menu:
+  [ ] Teachers > Punch Clock → loads
+  [ ] Teachers > Class Sessions → loads
+  [ ] Learning → landing page
+  [ ] Coding Lab → landing page
+  [ ] Robotics Lab → landing page
+  [ ] Competitions → loads
+  [ ] Library → landing page
+  [ ] AI Platform → loads
+  [ ] Certificates → loads
+  [ ] Settings/Profile → opens TEACHER profile (not student profile)
+  [ ] Classes → loads teacher classes
+  [ ] Class detail → shows students
+  [ ] Class roster → loads
+  [ ] Mark attendance → submit works (entries key)
+  [ ] Assignments → loads
+  [ ] Create assignment → form works
+  [ ] View submissions → loads
+  [ ] Grade submission → works (uses submission ID)
+  [ ] Exams → loads
+  [ ] Create exam → form works
+  [ ] Exam detail → loads with summary
+  [ ] Gradebook → loads entries
+  [ ] Gradebook summary → shows correct stats
+  [ ] Lesson Notes → loads
+  [ ] Create lesson note → works
+  [ ] Attach file to lesson note → upload works
+  [ ] Calendar → loads
+  [ ] Notifications → loads
+
+=============================================
+5. ADMIN ROLE (admin@codershero.com)
+=============================================
+
+Dashboard:
+  [ ] Stats load (students, teachers, revenue, etc.)
+  [ ] Activity logs load
+  [ ] Notification links work
+
+Drawer Menu:
+  [ ] Organization > Overview → loads
+  [ ] Organization > Branches → loads
+  [ ] Organization > Academic Years → loads
+  [ ] Organization > Contracts → loads
+  [ ] Students > All Students → loads STUDENT LIST (not courses)
+  [ ] Students > Admissions → loads
+  [ ] Students > Attendance → loads
+  [ ] Finance > landing page loads
+  [ ] Finance > Expense Approval → loads
+  [ ] HR > Employees → loads employee list
+  [ ] HR > Documents → loads
+  [ ] HR > Attendance → loads
+  [ ] Inventory > Suppliers → loads
+  [ ] Inventory > Purchase Orders → loads
+  [ ] Library → landing page
+  [ ] Website/CMS > Settings → loads
+  [ ] Website/CMS > Blog → loads
+  [ ] Website/CMS > Testimonials → loads
+  [ ] Communication > Messages → loads
+  [ ] Communication > Notifications → loads
+  [ ] Project Management > Active Projects → loads
+  [ ] Project Management > My Tasks → loads
+  [ ] Reports > Enrollment → loads stats
+  [ ] Reports > Users → loads stats
+  [ ] Reports > Revenue → loads stats
+  [ ] Settings/Profile → opens ADMIN profile (not student profile)
+  [ ] Notifications → loads
+
+Specific Features:
+  [ ] Student list → create new student works
+  [ ] Student detail → view/edit works
+  [ ] Toggle student status → works
+  [ ] Teacher list → loads
+  [ ] Delete actions (student, teacher, lead, supplier, PO, contract) → confirmation dialog + delete
+  [ ] Upload admin profile photo → avatar shows
+
+=============================================
+6. COMMON / SHARED FEATURES
+=============================================
+
+Navigation:
+  [ ] All drawer items navigate to working screens
+  [ ] All bottom nav tabs work
+  [ ] All landing page tiles navigate correctly
+  [ ] Back button navigation works
+  [ ] No "GoException: no routes for location" errors
+
+Notifications:
+  [ ] Notification list loads for all roles
+  [ ] Unread badge count shows
+  [ ] Tap notification → detail screen
+  [ ] Mark as read works
+  [ ] Mark all read works
+
+Profile:
+  [ ] Each role opens their OWN profile screen
+  [ ] View profile info
+  [ ] Edit profile → saves
+  [ ] Upload photo → avatar shows immediately
+
+Chat/Messages:
+  [ ] Inbox loads conversations
+  [ ] Tap conversation → messages load
+  [ ] Send message → appears in chat
+  [ ] New conversation → select teacher → create
+
+File Uploads:
+  [ ] Profile photo upload → shows after upload
+  [ ] Assignment file upload → submit with attachment
+  [ ] Lesson note file attachment → works
+
+File Downloads:
+  [ ] Certificate PDF download → opens on device
+
+=============================================
+7. KNOWN LIMITATIONS (not bugs)
+=============================================
+
+These are intentional omissions, not bugs:
+
+  - Teacher analytics screens: backend endpoints exist but no Flutter UI
+  - Teacher reports screens: backend endpoints exist but no Flutter UI
+  - Instructor-specific screens: backend endpoints exist but no Flutter UI
+  - Parent appointments: backend endpoints exist but no Flutter UI
+  - Student/parent can't return library books (librarian-only action)
+  - New conversation for students: manual UUID entry (no teacher dropdown yet)
+
+=============================================
+8. IF SOMETHING FAILS
+=============================================
+
+Check server-side:
+  1. SSH to server
+  2. cd ~/coderhero.duncowebsolutions.co.ke
+  3. Check logs: tail -50 storage/logs/laravel.log
+  4. Verify storage link: ls -la public/storage
+  5. If storage link missing: php artisan storage:link
+
+Check APK-side:
+  1. Force close and reopen the app
+  2. Clear app data if needed (Settings > Apps > Coder's Hero > Clear Data)
+  3. Reinstall the APK
+
+Report issues with:
+  - Which role (student/parent/teacher/admin)
+  - Which screen/menu
+  - Exact error message
+  - Screenshot if possible
+
+=============================================
+9. TESTING RESULTS (fill in as you test)
+=============================================
+
+Date Tested: _______________
+Tested By: _______________
+
+Student Login:           [ ] Pass  [ ] Fail  Notes: _______________
+Parent Login:            [ ] Pass  [ ] Fail  Notes: _______________
+Teacher Login:           [ ] Pass  [ ] Fail  Notes: _______________
+Admin Login:             [ ] Pass  [ ] Fail  Notes: _______________
+
+Student Dashboard:       [ ] Pass  [ ] Fail  Notes: _______________
+Parent Dashboard:        [ ] Pass  [ ] Fail  Notes: _______________
+Teacher Dashboard:       [ ] Pass  [ ] Fail  Notes: _______________
+Admin Dashboard:         [ ] Pass  [ ] Fail  Notes: _______________
+
+Student Menus:           [ ] Pass  [ ] Fail  Notes: _______________
+Parent Menus:            [ ] Pass  [ ] Fail  Notes: _______________
+Teacher Menus:           [ ] Pass  [ ] Fail  Notes: _______________
+Admin Menus:             [ ] Pass  [ ] Fail  Notes: _______________
+
+Chat/Messages:           [ ] Pass  [ ] Fail  Notes: _______________
+Notifications:           [ ] Pass  [ ] Fail  Notes: _______________
+Profile/Photo Upload:    [ ] Pass  [ ] Fail  Notes: _______________
+Certificate Download:    [ ] Pass  [ ] Fail  Notes: _______________
+File Upload (assignment): [ ] Pass  [ ] Fail  Notes: _______________
+
+=============================================
+END OF TESTING CHECKLIST
+=============================================

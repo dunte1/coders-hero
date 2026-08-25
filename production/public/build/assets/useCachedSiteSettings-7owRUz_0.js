@@ -1,1 +1,0 @@
-import{F as t,g as s}from"./index-Boo8T5Sb.js";const n=["website","site"];function o(){const e=t().getQueryData(n);return s(e==null?void 0:e.settings,"general.site_name","Coder's Hero")}export{o as u};

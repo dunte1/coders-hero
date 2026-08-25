@@ -40,22 +40,28 @@ class ParentPaymentController extends Controller
             return $this->errorResponse('This fee has already been paid.', 422);
         }
 
+        $outstanding = $fee->outstandingBalance();
+
         $validated = $request->validate([
+            'amount' => ['nullable', 'numeric', 'min:0.01', "max:{$outstanding}"],
             'method' => ['nullable', 'in:cash,card,bank_transfer,online'],
             'reference' => ['nullable', 'string', 'max:120'],
         ]);
 
+        $payAmount = isset($validated['amount']) ? (float) $validated['amount'] : $outstanding;
+
         $payment = Payment::create([
             'fee_id' => $fee->id,
             'receipt_no' => 'RCPT-' . strtoupper(Str::random(10)),
-            'amount' => $fee->amount,
+            'amount' => $payAmount,
             'method' => $validated['method'] ?? 'online',
             'reference' => $validated['reference'] ?? 'PAY-' . strtoupper(Str::random(10)),
             'paid_at' => now()->toDateString(),
             'paid_by_user_id' => auth()->id(),
         ]);
 
-        $fee->update(['status' => 'paid']);
+        $newBalance = $outstanding - $payAmount;
+        $fee->update(['status' => $newBalance <= 0 ? 'paid' : 'partial']);
 
         return $this->createdResponse($payment->load('fee.student'), 'Payment successful. Receipt generated.');
     }

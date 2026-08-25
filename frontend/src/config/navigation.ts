@@ -122,6 +122,10 @@ const LEARNER_ROLES: NavRole[] = ['super_admin', 'admin', 'teacher', 'instructor
 const CODING_ROLES: NavRole[] = ['super_admin', 'admin', 'teacher', 'instructor', 'student'];
 const ROBOTICS_ROLES: NavRole[] = ['super_admin', 'admin', 'teacher', 'instructor', 'student'];
 const HR_ROLES: NavRole[] = ['super_admin', 'admin', 'hr_officer'];
+const OVERSIGHT_ROLES: NavRole[] = ['super_admin', 'admin', 'director'];
+const FINANCE_ADMIN_ROLES: NavRole[] = ['super_admin', 'admin', 'accountant'];
+const ROBOTICS_MANAGE_ROLES: NavRole[] = ['super_admin', 'admin', 'teacher', 'instructor'];
+const MESSAGING_ROLES: NavRole[] = ['parent', 'teacher', 'instructor', 'admin', 'super_admin'];
 const INVENTORY_ROLES: NavRole[] = ['super_admin', 'admin', 'inventory_officer'];
 const LIBRARY_MANAGE_ROLES: NavRole[] = ['super_admin', 'admin', 'librarian'];
 const FINANCE_ROLES: NavRole[] = ['super_admin', 'admin', 'director', 'accountant', 'student', 'parent'];
@@ -147,11 +151,12 @@ export const navigation: NavEntry[] = [
     icon: Building2,
     roles: SIS_ROLES,
     children: [
+      { label: 'School Dashboard', href: '/school', icon: LayoutDashboard, roles: ['super_admin', 'admin', 'school_admin'] },
       { label: 'Overview', href: '/organization/overview', icon: LayoutDashboard },
       { label: 'Branches', href: '/organization/branches', icon: Building2 },
       { label: 'Partner Schools', href: '/organization/partner-schools', icon: GraduationCap },
       { label: 'Academic Years', href: '/organization/academic-years', icon: CalendarCheck },
-      { label: 'Contracts', href: '/organization/contracts', icon: FileText },
+      { label: 'Contracts', href: '/organization/contracts', icon: FileText, roles: OVERSIGHT_ROLES },
     ],
   },
 
@@ -215,7 +220,7 @@ export const navigation: NavEntry[] = [
     roles: ACADEMICS_ROLES,
     children: [
       { label: 'Courses', href: '/courses', icon: BookOpen },
-      { label: 'Enrollments', href: '/academics/enrollments', icon: UserRound },
+      { label: 'Enrollments', href: '/academics/enrollments', icon: UserRound, roles: ['super_admin', 'admin'] },
     ],
   },
 
@@ -230,7 +235,6 @@ export const navigation: NavEntry[] = [
       { label: 'My Projects', href: '/student/projects', icon: FolderKanban, roles: ['student'] },
       { label: 'My Exams', href: '/student/exams', icon: FileText, roles: ['student'] },
       { label: 'My Progress', href: '/lms/analytics', icon: BarChart3, roles: ['student'] },
-      { label: 'My Certificates', href: '/certificates', icon: Award, roles: ['student'] },
       { label: 'Quizzes', href: '/quizzes', icon: FileText },
       { label: 'Forum', href: '/lms/forum', icon: MessageSquare },
       { label: 'Bookmarks', href: '/lms/bookmarks', icon: BookOpen },
@@ -256,11 +260,11 @@ export const navigation: NavEntry[] = [
     roles: ROBOTICS_ROLES,
     children: [
       { label: 'Overview', href: '/robotics/dashboard', icon: LayoutDashboard },
-      { label: 'Equipment', href: '/robotics/equipment', icon: Cpu },
+      { label: 'Equipment', href: '/robotics/equipment', icon: Cpu, roles: ROBOTICS_MANAGE_ROLES },
       { label: 'Teams', href: '/robotics/teams', icon: Users },
       { label: 'Projects', href: '/robotics/projects', icon: FolderKanban },
       { label: 'Reservations', href: '/robotics/reservations', icon: CalendarCheck },
-      { label: 'Maintenance', href: '/robotics/maintenance', icon: Wrench },
+      { label: 'Maintenance', href: '/robotics/maintenance', icon: Wrench, roles: ROBOTICS_MANAGE_ROLES },
     ],
   },
 
@@ -279,15 +283,15 @@ export const navigation: NavEntry[] = [
     icon: Wallet,
     roles: FINANCE_ROLES,
     children: [
-      { label: 'Dashboard', href: '/finance', icon: LayoutDashboard },
+      { label: 'Dashboard', href: '/finance', icon: LayoutDashboard, roles: FINANCE_ADMIN_ROLES },
       { label: 'Fee Structures', href: '/finance/fee-structures', icon: ClipboardList, permission: 'manage_fee_structures' },
       { label: 'Invoices', href: '/finance/invoices', icon: FileText, permission: 'manage_invoices' },
       { label: 'Payments', href: '/finance/payments', icon: Receipt, permission: 'record_payments' },
       { label: 'Expenses', href: '/finance/expenses', icon: XCircle, permission: 'manage_expenses' },
       { label: 'Budgets', href: '/finance/budgets', icon: BarChart3, permission: 'manage_budgets' },
       { label: 'M-Pesa', href: '/finance/mpesa', icon: Smartphone, permission: 'manage_mpesa' },
-      { label: 'Outstanding Fees', href: '/finance/outstanding', icon: AlertTriangle },
-      { label: 'Transactions', href: '/finance/transactions', icon: CreditCard },
+      { label: 'Outstanding Fees', href: '/finance/outstanding', icon: AlertTriangle, roles: FINANCE_ADMIN_ROLES },
+      { label: 'Transactions', href: '/finance/transactions', icon: CreditCard, roles: FINANCE_ADMIN_ROLES },
       { label: 'My Finance', href: '/finance/mine', icon: Wallet, roles: ['student', 'parent'] },
     ],
   },
@@ -402,7 +406,7 @@ export const navigation: NavEntry[] = [
       { label: 'Inbox', href: '/notifications', icon: Bell },
       { label: 'Notification Preferences', href: '/notifications/preferences', icon: Settings },
       { label: 'Announcements', href: '/announcements', icon: Bell },
-      { label: 'Messages', href: '/chat', icon: MessageSquare },
+      { label: 'Messages', href: '/chat', icon: MessageSquare, roles: MESSAGING_ROLES },
       { label: 'Administration', href: '/admin/notifications', icon: LayoutTemplate, roles: ADMIN_ROLES },
       { label: 'Templates', href: '/admin/notifications/templates', icon: FileText, roles: ADMIN_ROLES },
     ],
@@ -419,9 +423,16 @@ export const navigation: NavEntry[] = [
   },
 
   {
+    label: 'CRM',
+    href: '/crm/leads',
+    icon: Target,
+    roles: OVERSIGHT_ROLES,
+  },
+
+  {
     label: 'Reports & Analytics',
     icon: BarChart3,
-    roles: ['super_admin', 'admin', 'director', 'school_admin'],
+    roles: ['super_admin', 'admin', 'director', 'branch_manager', 'school_admin', 'accountant'],
     children: [
       { label: 'Executive Dashboard', href: '/analytics', icon: BarChart3 },
       { label: 'Reports', href: '/reports', icon: FileText },
@@ -443,7 +454,6 @@ export const navigation: NavEntry[] = [
       { label: 'System Health', href: '/admin/system-health', icon: ActivityIcon, roles: ['super_admin'] },
       { label: 'Backups', href: '/admin/backups', icon: Save, roles: ['super_admin'] },
       { label: 'System Logs', href: '/admin/system-logs', icon: FileText, roles: ['super_admin'] },
-      { label: 'CRM', href: '/crm/leads', icon: Target },
     ],
   },
 

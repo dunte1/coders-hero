@@ -163,7 +163,7 @@ class PermissionSeeder extends Seeder
             ],
             'hr' => [
                 ['name' => 'view_hr', 'display_name' => 'View HR', 'description' => 'View HR overview and reports.'],
-                ['name' => 'manage_contracts', 'display_name' => 'Manage Contracts', 'description' => 'Create, edit and terminate employee contracts.'],
+                ['name' => 'manage_contracts', 'display_name' => 'Manage Contracts', 'description' => 'Create, edit and terminate employee and school contracts.'],
                 ['name' => 'manage_leave', 'display_name' => 'Manage Leave', 'description' => 'Approve and reject leave requests.'],
                 ['name' => 'manage_attendance', 'display_name' => 'Manage Attendance', 'description' => 'Record and manage staff attendance.'],
                 ['name' => 'manage_payroll', 'display_name' => 'Manage Payroll', 'description' => 'Run and manage payroll and payslips.'],
@@ -281,9 +281,6 @@ class PermissionSeeder extends Seeder
             'procurement' => [
                 ['name' => 'manage_suppliers', 'display_name' => 'Manage Suppliers', 'description' => 'Create, edit and delete suppliers.'],
                 ['name' => 'manage_purchase_orders', 'display_name' => 'Manage Purchase Orders', 'description' => 'Create, edit and manage purchase orders.'],
-            ],
-            'contracts' => [
-                ['name' => 'manage_contracts', 'display_name' => 'Manage Contracts', 'description' => 'Create, edit and delete school contracts.'],
             ],
             'class_sessions' => [
                 ['name' => 'manage_class_sessions', 'display_name' => 'Manage Class Sessions', 'description' => 'Create, edit and delete live class sessions.'],

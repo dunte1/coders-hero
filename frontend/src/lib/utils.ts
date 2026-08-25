@@ -78,13 +78,21 @@ export function getPriorityColor(priority: string): string {
   return colors[priority] || 'bg-slate-100 text-slate-600';
 }
 
-export function downloadFile(url: string, filename: string): void {
+export async function downloadFile(url: string, filename: string): Promise<void> {
+  const token = localStorage.getItem('auth_token');
+  const response = await fetch(url.startsWith('http') ? url : `${import.meta.env.VITE_API_URL || '/api'}${url}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!response.ok) throw new Error(`Download failed: ${response.status}`);
+  const blob = await response.blob();
+  const blobUrl = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.href = url;
+  link.href = blobUrl;
   link.download = filename;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  URL.revokeObjectURL(blobUrl);
 }
 
 export function validateEmail(email: string): boolean {

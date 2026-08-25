@@ -49,4 +49,17 @@ class ParentController extends Controller
 
         return $this->successResponse($students, 'Children retrieved successfully.');
     }
+
+    public function show(int $id): JsonResponse
+    {
+        $student = $this->portalService->accessibleStudents()
+            ->with(['schoolClasses:id,name,grade', 'fees'])
+            ->find($id);
+
+        if (!$student) {
+            return $this->notFoundResponse('Child not found.');
+        }
+
+        return $this->successResponse($student, 'Child retrieved successfully.');
+    }
 }

@@ -9,6 +9,20 @@ const api = axios.create({
   timeout: 30000,
 });
 
+let isRefreshing = false;
+let failedQueue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = [];
+
+function processQueue(error: unknown, token: string | null) {
+  failedQueue.forEach((prom) => {
+    if (error || !token) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+}
+
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('auth_token');
@@ -26,15 +40,46 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise<string>((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then((token) => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return api(originalRequest);
+        });
+      }
+
       originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const { data } = await api.post('/refresh-token');
+        const newToken = data?.data?.token;
+        if (newToken) {
+          localStorage.setItem('auth_token', newToken);
+          processQueue(null, newToken);
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          return api(originalRequest);
+        }
+      } catch {
+        // refresh failed
+      }
+
+      processQueue(new Error('Token refresh failed'), null);
+      isRefreshing = false;
       localStorage.removeItem('auth_token');
       localStorage.removeItem('auth_user');
       window.location.href = '/login';
       return Promise.reject(error);
     }
 
-    if (error.response?.status === 403) {
-      toast.error('You do not have permission to perform this action.');
+    if (error.response?.status === 403 && !originalRequest._retry) {
+      const url = originalRequest?.url || 'unknown endpoint';
+      const message = error.response?.data?.message || 'You do not have permission to perform this action.';
+      const requiredRoles = error.response?.data?.required_roles;
+      const yourRoles = error.response?.data?.your_roles;
+      console.error(`[403] ${url} — ${message}`, { requiredRoles, yourRoles });
+      toast.error(message);
     }
 
     if (error.response?.status === 429) {

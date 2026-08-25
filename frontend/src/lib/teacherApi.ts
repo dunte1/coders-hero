@@ -162,6 +162,16 @@ export const teacherApi = {
 
   deleteLessonNote: (id: number) => api.delete(`/teacher/lesson-notes/${id}`).then(() => undefined),
 
+  attachLessonNoteFile: (id: number, file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api
+      .post<{ data: LessonNote }>(`/teacher/lesson-notes/${id}/files`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      .then(unwrap<LessonNote>);
+  },
+
   // Calendar
   calendarEvents: (params?: { from?: string; to?: string; class_id?: number; event_type?: string }) =>
     api.get<{ data: CalendarEvent[] }>('/teacher/calendar', { params }).then(unwrap<CalendarEvent[]>),
