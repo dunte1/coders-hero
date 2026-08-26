@@ -257,11 +257,11 @@ export const usersApi = {
   deleteUser: (id: string | number) =>
     api.delete(`/admin/users/${id}`).then(handleResponse),
   assignRole: (userId: string | number, roleName: string) =>
-    api.post(`/admin/users/${userId}/assign-role`, { role: roleName }).then(handleResponse),
+    api.put(`/admin/users/${userId}/assign-role`, { role: roleName }).then(handleResponse),
   removeRole: (userId: string | number, roleName: string) =>
     api.delete(`/admin/users/${userId}/remove-role`, { data: { role: roleName } }).then(handleResponse),
   toggleStatus: (userId: string | number) =>
-    api.post(`/admin/users/${userId}/toggle-status`).then(handleResponse),
+    api.put(`/admin/users/${userId}/toggle-status`).then(handleResponse),
   resetPassword: (userId: string | number, data: { password: string; password_confirmation: string }) =>
     api.put(`/admin/users/${userId}/password`, data).then(handleResponse),
   uploadAvatar: (userId: string | number, file: File) => {
@@ -282,13 +282,13 @@ export const coursesApi = {
   createCourse: (data: CourseCreate) =>
     api.post<Course>('/courses/', data).then(handleResponse),
   updateCourse: (id: number, data: CourseUpdate) =>
-    api.patch<Course>(`/courses/${id}/`, data).then(handleResponse),
+    api.put<Course>(`/courses/${id}/`, data).then(handleResponse),
   deleteCourse: (id: number) =>
     api.delete(`/courses/${id}/`).then(handleResponse),
   publishCourse: (id: number) =>
-    api.post(`/courses/${id}/publish/`).then(handleResponse),
+    api.put(`/courses/${id}/publish/`).then(handleResponse),
   archiveCourse: (id: number) =>
-    api.post(`/courses/${id}/archive/`).then(handleResponse),
+    api.put(`/courses/${id}/archive/`).then(handleResponse),
   getCourseLessons: (courseId: number) =>
     api.get<Lesson[]>(`/courses/${courseId}/lessons/`).then(handleResponse),
 };
@@ -299,8 +299,8 @@ export const lessonsApi = {
     api.get<PaginatedResponse<Lesson>>('/lessons/', { params }).then(handleResponse),
   createLesson: (courseId: number, data: LessonCreate) =>
     api.post<Lesson>(`/courses/${courseId}/lessons/`, data).then(handleResponse),
-  updateLesson: (id: number, data: Partial<LessonCreate>) =>
-    api.patch<Lesson>(`/lessons/${id}/`, data).then(handleResponse),
+  updateLesson: (courseId: number, id: number, data: Partial<LessonCreate>) =>
+    api.put<Lesson>(`/courses/${courseId}/lessons/${id}`, data).then(handleResponse),
   deleteLesson: (id: number) =>
     api.delete(`/lessons/${id}/`).then(handleResponse),
   reorderLessons: (courseId: number, lessonIds: number[]) =>
@@ -317,8 +317,8 @@ export const enrollmentsApi = {
     api.delete(`/enrollments/${enrollmentId}/`).then(handleResponse),
   getMyCourses: () =>
     api.get<PaginatedResponse<Enrollment>>('/enrollments/my-courses/').then(handleResponse),
-  updateProgress: (enrollmentId: number, progress: number) =>
-    api.patch(`/enrollments/${enrollmentId}/progress/`, { progress }).then(handleResponse),
+  updateProgress: (lessonId: number) =>
+    api.post(`/enrollments/progress/${lessonId}`).then(handleResponse),
 };
 
 // Categories
@@ -328,7 +328,7 @@ export const categoriesApi = {
   createCategory: (data: { name: string; description?: string }) =>
     api.post<Category>('/categories/', data).then(handleResponse),
   updateCategory: (id: number, data: { name?: string; description?: string }) =>
-    api.patch<Category>(`/categories/${id}/`, data).then(handleResponse),
+    api.put<Category>(`/categories/${id}/`, data).then(handleResponse),
   deleteCategory: (id: number) =>
     api.delete(`/categories/${id}/`).then(handleResponse),
 };
@@ -342,7 +342,7 @@ export const tasksApi = {
   createTask: (data: TaskCreate) =>
     api.post<Task>('/tasks/', data).then(handleResponse),
   updateTask: (id: number, data: TaskUpdate) =>
-    api.patch<Task>(`/tasks/${id}/`, data).then(handleResponse),
+    api.put<Task>(`/tasks/${id}/`, data).then(handleResponse),
   deleteTask: (id: number) =>
     api.delete(`/tasks/${id}/`).then(handleResponse),
   assignTask: (taskId: number, userId: number) =>
@@ -422,7 +422,7 @@ export const quizzesApi = {
   createQuiz: (data: QuizCreate) =>
     api.post<Quiz>('/quizzes/', data).then(handleResponse),
   updateQuiz: (id: number, data: Partial<QuizCreate>) =>
-    api.patch<Quiz>(`/quizzes/${id}/`, data).then(handleResponse),
+    api.put<Quiz>(`/quizzes/${id}/`, data).then(handleResponse),
   submitQuiz: (quizId: number, answers: QuizSubmission[]) =>
     api.post<QuizAttempt>(`/quizzes/${quizId}/submit/`, { answers }).then(handleResponse),
   getQuizAttempts: (quizId: number) =>
@@ -446,11 +446,11 @@ export const announcementsApi = {
   getAnnouncements: (params?: Record<string, string | number | boolean>) =>
     api.get<PaginatedResponse<Announcement>>('/announcements/', { params }).then(handleResponse),
   createAnnouncement: (data: { title: string; content: string; priority: string; target_audience: string; is_pinned?: boolean }) =>
-    api.post<Announcement>('/announcements/', data).then(handleResponse),
+    api.post<Announcement>('/admin/announcements', data).then(handleResponse),
   updateAnnouncement: (id: number, data: Partial<{ title: string; content: string; priority: string; target_audience: string; is_pinned: boolean }>) =>
-    api.patch<Announcement>(`/announcements/${id}/`, data).then(handleResponse),
+    api.put<Announcement>(`/admin/announcements/${id}`, data).then(handleResponse),
   deleteAnnouncement: (id: number) =>
-    api.delete(`/announcements/${id}/`).then(handleResponse),
+    api.delete(`/admin/announcements/${id}`).then(handleResponse),
 };
 
 // Notifications
@@ -512,11 +512,11 @@ export const dashboardApi = {
 // Reports
 export const reportsApi = {
   getUserReport: (params?: Record<string, string | number | boolean>) =>
-    api.get<Record<string, unknown>>('/reports/users/', { params }).then(handleResponse),
+    api.get<Record<string, unknown>>('/admin/reports/users', { params }).then(handleResponse),
   getCourseReport: (params?: Record<string, string | number | boolean>) =>
-    api.get<Record<string, unknown>>('/reports/courses/', { params }).then(handleResponse),
+    api.get<Record<string, unknown>>('/admin/reports/courses', { params }).then(handleResponse),
   getEnrollmentReport: (params?: Record<string, string | number | boolean>) =>
-    api.get<Record<string, unknown>>('/reports/enrollments/', { params }).then(handleResponse),
+    api.get<Record<string, unknown>>('/admin/reports/enrollments', { params }).then(handleResponse),
 };
 
 // Student Assignments
@@ -604,7 +604,7 @@ export const reportsGeneratedApi = {
   generateReport: (data: { month: number; year: number }) =>
     api.post('/admin/reports/generated', data).then(r => handleResponse(r)),
   downloadReport: (id: number) =>
-    api.get(`/reports/download/${id}`, { responseType: 'blob' }).then(r => r.data),
+    api.get(`/admin/reports/download/${id}`, { responseType: 'blob' }).then(r => r.data),
   listGenerated: (params?: Record<string, string | number | boolean>) =>
     api.get('/admin/reports/generated', { params }).then(r => unwrapPage(r)),
 };
@@ -632,17 +632,17 @@ export const publicPortfolioApi = {
 // CRM Leads
 export const leadsApi = {
   getAll: (params?: Record<string, string | number | boolean>) =>
-    api.get('/crm/leads', { params }).then(r => unwrapPage(r)),
+    api.get('/admin/crm/leads', { params }).then(r => unwrapPage(r)),
   get: (id: number) =>
-    api.get(`/crm/leads/${id}`).then(r => handleResponse(r)),
+    api.get(`/admin/crm/leads/${id}`).then(r => handleResponse(r)),
   create: (data: Record<string, unknown>) =>
-    api.post('/crm/leads', data).then(r => handleResponse(r)),
+    api.post('/admin/crm/leads', data).then(r => handleResponse(r)),
   update: (id: number, data: Record<string, unknown>) =>
-    api.put(`/crm/leads/${id}`, data).then(r => handleResponse(r)),
+    api.put(`/admin/crm/leads/${id}`, data).then(r => handleResponse(r)),
   delete: (id: number) =>
-    api.delete(`/crm/leads/${id}`).then(handleResponse),
+    api.delete(`/admin/crm/leads/${id}`).then(handleResponse),
   changeStatus: (id: number, status: string) =>
-    api.put(`/crm/leads/${id}/status`, { status }).then(r => handleResponse(r)),
+    api.put(`/admin/crm/leads/${id}/status`, { status }).then(r => handleResponse(r)),
 };
 
 // Finance — expense approval

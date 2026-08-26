@@ -6,8 +6,10 @@ use App\Jobs\GenerateCertificateJob;
 use App\Jobs\SyncCourseProgressJob;
 use App\Models\Course;
 use App\Models\Enrollment;
+use App\Models\Invoice;
 use App\Models\Lesson;
 use App\Repositories\Interfaces\EnrollmentRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class EnrollmentService
@@ -36,6 +38,21 @@ class EnrollmentService
 
         if ($course->max_enrollments && $course->enrollments()->count() >= $course->max_enrollments) {
             throw new \Exception('This course has reached maximum enrollment capacity.');
+        }
+
+        if ((float) $course->price > 0) {
+            $student = \App\Models\Student::where('user_id', $userId)->first();
+
+            if ($student) {
+                $hasPaid = Invoice::where('student_id', $student->id)
+                    ->where('description', 'like', '%' . $course->title . '%')
+                    ->whereIn('status', ['paid'])
+                    ->exists();
+
+                if (!$hasPaid) {
+                    throw new \Exception('Payment is required before enrolling in this course.');
+                }
+            }
         }
 
         return $this->enrollmentRepository->create([
@@ -68,31 +85,33 @@ class EnrollmentService
             throw new \Exception('Not enrolled in this course.');
         }
 
-        $existingCompletion = \App\Models\LessonCompletion::where('user_id', $userId)
-            ->where('lesson_id', $lessonId)
-            ->first();
+        return DB::transaction(function () use ($userId, $lessonId, $lesson, $enrollment) {
+            $existingCompletion = \App\Models\LessonCompletion::where('user_id', $userId)
+                ->where('lesson_id', $lessonId)
+                ->first();
 
-        if (!$existingCompletion) {
-            \App\Models\LessonCompletion::create([
-                'user_id' => $userId,
-                'lesson_id' => $lessonId,
-                'enrollment_id' => $enrollment->id,
-                'completed_at' => now(),
-                'time_spent_minutes' => $lesson->duration_minutes,
-            ]);
-        }
+            if (!$existingCompletion) {
+                \App\Models\LessonCompletion::create([
+                    'user_id' => $userId,
+                    'lesson_id' => $lessonId,
+                    'enrollment_id' => $enrollment->id,
+                    'completed_at' => now(),
+                    'time_spent_minutes' => $lesson->duration_minutes,
+                ]);
+            }
 
-        $totalLessons = Lesson::where('course_id', $lesson->course_id)->count();
-        $completedLessons = \App\Models\LessonCompletion::where('user_id', $userId)
-            ->whereHas('lesson', function ($q) use ($lesson) {
-                $q->where('course_id', $lesson->course_id);
-            })->count();
+            $totalLessons = Lesson::where('course_id', $lesson->course_id)->count();
+            $completedLessons = \App\Models\LessonCompletion::where('user_id', $userId)
+                ->whereHas('lesson', function ($q) use ($lesson) {
+                    $q->where('course_id', $lesson->course_id);
+                })->count();
 
-        $progress = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100, 2) : 0;
+            $progress = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100, 2) : 0;
 
-        SyncCourseProgressJob::dispatch($enrollment->id, $progress);
+            SyncCourseProgressJob::dispatch($enrollment->id, $progress);
 
-        return $this->enrollmentRepository->updateProgress($enrollment->id, $progress);
+            return $this->enrollmentRepository->updateProgress($enrollment->id, $progress);
+        });
     }
 
     public function completeCourse(string $userId, int $courseId): Enrollment

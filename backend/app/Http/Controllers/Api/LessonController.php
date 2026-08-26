@@ -34,6 +34,7 @@ class LessonController extends Controller
     public function store(StoreLessonRequest $request, int $courseId): JsonResponse
     {
         $course = Course::findOrFail($courseId);
+        $this->authorize('update', $course);
 
         $lesson = $course->lessons()->create([
             'module_name' => $request->module_name,
@@ -66,6 +67,8 @@ class LessonController extends Controller
     public function update(UpdateLessonRequest $request, int $courseId, int $lessonId): JsonResponse
     {
         $lesson = Lesson::where('course_id', $courseId)->findOrFail($lessonId);
+        $course = Course::findOrFail($courseId);
+        $this->authorize('update', $course);
 
         $data = $request->validated();
         if (isset($data['title'])) {
@@ -83,6 +86,8 @@ class LessonController extends Controller
     public function destroy(int $courseId, int $lessonId): JsonResponse
     {
         $lesson = Lesson::where('course_id', $courseId)->findOrFail($lessonId);
+        $course = Course::findOrFail($courseId);
+        $this->authorize('delete', $course);
         $lesson->delete();
 
         return $this->noContentResponse('Lesson deleted successfully.');
@@ -90,6 +95,9 @@ class LessonController extends Controller
 
     public function reorder(Request $request, int $courseId): JsonResponse
     {
+        $course = Course::findOrFail($courseId);
+        $this->authorize('reorder', $course);
+
         $request->validate([
             'lesson_order' => ['required', 'array'],
             'lesson_order.*' => ['integer', 'exists:lessons,id'],

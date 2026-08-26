@@ -10,6 +10,7 @@ import { DialogRoot, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Di
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Spinner } from '@/components/ui/Spinner';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { ConfirmDelete } from '@/components/cms/ConfirmDelete';
 import { useTeacherClasses, useCreateClass, useDeleteClass } from '@/hooks/useTeacher';
 import type { ClassInput } from '@/types/teacher';
 
@@ -22,6 +23,7 @@ export default function TeacherClassesPage() {
   const deleteClass = useDeleteClass();
   const [form, setForm] = useState<ClassInput>({ name: '', subject: '', room: '', capacity: 30, status: 'active' });
   const [open, setOpen] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 
   const classes = data?.results ?? [];
 
@@ -103,7 +105,7 @@ export default function TeacherClassesPage() {
                           variant="ghost"
                           size="sm"
                           className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                          onClick={() => deleteClass.mutate(c.id)}
+                          onClick={() => setConfirmDeleteId(c.id)}
                         >
                           Delete
                         </Button>
@@ -121,6 +123,17 @@ export default function TeacherClassesPage() {
           )}
         </CardContent>
       </Card>
+
+      <ConfirmDelete
+        open={!!confirmDeleteId}
+        onOpenChange={() => setConfirmDeleteId(null)}
+        title="Delete Class"
+        description="Are you sure you want to delete this class? This action cannot be undone."
+        loading={deleteClass.isPending}
+        onConfirm={() => {
+          if (confirmDeleteId) deleteClass.mutate(confirmDeleteId, { onSettled: () => setConfirmDeleteId(null) });
+        }}
+      />
     </div>
   );
 }

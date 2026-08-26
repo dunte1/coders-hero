@@ -32,6 +32,7 @@ import {
 import { Bot, MessageSquare, Coins, Plus, Pencil, Trash2, Wand2 } from 'lucide-react';
 import type { AiAssistant, AiPromptTemplate, AiUsageLogEntry } from '@/types/ai';
 import { formatDateTime } from '@/lib/utils';
+import { ConfirmDelete } from '@/components/cms/ConfirmDelete';
 
 interface AssistantForm {
   name: string;
@@ -84,6 +85,8 @@ export default function AiAdminPage() {
   const [editingTemplate, setEditingTemplate] = useState<AiPromptTemplate | null>(null);
   const [templateForm, setTemplateForm] = useState<TemplateForm>(emptyTemplate);
   const [usagePage, setUsagePage] = useState(1);
+  const [confirmDeleteAssistantId, setConfirmDeleteAssistantId] = useState<number | null>(null);
+  const [confirmDeleteTemplateId, setConfirmDeleteTemplateId] = useState<number | null>(null);
 
   const usage = useAdminAiUsage({ page: usagePage, per_page: 15 });
   const { data: assistantsData, isLoading: assistantsLoading } = useAdminAiAssistants({ per_page: 50 });
@@ -214,9 +217,7 @@ export default function AiAdminPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => {
-              if (window.confirm(`Delete assistant "${a.name}"?`)) deleteAssistant.mutate(a.id);
-            }}
+            onClick={() => setConfirmDeleteAssistantId(a.id)}
           >
             <Trash2 className="h-4 w-4 text-red-600" />
           </Button>
@@ -254,9 +255,7 @@ export default function AiAdminPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => {
-              if (window.confirm(`Delete template "${t.name}"?`)) deleteTemplate.mutate(t.id);
-            }}
+            onClick={() => setConfirmDeleteTemplateId(t.id)}
           >
             <Trash2 className="h-4 w-4 text-red-600" />
           </Button>
@@ -494,6 +493,27 @@ export default function AiAdminPage() {
           </DialogFooter>
         </DialogContent>
       </DialogRoot>
+
+      <ConfirmDelete
+        open={!!confirmDeleteAssistantId}
+        onOpenChange={() => setConfirmDeleteAssistantId(null)}
+        title="Delete Assistant"
+        description="Are you sure you want to delete this assistant?"
+        loading={deleteAssistant.isPending}
+        onConfirm={() => {
+          if (confirmDeleteAssistantId) deleteAssistant.mutate(confirmDeleteAssistantId, { onSettled: () => setConfirmDeleteAssistantId(null) });
+        }}
+      />
+      <ConfirmDelete
+        open={!!confirmDeleteTemplateId}
+        onOpenChange={() => setConfirmDeleteTemplateId(null)}
+        title="Delete Template"
+        description="Are you sure you want to delete this template?"
+        loading={deleteTemplate.isPending}
+        onConfirm={() => {
+          if (confirmDeleteTemplateId) deleteTemplate.mutate(confirmDeleteTemplateId, { onSettled: () => setConfirmDeleteTemplateId(null) });
+        }}
+      />
     </div>
   );
 }

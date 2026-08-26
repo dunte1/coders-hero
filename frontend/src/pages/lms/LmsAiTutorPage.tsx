@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Bot, Send, Plus, Trash2 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -22,6 +22,7 @@ import type { AiTutorMessage } from '@/types/lms';
 
 export default function LmsAiTutorPage() {
   const { conversationId } = useParams<{ conversationId?: string }>();
+  const navigate = useNavigate();
   const [listOpen, setListOpen] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const { data: conversationsData, isLoading: listLoading } = useTutorConversations({ per_page: 50 });
@@ -42,7 +43,7 @@ export default function LmsAiTutorPage() {
         onSuccess: (data) => {
           setCreateOpen(false);
           setNewTitle('');
-          window.location.href = `/lms/ai-tutor/conversations/${data.id}`;
+          navigate(`/lms/ai-tutor/conversations/${data.id}`);
         },
       }
     );
@@ -95,7 +96,7 @@ export default function LmsAiTutorPage() {
                 variant="ghost"
                 size="sm"
                 className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                onClick={() => deleteConversation.mutate(conversation.id, { onSuccess: () => (window.location.href = '/lms/ai-tutor') })}
+                onClick={() => deleteConversation.mutate(conversation.id, { onSuccess: () => navigate('/lms/ai-tutor') })}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>

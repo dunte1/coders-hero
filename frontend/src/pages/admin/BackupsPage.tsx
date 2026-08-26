@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { ConfirmDelete } from '@/components/cms/ConfirmDelete';
 import { Download, Plus, RefreshCw, Trash2, Database, FileArchive } from 'lucide-react';
 import { toast } from 'sonner';
 import type { BackupItem } from '@/lib/adminApi';
@@ -15,11 +16,10 @@ export default function BackupsPage() {
   const createBackup = useCreateBackup();
   const deleteBackup = useDeleteBackup();
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [confirmDeleteName, setConfirmDeleteName] = useState<string | null>(null);
 
   const handleDelete = (name: string) => {
-    if (!window.confirm(`Delete backup "${name}"? This cannot be undone.`)) return;
-    setDeleting(name);
-    deleteBackup.mutate(name, { onSettled: () => setDeleting(null) });
+    setConfirmDeleteName(name);
   };
 
   const columns: Column<BackupItem>[] = [
@@ -99,6 +99,20 @@ export default function BackupsPage() {
           )}
         />
       )}
+
+      <ConfirmDelete
+        open={!!confirmDeleteName}
+        onOpenChange={() => setConfirmDeleteName(null)}
+        title="Delete Backup"
+        description={`Delete backup "${confirmDeleteName}"? This cannot be undone.`}
+        loading={deleteBackup.isPending}
+        onConfirm={() => {
+          if (confirmDeleteName) {
+            setDeleting(confirmDeleteName);
+            deleteBackup.mutate(confirmDeleteName, { onSettled: () => { setDeleting(null); setConfirmDeleteName(null); } });
+          }
+        }}
+      />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useFinanceSummary, useExpensesByCategory } from '@/hooks/useFinance';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageSpinner } from '@/components/ui/Spinner';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { StatsCard } from '@/components/ui/StatsCard';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -33,10 +34,16 @@ const sections = [
 
 export default function FinanceOverviewPage() {
   const navigate = useNavigate();
-  const { data: summary, isLoading } = useFinanceSummary();
+  const { data: summary, isLoading, isError } = useFinanceSummary();
   const { data: categories } = useExpensesByCategory();
 
   if (isLoading) return <PageSpinner />;
+  if (isError || !summary) return (
+    <div className="space-y-6">
+      <PageHeader title="Finance" description="Invoicing, collections, expenses and M-Pesa reconciliation" breadcrumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Finance' }]} />
+      <EmptyState title="Could not load finance data" description="Please try again later." />
+    </div>
+  );
 
   const budgetUtilization = summary?.budget_utilization ?? 0;
 

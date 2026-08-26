@@ -4,6 +4,8 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { PageSpinner } from '@/components/ui/Spinner';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { Card, CardContent } from '@/components/ui/Card';
+import { ConfirmDelete } from '@/components/cms/ConfirmDelete';
+import { Pagination } from '@/components/ui/Pagination';
 import {
   useNotifications,
   useMarkNotificationRead,
@@ -26,9 +28,11 @@ const categoryTabs: Array<{ value: string; label: string }> = [
 export default function NotificationsPage() {
   const [tab, setTab] = useState('all');
   const [showUnreadOnly, setShowUnreadOnly] = useState(false);
+  const [page, setPage] = useState(1);
 
   const { data, isLoading } = useNotifications({
-    per_page: 50,
+    page,
+    per_page: 20,
     category: tab === 'all' ? undefined : tab,
     is_read: showUnreadOnly ? false : undefined,
   });
@@ -38,7 +42,10 @@ export default function NotificationsPage() {
   const markAllRead = useMarkAllNotificationsRead();
   const deleteNotification = useDeleteNotification();
 
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const notifications = data?.results ?? [];
+  const totalPages = data?.meta?.last_page ?? 1;
+  const totalCount = data?.meta?.total ?? 0;
 
   const handleMarkRead = (id: string) => {
     markRead.mutate(id);
@@ -49,7 +56,7 @@ export default function NotificationsPage() {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm('Delete this notification?')) deleteNotification.mutate(id);
+    setConfirmDeleteId(id);
   };
 
   return (
@@ -61,7 +68,7 @@ export default function NotificationsPage() {
       />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Tabs value={tab} onValueChange={setTab}>
+        <Tabs value={tab} onValueChange={(v) => { setTab(v); setPage(1); }}>
           <TabsList className="flex-wrap">
             {categoryTabs.map((t) => (
               <TabsTrigger key={t.value} value={t.value}>
@@ -74,7 +81,7 @@ export default function NotificationsPage() {
           <input
             type="checkbox"
             checked={showUnreadOnly}
-            onChange={(e) => setShowUnreadOnly(e.target.checked)}
+            onChange={(e) => { setShowUnreadOnly(e.target.checked); setPage(1); }}
             className="h-4 w-4 rounded border-slate-300 text-brand-600"
           />
           Unread only
@@ -97,6 +104,29 @@ export default function NotificationsPage() {
           )}
         </CardContent>
       </Card>
+
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          totalCount={totalCount}
+          pageSize={20}
+        />
+      )}
+
+      <ConfirmDelete
+        open={!!confirmDeleteId}
+        onOpenChange={() => setConfirmDeleteId(null)}
+        title="Delete Notification"
+        description="Are you sure you want to delete this notification?"
+        loading={deleteNotification.isPending}
+        onConfirm={() => {
+          if (confirmDeleteId) {
+            deleteNotification.mutate(confirmDeleteId, { onSettled: () => setConfirmDeleteId(null) });
+          }
+        }}
+      />
     </div>
   );
 }

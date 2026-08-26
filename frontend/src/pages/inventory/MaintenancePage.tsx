@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/Label';
 import { Textarea } from '@/components/ui/Textarea';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { ConfirmDelete } from '@/components/cms/ConfirmDelete';
 import {
   DialogRoot,
   DialogContent,
@@ -52,6 +53,7 @@ export default function MaintenancePage() {
   const [editing, setEditing] = useState<AssetMaintenanceRecord | null>(null);
   const [form, setForm] = useState<MaintenanceInput>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<AssetMaintenanceRecord | null>(null);
 
   const { data, isLoading } = useMaintenanceRecords({ page, status });
   const createMaintenance = useCreateMaintenance();
@@ -95,8 +97,7 @@ export default function MaintenancePage() {
   };
 
   const handleDelete = async (r: AssetMaintenanceRecord) => {
-    if (!window.confirm('Delete this maintenance record?')) return;
-    await deleteMaintenance.mutateAsync(r.id);
+    setDeleteTarget(r);
   };
 
   const columns: Column<AssetMaintenanceRecord>[] = [
@@ -197,6 +198,17 @@ export default function MaintenancePage() {
           </DialogFooter>
         </DialogContent>
       </DialogRoot>
+
+      <ConfirmDelete
+        open={!!deleteTarget}
+        onOpenChange={() => setDeleteTarget(null)}
+        title="Delete Maintenance Record"
+        description="Are you sure you want to delete this maintenance record? This action cannot be undone."
+        loading={deleteMaintenance.isPending}
+        onConfirm={() => {
+          if (deleteTarget) deleteMaintenance.mutate(deleteTarget.id);
+        }}
+      />
     </div>
   );
 }

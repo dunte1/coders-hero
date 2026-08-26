@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { Badge } from '@/components/ui/Badge';
+import { ConfirmDelete } from '@/components/cms/ConfirmDelete';
 import {
   DialogRoot,
   DialogContent,
@@ -28,6 +29,7 @@ export default function LocationsPage() {
   const [editing, setEditing] = useState<Location | null>(null);
   const [form, setForm] = useState<LocationInput>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Location | null>(null);
 
   const { data, isLoading } = useInventoryLocations({ page });
   const createLocation = useCreateLocation();
@@ -64,8 +66,7 @@ export default function LocationsPage() {
   };
 
   const handleDelete = async (l: Location) => {
-    if (!window.confirm(`Delete location "${l.name}"?`)) return;
-    await deleteLocation.mutateAsync(l.id);
+    setDeleteTarget(l);
   };
 
   const columns: Column<Location>[] = [
@@ -146,6 +147,17 @@ export default function LocationsPage() {
           </DialogFooter>
         </DialogContent>
       </DialogRoot>
+
+      <ConfirmDelete
+        open={!!deleteTarget}
+        onOpenChange={() => setDeleteTarget(null)}
+        title="Delete Location"
+        description={`Are you sure you want to delete "${deleteTarget?.name}"? This action cannot be undone.`}
+        loading={deleteLocation.isPending}
+        onConfirm={() => {
+          if (deleteTarget) deleteLocation.mutate(deleteTarget.id);
+        }}
+      />
     </div>
   );
 }

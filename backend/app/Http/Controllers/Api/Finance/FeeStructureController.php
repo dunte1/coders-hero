@@ -16,6 +16,8 @@ class FeeStructureController extends Controller
 
     public function index(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', FeeStructure::class);
+
         $structures = FeeStructure::query()
             ->with('createdBy:id,name')
             ->when(($request->get('fee_type')) && ($request->get('fee_type') !== 'all'), fn ($q, $v) => $q->where('fee_type', $v))
@@ -29,6 +31,8 @@ class FeeStructureController extends Controller
 
     public function store(StoreFeeStructureRequest $request): JsonResponse
     {
+        $this->authorize('create', FeeStructure::class);
+
         $structure = FeeStructure::create(array_merge(
             $request->validated(),
             ['created_by_user_id' => auth()->id()]
@@ -45,6 +49,8 @@ class FeeStructureController extends Controller
             return $this->notFoundResponse('Fee structure not found.');
         }
 
+        $this->authorize('view', $structure);
+
         return $this->successResponse($structure, 'Fee structure retrieved successfully.');
     }
 
@@ -55,6 +61,8 @@ class FeeStructureController extends Controller
         if (!$structure) {
             return $this->notFoundResponse('Fee structure not found.');
         }
+
+        $this->authorize('update', $structure);
 
         $structure->update($request->validated());
 
@@ -68,6 +76,8 @@ class FeeStructureController extends Controller
         if (!$structure) {
             return $this->notFoundResponse('Fee structure not found.');
         }
+
+        $this->authorize('delete', $structure);
 
         if ($structure->invoices()->exists()) {
             return $this->errorResponse('Fee structures with generated invoices cannot be deleted.', 422);

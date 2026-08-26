@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Pin, Lock, Trash2, Reply } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -44,6 +44,7 @@ function renderReply(
 export default function LmsForumThreadPage() {
   const { id } = useParams<{ id: string }>();
   const threadId = Number(id);
+  const navigate = useNavigate();
   const { data: thread, isLoading } = useForumThread(threadId);
   const createPost = useCreatePost(threadId);
   const deleteThread = useDeleteThread();
@@ -74,7 +75,7 @@ export default function LmsForumThreadPage() {
             <Button
               variant="destructive"
               size="sm"
-              onClick={() => deleteThread.mutate(threadId, { onSuccess: () => (window.location.href = '/lms/forum') })}
+              onClick={() => deleteThread.mutate(threadId, { onSuccess: () => navigate('/lms/forum') })}
             >
               <Trash2 className="mr-1 h-4 w-4" />Delete
             </Button>

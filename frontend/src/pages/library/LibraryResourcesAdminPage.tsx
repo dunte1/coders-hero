@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/Label';
 import { Textarea } from '@/components/ui/Textarea';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { Badge } from '@/components/ui/Badge';
+import { ConfirmDelete } from '@/components/cms/ConfirmDelete';
 import {
   DialogRoot,
   DialogContent,
@@ -78,6 +79,7 @@ export default function LibraryResourcesAdminPage() {
   const [form, setForm] = useState<ResourceForm>(emptyForm);
   const [file, setFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<LibraryResource | null>(null);
 
   const { data, isLoading } = useLibraryResources({ page, search, type });
   const createResource = useCreateResource();
@@ -140,8 +142,7 @@ export default function LibraryResourcesAdminPage() {
   };
 
   const handleDelete = async (r: LibraryResource) => {
-    if (!window.confirm(`Delete resource "${r.title}"?`)) return;
-    await deleteResource.mutateAsync(r.id);
+    setDeleteTarget(r);
   };
 
   const columns: Column<LibraryResource>[] = [
@@ -334,6 +335,17 @@ export default function LibraryResourcesAdminPage() {
           </DialogFooter>
         </DialogContent>
       </DialogRoot>
+
+      <ConfirmDelete
+        open={!!deleteTarget}
+        onOpenChange={() => setDeleteTarget(null)}
+        title="Delete Resource"
+        description={`Are you sure you want to delete "${deleteTarget?.title}"? This action cannot be undone.`}
+        loading={deleteResource.isPending}
+        onConfirm={() => {
+          if (deleteTarget) deleteResource.mutate(deleteTarget.id);
+        }}
+      />
     </div>
   );
 }

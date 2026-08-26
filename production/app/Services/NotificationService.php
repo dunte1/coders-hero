@@ -25,22 +25,28 @@ class NotificationService
 
     public function sendToMultiple(array $userIds, string $title, string $body, string $type = 'general'): void
     {
-        foreach ($userIds as $userId) {
-            $this->send($userId, $title, $body, $type);
+        $now = now();
+        $chunks = array_chunk($userIds, 1000);
+
+        foreach ($chunks as $chunk) {
+            $records = array_map(fn(string $userId) => [
+                'type' => $type,
+                'notifiable_type' => User::class,
+                'notifiable_id' => $userId,
+                'data' => json_encode(['title' => $title, 'body' => $body]),
+                'created_at' => $now,
+                'updated_at' => $now,
+            ], $chunk);
+
+            Notification::insert($records);
         }
     }
 
     public function sendToRole(string $roleName, string $title, string $body, string $type = 'general'): int
     {
-        $users = User::role($roleName)->pluck('id');
-        $count = 0;
-
-        foreach ($users as $userId) {
-            $this->send($userId, $title, $body, $type);
-            $count++;
-        }
-
-        return $count;
+        $userIds = User::role($roleName)->pluck('id')->toArray();
+        $this->sendToMultiple($userIds, $title, $body, $type);
+        return count($userIds);
     }
 
     public function getAll(string $userId, int $perPage = 15, array $filters = [])

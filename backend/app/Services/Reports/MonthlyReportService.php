@@ -79,7 +79,7 @@ class MonthlyReportService
 
         $totalCollected = Payment::whereBetween('paid_at', [$start, $end])->sum('amount');
         $totalInvoices = Invoice::whereBetween('created_at', [$start, $end])->sum('amount');
-        $paidInvoices = Invoice::where('status', 'paid')->whereBetween('paid_at', [$start, $end])->count();
+        $paidInvoices = Payment::whereBetween('paid_at', [$start, $end])->distinct('invoice_id')->count('invoice_id');
         $totalInvoicesCount = Invoice::whereBetween('created_at', [$start, $end])->count();
         $outstandingBalance = Invoice::whereIn('status', ['issued', 'partial', 'overdue'])->sum(DB::raw('amount - paid_amount'));
 

@@ -34,6 +34,7 @@ import {
   useAiGenerate,
   useAiMyUsage,
 } from '@/hooks/useAi';
+import { ConfirmDelete } from '@/components/cms/ConfirmDelete';
 import type { AiAssistant, AiMessage, AiPromptTemplate } from '@/types/ai';
 
 const ASSISTANT_ICONS: Record<string, typeof Bot> = {
@@ -92,6 +93,7 @@ export default function AiPlatformPage() {
   const [toolResult, setToolResult] = useState('');
   const [toolLoading, setToolLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const [confirmDeleteConversation, setConfirmDeleteConversation] = useState(false);
 
   const { data: assistants = [] } = useAiAssistants();
   const { data: conversationsData } = useAiConversations({ per_page: 50 });
@@ -321,11 +323,7 @@ export default function AiPlatformPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => {
-                        if (window.confirm('Delete this conversation?')) {
-                          deleteConversation.mutate(Number(conversationId), { onSuccess: () => navigate('/ai') });
-                        }
-                      }}
+                      onClick={() => setConfirmDeleteConversation(true)}
                     >
                       <Trash2 className="h-4 w-4 text-red-600" />
                     </Button>
@@ -404,6 +402,17 @@ export default function AiPlatformPage() {
           </Card>
         </div>
       </div>
+
+      <ConfirmDelete
+        open={confirmDeleteConversation}
+        onOpenChange={setConfirmDeleteConversation}
+        title="Delete Conversation"
+        description="Are you sure you want to delete this conversation?"
+        loading={deleteConversation.isPending}
+        onConfirm={() => {
+          deleteConversation.mutate(Number(conversationId), { onSuccess: () => navigate('/ai') });
+        }}
+      />
 
       <DialogRoot open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent>

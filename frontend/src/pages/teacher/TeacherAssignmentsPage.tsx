@@ -10,6 +10,7 @@ import { SelectRoot, SelectTrigger, SelectContent, SelectItem, SelectValue } fro
 import { DialogRoot, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/Dialog';
 import { DataTable } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { ConfirmDelete } from '@/components/cms/ConfirmDelete';
 import { formatDate } from '@/lib/utils';
 import {
   useTeacherAssignments,
@@ -34,6 +35,7 @@ export default function TeacherAssignmentsPage() {
   const closeAssignment = useCloseAssignment();
   const deleteAssignment = useDeleteAssignment();
   const [open, setOpen] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
   const [form, setForm] = useState<AssignmentInput>({ title: '', description: '', max_score: 100, status: 'draft', type: 'homework' });
 
   const assignments = data?.results ?? [];
@@ -177,7 +179,7 @@ export default function TeacherAssignmentsPage() {
                   size="sm"
                   variant="ghost"
                   className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                  onClick={() => deleteAssignment.mutate(a.id)}
+                  onClick={() => setConfirmDeleteId(a.id)}
                 >
                   Delete
                 </Button>
@@ -186,6 +188,17 @@ export default function TeacherAssignmentsPage() {
           />
         </CardContent>
       </Card>
+
+      <ConfirmDelete
+        open={!!confirmDeleteId}
+        onOpenChange={() => setConfirmDeleteId(null)}
+        title="Delete Assignment"
+        description="Are you sure you want to delete this assignment and its submissions?"
+        loading={deleteAssignment.isPending}
+        onConfirm={() => {
+          if (confirmDeleteId) deleteAssignment.mutate(confirmDeleteId, { onSettled: () => setConfirmDeleteId(null) });
+        }}
+      />
     </div>
   );
 }

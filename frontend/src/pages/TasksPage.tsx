@@ -4,6 +4,7 @@ import { useTasks, useChangeTaskStatus } from '@/hooks/useTasks';
 import { TaskBoard } from '@/components/features/tasks/TaskBoard';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageSpinner } from '@/components/ui/Spinner';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/Button';
 import { LayoutGrid, List } from 'lucide-react';
 import { DataTable, type Column } from '@/components/ui/DataTable';
@@ -14,7 +15,7 @@ import type { Task } from '@/types';
 export default function TasksPage() {
   const navigate = useNavigate();
   const [view, setView] = useState<'board' | 'list'>('board');
-  const { data, isLoading } = useTasks();
+  const { data, isLoading, isError } = useTasks();
   const changeStatus = useChangeTaskStatus();
 
   const tasks = data?.results || [];
@@ -71,6 +72,8 @@ export default function TasksPage() {
 
       {isLoading ? (
         <PageSpinner />
+      ) : isError ? (
+        <EmptyState title="Could not load tasks" description="Please try again later." />
       ) : view === 'board' ? (
         <TaskBoard
           tasks={tasks}

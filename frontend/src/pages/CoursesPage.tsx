@@ -34,7 +34,7 @@ export default function CoursesPage() {
     return p;
   }, [debouncedSearch, level, category, status]);
 
-  const { data, isLoading } = useCourses(params);
+  const { data, isLoading, isError } = useCourses(params);
   const { data: categories } = useQuery({
     queryKey: ['categories'],
     queryFn: categoriesApi.getCategories,
@@ -88,6 +88,11 @@ export default function CoursesPage() {
 
       {isLoading ? (
         <PageSpinner />
+      ) : isError ? (
+        <EmptyState
+          title="Could not load courses"
+          description="Please try again later."
+        />
       ) : !data?.results || data.results.length === 0 ? (
         <EmptyState
           title="No courses found"

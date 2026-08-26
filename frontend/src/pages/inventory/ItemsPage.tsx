@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/Label';
 import { Textarea } from '@/components/ui/Textarea';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { Badge } from '@/components/ui/Badge';
+import { ConfirmDelete } from '@/components/cms/ConfirmDelete';
 import {
   DialogRoot,
   DialogContent,
@@ -64,6 +65,7 @@ export default function ItemsPage() {
   const [editing, setEditing] = useState<InventoryItem | null>(null);
   const [form, setForm] = useState<InventoryItemInput>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<InventoryItem | null>(null);
 
   const [movementOpen, setMovementOpen] = useState(false);
   const [movementItem, setMovementItem] = useState<InventoryItem | null>(null);
@@ -120,8 +122,7 @@ export default function ItemsPage() {
   };
 
   const handleDelete = async (item: InventoryItem) => {
-    if (!window.confirm(`Delete stock item "${item.name}"?`)) return;
-    await deleteItem.mutateAsync(item.id);
+    setDeleteTarget(item);
   };
 
   const openMovement = (item: InventoryItem) => {
@@ -326,6 +327,17 @@ export default function ItemsPage() {
           </DialogFooter>
         </DialogContent>
       </DialogRoot>
+
+      <ConfirmDelete
+        open={!!deleteTarget}
+        onOpenChange={() => setDeleteTarget(null)}
+        title="Delete Stock Item"
+        description={`Are you sure you want to delete "${deleteTarget?.name}"? This action cannot be undone.`}
+        loading={deleteItem.isPending}
+        onConfirm={() => {
+          if (deleteTarget) deleteItem.mutate(deleteTarget.id);
+        }}
+      />
     </div>
   );
 }

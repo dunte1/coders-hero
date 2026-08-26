@@ -10,6 +10,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LogActivity
 {
+    private const SENSITIVE_FIELDS = [
+        'password', 'password_confirmation', 'current_password',
+        'amount', 'phone', 'email', 'national_id', 'bank_account_number',
+        'medical_conditions', 'medical_notes', 'medical_allergies',
+        'two_factor_secret', 'two_factor_recovery_codes',
+        'private_key', 'secret', 'token',
+    ];
+
     public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);
@@ -27,7 +35,7 @@ class LogActivity
                 ];
 
                 if ($request->isMethod('POST') || $request->isMethod('PUT') || $request->isMethod('PATCH')) {
-                    $data['request_data'] = collect($request->except(['password', 'password_confirmation', 'current_password']))->toArray();
+                    $data['request_data'] = collect($request->except(self::SENSITIVE_FIELDS))->toArray();
                 }
 
                 Log::channel('activity')->info('User activity', $data);

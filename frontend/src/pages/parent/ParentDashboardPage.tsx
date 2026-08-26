@@ -82,7 +82,7 @@ export default function ParentDashboardPage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatsCard icon={GraduationCap} title="My Children" value={students.length} />
-        <StatsCard icon={Wallet} title="Outstanding Fees" value={`$${outstanding.toFixed(2)}`} />
+        <StatsCard icon={Wallet} title="Outstanding Fees" value={`KSh ${outstanding.toFixed(2)}`} />
         <StatsCard icon={CalendarCheck} title="Upcoming Appointments" value={upcoming} />
         <StatsCard icon={Bell} title="Unread Notifications" value={unread} />
       </div>

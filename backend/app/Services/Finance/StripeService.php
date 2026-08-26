@@ -91,9 +91,10 @@ class StripeService
         }
 
         $webhookSecret = config('stripe.webhook_secret');
-        if ($webhookSecret) {
-            $this->verifyWebhookSignature($payload, $sigHeader, $webhookSecret);
+        if (!$webhookSecret) {
+            throw new \RuntimeException('Stripe webhook secret is not configured.', 500);
         }
+        $this->verifyWebhookSignature($payload, $sigHeader, $webhookSecret);
 
         $type = $payload['type'] ?? '';
         $data = $payload['data']['object'] ?? [];
@@ -110,7 +111,7 @@ class StripeService
             return;
         }
 
-        $invoice = Invoice::find($invoiceId);
+        $invoice = Invoice::lockForUpdate()->find($invoiceId);
         if (!$invoice) {
             return;
         }
@@ -141,12 +142,21 @@ class StripeService
             ]);
         }
 
+        $paymentRef = $session['payment_intent'] ?? $session['id'];
+        $alreadyPaid = \App\Models\Payment::where('invoice_id', $invoiceId)
+            ->where('reference', $paymentRef)
+            ->exists();
+
+        if ($alreadyPaid) {
+            return;
+        }
+
         $payment = \App\Models\Payment::create([
             'invoice_id' => $invoiceId,
             'receipt_no' => 'STRIPE-' . strtoupper(Str::random(10)),
             'amount' => $transaction->amount,
             'method' => 'card',
-            'reference' => $session['payment_intent'] ?? $session['id'],
+            'reference' => $paymentRef,
             'paid_at' => now()->toDateString(),
             'paid_by_user_id' => $transaction->user_id,
         ]);

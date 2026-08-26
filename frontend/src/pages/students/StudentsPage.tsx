@@ -40,7 +40,7 @@ export default function StudentsPage() {
     return p;
   }, [page, debouncedSearch, status, grade]);
 
-  const { data, isLoading } = useStudents(params);
+  const { data, isLoading, isError } = useStudents(params);
   const deleteMutation = useDeleteStudent();
 
   const exportParams = {
@@ -150,6 +150,11 @@ export default function StudentsPage() {
         }
       />
 
+      {isError ? (
+        <div className="text-center py-12 text-slate-500">
+          <p>Could not load students. Please try again later.</p>
+        </div>
+      ) : (
       <DataTable
         columns={columns}
         data={data?.results || []}
@@ -247,6 +252,7 @@ export default function StudentsPage() {
           </div>
         )}
       />
+      )}
 
       <ConfirmDelete
         open={!!deleteId}

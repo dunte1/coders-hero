@@ -3,6 +3,7 @@
 namespace App\Services\Notifications;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 use RuntimeException;
 use Throwable;
 
@@ -26,6 +27,15 @@ class FcmGateway
             return $serverKey;
         }
 
+        $cacheKey = 'fcm_access_token';
+
+        return Cache::remember($cacheKey, 3500, function () {
+            return $this->generateAccessToken();
+        });
+    }
+
+    private function generateAccessToken(): ?string
+    {
         $credentialsFile = config('notifications.fcm.credentials_file');
         if (!is_string($credentialsFile) || !is_file($credentialsFile)) {
             return null;

@@ -143,17 +143,17 @@ export const lmsApi = {
 
   // Coding leaderboard
   codingLeaderboardForExercise: (exerciseId: number) =>
-    api.get<{ data: CodingLeaderboardForExercise }>(`/lms/coding-leaderboard/for-exercise/${exerciseId}`).then(unwrap<CodingLeaderboardForExercise>),
+    api.get<{ data: CodingLeaderboardForExercise }>(`/coding-leaderboard/for-exercise/${exerciseId}`).then(unwrap<CodingLeaderboardForExercise>),
 
   codingLeaderboardForCourse: (courseId: number) =>
-    api.get<{ data: CodingLeaderboardForCourse }>(`/lms/coding-leaderboard/for-course/${courseId}`).then(unwrap<CodingLeaderboardForCourse>),
+    api.get<{ data: CodingLeaderboardForCourse }>(`/coding-leaderboard/for-course/${courseId}`).then(unwrap<CodingLeaderboardForCourse>),
 
   // Coding AI
   codingHint: (data: { code: string; error_message: string }) =>
-    api.post<{ data: CodingAiResult }>('/lms/coding-ai/hint', data).then(unwrap<CodingAiResult>),
+    api.post<{ data: CodingAiResult }>('/coding-ai/hint', data).then(unwrap<CodingAiResult>),
 
   codingDebug: (data: { code: string; error_output: string }) =>
-    api.post<{ data: CodingAiResult }>('/lms/coding-ai/debug', data).then(unwrap<CodingAiResult>),
+    api.post<{ data: CodingAiResult }>('/coding-ai/debug', data).then(unwrap<CodingAiResult>),
 };
 
 export type { AiTutorMessage };

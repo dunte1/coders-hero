@@ -17,8 +17,8 @@ class NotificationTemplateService
         foreach ($data as $key => $value) {
             $placeholder = '{{' . $key . '}}';
             $replacement = is_scalar($value) || $value === null
-                ? (string) $value
-                : (is_array($value) ? json_encode($value) : (string) $value);
+                ? e((string) $value)
+                : (is_array($value) ? e(json_encode($value)) : e((string) $value));
 
             if (str_contains((string) $subject, $placeholder)) {
                 $subject = str_replace($placeholder, $replacement, (string) $subject);

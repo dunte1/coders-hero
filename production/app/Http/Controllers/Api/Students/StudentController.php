@@ -183,10 +183,10 @@ class StudentController extends Controller
         $this->authorize('uploadPhoto', $student);
 
         $validated = $request->validate([
-            'photo' => ['required'],
+            'photo' => ['required', 'image', 'max:5120'],
         ]);
 
-        $photo = $request->file('photo') ?? $validated['photo'];
+        $photo = $request->file('photo');
 
         $student = $this->studentService->uploadPhoto($student, $photo);
 

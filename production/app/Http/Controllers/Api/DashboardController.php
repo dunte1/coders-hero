@@ -42,14 +42,14 @@ class DashboardController extends Controller
         $stats = [];
 
         if ($user->hasAnyRole(['admin', 'super_admin', 'director', 'branch_manager', 'school_admin', 'accountant'])) {
-            $stats = $this->dashboardService->getAdminDashboard()['overview'];
+            $stats = $this->dashboardService->getAdminStats($user->id);
         } elseif ($user->hasRole('instructor')) {
-            $stats = $this->dashboardService->getInstructorDashboard($user->id)['overview'];
+            $stats = $this->dashboardService->getInstructorStats($user->id);
         } elseif ($user->hasRole('employee')) {
-            $stats = $this->dashboardService->getEmployeeDashboard($user->id)['overview'];
+            $stats = $this->dashboardService->getEmployeeStats($user->id);
             $stats['task_stats'] = $this->taskService->getDashboardStats($user->id);
         } else {
-            $stats = $this->dashboardService->getStudentDashboard($user->id)['overview'];
+            $stats = $this->dashboardService->getStudentStats($user->id);
         }
 
         return $this->successResponse($stats, 'Dashboard stats retrieved successfully.');

@@ -23,6 +23,7 @@ import {
   DialogFooter,
 } from '@/components/ui/Dialog';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { ConfirmDelete } from '@/components/cms/ConfirmDelete';
 import type { NotificationCategory, NotificationChannel, NotificationTemplate } from '@/types';
 import { formatDateTime } from '@/lib/utils';
 
@@ -60,6 +61,7 @@ export default function NotificationTemplatesAdminPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<NotificationTemplate | null>(null);
   const [form, setForm] = useState<TemplateForm>(emptyTemplate);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 
   const openCreate = () => {
     setEditing(null);
@@ -151,9 +153,7 @@ export default function NotificationTemplatesAdminPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => {
-              if (window.confirm(`Delete template "${t.name}"?`)) deleteTemplate.mutate(t.id);
-            }}
+            onClick={() => setConfirmDeleteId(t.id)}
           >
             <Trash2 className="h-4 w-4 text-red-600" />
           </Button>
@@ -191,6 +191,17 @@ export default function NotificationTemplatesAdminPage() {
           />
         </CardContent>
       </Card>
+
+      <ConfirmDelete
+        open={!!confirmDeleteId}
+        onOpenChange={() => setConfirmDeleteId(null)}
+        title="Delete Template"
+        description="Are you sure you want to delete this template?"
+        loading={deleteTemplate.isPending}
+        onConfirm={() => {
+          if (confirmDeleteId) deleteTemplate.mutate(confirmDeleteId, { onSettled: () => setConfirmDeleteId(null) });
+        }}
+      />
 
       <DialogRoot open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-2xl">

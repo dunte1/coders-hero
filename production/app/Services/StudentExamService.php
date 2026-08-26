@@ -93,12 +93,14 @@ class StudentExamService
             return null;
         }
 
-        $existingSubmitted = ExamAttempt::where('exam_id', $id)
+        $existingSubmittedCount = ExamAttempt::where('exam_id', $id)
             ->where('student_id', $student->id)
             ->where('status', 'submitted')
-            ->exists();
+            ->count();
 
-        if ($existingSubmitted) {
+        $maxAttempts = $exam->max_attempts ?? 1;
+
+        if ($existingSubmittedCount >= $maxAttempts) {
             return null;
         }
 
@@ -131,6 +133,42 @@ class StudentExamService
             return null;
         }
 
+        $exam = Exam::find($id);
+        $timeLimit = $exam->duration_minutes ?? null;
+
+        if ($timeLimit) {
+            $expiresAt = $attempt->started_at->addMinutes($timeLimit);
+
+            if (now()->greaterThan($expiresAt)) {
+                $attempt->update([
+                    'answers' => $answers,
+                    'submitted_at' => now(),
+                    'status' => 'submitted',
+                ]);
+
+                $questions = ExamQuestion::where('exam_id', $id)->orderBy('sort_order')->get();
+                $earnedPoints = 0;
+
+                foreach ($questions as $question) {
+                    $studentAnswer = $answers[$question->id] ?? null;
+                    if ($studentAnswer !== null && strtolower(trim((string) $studentAnswer)) === strtolower(trim((string) $question->correct_answer))) {
+                        $earnedPoints += $question->points;
+                    }
+                }
+
+                $totalPoints = $questions->sum('points');
+                $score = $totalPoints > 0 ? round(($earnedPoints / $totalPoints) * 100, 2) : 0;
+
+                $attempt->update([
+                    'earned_points' => $earnedPoints,
+                    'total_points' => $totalPoints,
+                    'score' => $score,
+                ]);
+
+                return $attempt->fresh();
+            }
+        }
+
         $questions = ExamQuestion::where('exam_id', $id)
             ->orderBy('sort_order')
             ->get();
@@ -140,7 +178,7 @@ class StudentExamService
         foreach ($questions as $question) {
             $studentAnswer = $answers[$question->id] ?? null;
 
-            if ($studentAnswer !== null && (string) $studentAnswer === (string) $question->correct_answer) {
+            if ($studentAnswer !== null && strtolower(trim((string) $studentAnswer)) === strtolower(trim((string) $question->correct_answer))) {
                 $earnedPoints += $question->points;
             }
         }

@@ -10,6 +10,12 @@ class RefundService
 {
     public function requestRefund(array $data): Refund
     {
+        $payment = Payment::findOrFail($data['payment_id']);
+
+        if ((float) $data['amount'] > (float) $payment->amount) {
+            throw new \RuntimeException('Refund amount exceeds the original payment.', 422);
+        }
+
         return Refund::create([
             'payment_id' => $data['payment_id'],
             'user_id' => auth()->id(),
@@ -21,14 +27,21 @@ class RefundService
 
     public function approveRefund(int $id, ?string $notes = null): Refund
     {
-        $refund = Refund::findOrFail($id);
+        $refund = Refund::with('payment')->findOrFail($id);
+        $payment = $refund->payment;
 
-        DB::transaction(function () use ($refund, $notes) {
+        if (!$payment) {
+            throw new \RuntimeException('Original payment not found.', 422);
+        }
+
+        DB::transaction(function () use ($refund, $payment, $notes) {
             $refund->update([
                 'status' => 'approved',
                 'admin_notes' => $notes,
                 'processed_at' => now(),
             ]);
+
+            app(PaymentService::class)->reverse($payment, 'Refund #' . $refund->id);
         });
 
         return $refund->fresh();

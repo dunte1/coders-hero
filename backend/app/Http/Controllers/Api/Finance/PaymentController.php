@@ -20,6 +20,8 @@ class PaymentController extends Controller
 
     public function index(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', Payment::class);
+
         $query = Payment::query()
             ->with(['invoice.student', 'fee.student', 'paidBy:id,name'])
             ->when($request->get('invoice_id'), fn ($q, $v) => $q->where('invoice_id', $v))
@@ -48,6 +50,8 @@ class PaymentController extends Controller
             return $this->notFoundResponse('Payment not found.');
         }
 
+        $this->authorize('view', $payment);
+
         return $this->successResponse($payment, 'Receipt retrieved successfully.');
     }
 
@@ -58,6 +62,8 @@ class PaymentController extends Controller
         if (!$payment) {
             abort(404, 'Payment not found.');
         }
+
+        $this->authorize('view', $payment);
 
         return $this->paymentService->receiptPdf($payment);
     }
@@ -70,7 +76,9 @@ class PaymentController extends Controller
             return $this->notFoundResponse('Payment not found.');
         }
 
-        $this->paymentService->reverse($payment);
+        $this->authorize('reverse', $payment);
+
+        $this->paymentService->reverse($payment, request()->input('reason', 'Manual reversal'));
 
         return $this->successResponse(null, 'Payment reversed.');
     }

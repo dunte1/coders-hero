@@ -145,8 +145,8 @@ use App\Http\Controllers\Api\TwoFactorController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:10,1');
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 // Named "login" route — sanctum redirects unauthenticated requests here
 Route::get('/login', fn () => response()->json(['message' => 'Unauthenticated.'], 401))->name('login');
 
@@ -174,11 +174,11 @@ Route::prefix('public')->group(function () {
     Route::get('/portfolio/{studentId}', [StudentPortfolioController::class, 'show']);
 });
 
-Route::post('/free-trial', [\App\Http\Controllers\Api\FreeTrialController::class, 'store']);
+Route::post('/free-trial', [\App\Http\Controllers\Api\FreeTrialController::class, 'store'])->middleware('throttle:5,1');
 
-Route::post('/forgot-password', [PasswordResetController::class, 'forgot']);
-Route::post('/reset-password', [PasswordResetController::class, 'reset']);
-Route::post('/reset-password/validate', [PasswordResetController::class, 'validateResetToken']);
+Route::post('/forgot-password', [PasswordResetController::class, 'forgot'])->middleware('throttle:5,1');
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])->middleware('throttle:5,1');
+Route::post('/reset-password/validate', [PasswordResetController::class, 'validateResetToken'])->middleware('throttle:10,1');
 
 Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
     ->name('verification.verify');
@@ -186,6 +186,33 @@ Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 've
 Route::post('/mpesa/callback', [MpesaController::class, 'callback']);
 
 Route::post('/stripe/webhook', [StripeController::class, 'webhook']);
+
+Route::get('/health', function () {
+    $checks = [];
+    $healthy = true;
+
+    try {
+        \Illuminate\Support\Facades\DB::connection()->getPdo();
+        $checks['database'] = 'ok';
+    } catch (\Exception $e) {
+        $checks['database'] = 'error';
+        $healthy = false;
+    }
+
+    try {
+        \Illuminate\Support\Facades\Cache::put('health_check', true, 10);
+        $checks['cache'] = 'ok';
+    } catch (\Exception $e) {
+        $checks['cache'] = 'error';
+        $healthy = false;
+    }
+
+    return response()->json([
+        'status' => $healthy ? 'healthy' : 'degraded',
+        'checks' => $checks,
+        'timestamp' => now()->toIso8601String(),
+    ], $healthy ? 200 : 503);
+});
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -349,14 +376,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/categories/{id}', [CategoryController::class, 'update']);
         Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
 
-        Route::get('/employees', [EmployeeController::class, 'index']);
-        Route::post('/employees', [EmployeeController::class, 'store']);
-        Route::get('/employees/directory', [EmployeeController::class, 'directory']);
-        Route::get('/employees/{id}', [EmployeeController::class, 'show']);
-        Route::put('/employees/{id}', [EmployeeController::class, 'update']);
-        Route::delete('/employees/{id}', [EmployeeController::class, 'destroy']);
-        Route::post('/employees/onboard', [EmployeeController::class, 'onboard']);
-        Route::put('/employees/{id}/offboard', [EmployeeController::class, 'offboard']);
+        Route::middleware('role:admin|super_admin|hr_officer')->group(function () {
+            Route::get('/employees', [EmployeeController::class, 'index']);
+            Route::post('/employees', [EmployeeController::class, 'store']);
+            Route::get('/employees/directory', [EmployeeController::class, 'directory']);
+            Route::get('/employees/{id}', [EmployeeController::class, 'show']);
+            Route::put('/employees/{id}', [EmployeeController::class, 'update']);
+            Route::delete('/employees/{id}', [EmployeeController::class, 'destroy']);
+            Route::post('/employees/onboard', [EmployeeController::class, 'onboard']);
+            Route::put('/employees/{id}/offboard', [EmployeeController::class, 'offboard']);
+        });
 
         Route::get('/departments', [DepartmentController::class, 'index']);
         Route::post('/departments', [DepartmentController::class, 'store']);
@@ -375,10 +404,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroy']);
         Route::put('/announcements/{id}/pin', [AnnouncementController::class, 'pin']);
 
-        Route::get('/reports/users', [ReportController::class, 'userReport']);
-        Route::get('/reports/courses', [ReportController::class, 'courseReport']);
-        Route::get('/reports/enrollments', [ReportController::class, 'enrollmentReport']);
-        Route::get('/reports/activity', [ReportController::class, 'activityReport']);
+        Route::middleware('role:admin|super_admin|director')->group(function () {
+            Route::get('/reports/users', [ReportController::class, 'userReport']);
+            Route::get('/reports/courses', [ReportController::class, 'courseReport']);
+            Route::get('/reports/enrollments', [ReportController::class, 'enrollmentReport']);
+            Route::get('/reports/activity', [ReportController::class, 'activityReport']);
+        });
 
         // Generated reports (monthly, downloadable)
         Route::get('/reports/generated', [ReportDownloadController::class, 'index']);
@@ -918,7 +949,7 @@ Route::middleware('role:instructor|teacher|admin')->prefix('instructor')->group(
         Route::get('/ai-tutor/conversations/{id}', [AiTutorController::class, 'show']);
         Route::put('/ai-tutor/conversations/{id}', [AiTutorController::class, 'rename']);
 Route::delete('/ai-tutor/conversations/{id}', [AiTutorController::class, 'destroy']);
-Route::post('/ai-tutor/conversations/{id}/messages', [AiTutorController::class, 'send']);
+Route::post('/ai-tutor/conversations/{id}/messages', [AiTutorController::class, 'send'])->middleware('throttle:10,1');
 
         // AI Platform
         Route::get('/ai/assistants', [AiPlatformController::class, 'assistants']);
@@ -928,9 +959,9 @@ Route::post('/ai-tutor/conversations/{id}/messages', [AiTutorController::class, 
         Route::get('/ai/conversations/{id}', [AiPlatformController::class, 'show']);
         Route::put('/ai/conversations/{id}', [AiPlatformController::class, 'rename']);
         Route::delete('/ai/conversations/{id}', [AiPlatformController::class, 'destroy']);
-        Route::post('/ai/conversations/{id}/messages', [AiPlatformController::class, 'send'])->middleware('throttle:30,1');
+        Route::post('/ai/conversations/{id}/messages', [AiPlatformController::class, 'send'])->middleware('throttle:10,1');
         Route::get('/ai/prompt-templates', [AiPlatformController::class, 'promptTemplates']);
-        Route::post('/ai/generate', [AiPlatformController::class, 'generateFromTemplate'])->middleware('throttle:30,1');
+        Route::post('/ai/generate', [AiPlatformController::class, 'generateFromTemplate'])->middleware('throttle:10,1');
         Route::get('/ai/my-usage', [AiPlatformController::class, 'myUsage']);
 
         // Playground
@@ -946,8 +977,8 @@ Route::get('/coding-leaderboard/for-course/{courseId}', [CodingLeaderboardContro
 Route::get('/coding-leaderboard/for-exercise/{exerciseId}', [CodingLeaderboardController::class, 'forExercise']);
 
 // AI Assistant
-Route::post('/coding-ai/hint', [CodingAiController::class, 'hint']);
-Route::post('/coding-ai/debug', [CodingAiController::class, 'debug']);
+Route::post('/coding-ai/hint', [CodingAiController::class, 'hint'])->middleware('throttle:10,1');
+Route::post('/coding-ai/debug', [CodingAiController::class, 'debug'])->middleware('throttle:10,1');
 
 Route::put('/lessons/{lessonId}/video-progress', [VideoProgressController::class, 'update']);
         Route::get('/lessons/{lessonId}/video-progress', [VideoProgressController::class, 'forLesson']);
@@ -1051,7 +1082,7 @@ Route::put('/lessons/{lessonId}/video-progress', [VideoProgressController::class
     // Finance
     Route::get('/invoices/mine', [InvoiceController::class, 'mine']);
     Route::get('/my-outstanding', [FinanceReportController::class, 'myOutstanding']);
-    Route::post('/mpesa/stk-push', [MpesaController::class, 'stkPush']);
+    Route::post('/mpesa/stk-push', [MpesaController::class, 'stkPush'])->middleware('throttle:5,1');
 
     Route::post('/stripe/checkout', [StripeController::class, 'createCheckout']);
     Route::get('/stripe/status', [StripeController::class, 'status']);

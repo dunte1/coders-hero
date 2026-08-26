@@ -15,7 +15,7 @@ class DisableTwoFactorRequest extends FormRequest
     {
         return [
             'current_password' => ['required', 'string'],
-            'code' => ['nullable', 'string'],
+            'code' => ['required', 'string'],
         ];
     }
 }

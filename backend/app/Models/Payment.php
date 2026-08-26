@@ -6,11 +6,13 @@ use App\Traits\HasActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Payment extends Model
 {
     use HasActivity;
     use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = [
         'fee_id',
@@ -21,6 +23,8 @@ class Payment extends Model
         'reference',
         'paid_at',
         'paid_by_user_id',
+        'reversal_reason',
+        'reversed_at',
     ];
 
     protected function casts(): array
@@ -28,6 +32,7 @@ class Payment extends Model
         return [
             'amount' => 'decimal:2',
             'paid_at' => 'date:Y-m-d',
+            'reversed_at' => 'datetime',
         ];
     }
 

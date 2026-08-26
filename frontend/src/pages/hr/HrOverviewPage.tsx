@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useHrSummary } from '@/hooks/useHr';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageSpinner } from '@/components/ui/Spinner';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { StatsCard } from '@/components/ui/StatsCard';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -34,9 +35,15 @@ const sections = [
 
 export default function HrOverviewPage() {
   const navigate = useNavigate();
-  const { data: summary, isLoading } = useHrSummary();
+  const { data: summary, isLoading, isError } = useHrSummary();
 
   if (isLoading) return <PageSpinner />;
+  if (isError || !summary) return (
+    <div className="space-y-6">
+      <PageHeader title="Human Resources" description="Employees, contracts, leave, attendance and payroll" breadcrumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'HR' }]} />
+      <EmptyState title="Could not load HR data" description="Please try again later." />
+    </div>
+  );
 
   const att = summary?.attendance_today;
 

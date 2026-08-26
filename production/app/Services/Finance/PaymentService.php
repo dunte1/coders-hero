@@ -67,6 +67,16 @@ class PaymentService
             throw new \RuntimeException('Amount exceeds the outstanding balance.', 422);
         }
 
+        if ($reference) {
+            $duplicate = Payment::where('invoice_id', $invoice->id)
+                ->where('reference', $reference)
+                ->exists();
+
+            if ($duplicate) {
+                throw new \RuntimeException('A payment with this reference already exists for this invoice.', 422);
+            }
+        }
+
         return DB::transaction(function () use ($user, $invoice, $amount, $method, $reference, $paidAt) {
             $payment = Payment::create([
                 'invoice_id' => $invoice->id,
@@ -96,6 +106,16 @@ class PaymentService
             throw new \RuntimeException('Amount exceeds the outstanding balance.', 422);
         }
 
+        if ($reference) {
+            $duplicate = Payment::where('fee_id', $fee->id)
+                ->where('reference', $reference)
+                ->exists();
+
+            if ($duplicate) {
+                throw new \RuntimeException('A payment with this reference already exists for this fee.', 422);
+            }
+        }
+
         return DB::transaction(function () use ($user, $fee, $amount, $method, $reference, $paidAt) {
             $payment = Payment::create([
                 'fee_id' => $fee->id,
@@ -118,11 +138,24 @@ class PaymentService
     /**
      * Reverse a payment and restore the payable status (staff only).
      */
-    public function reverse(Payment $payment): void
+    public function reverse(Payment $payment, string $reason = 'Manual reversal'): void
     {
         $invoice = $payment->invoice;
 
-        DB::transaction(function () use ($payment, $invoice) {
+        DB::transaction(function () use ($payment, $invoice, $reason) {
+            activity()
+                ->performedOn($payment)
+                ->causedBy(auth()->user())
+                ->withProperties([
+                    'payment_id' => $payment->id,
+                    'amount' => $payment->amount,
+                    'method' => $payment->method,
+                    'receipt_no' => $payment->receipt_no,
+                    'reason' => $reason,
+                ])
+                ->log('payment.reversed');
+
+            $payment->update(['reversal_reason' => $reason, 'reversed_at' => now()]);
             $payment->delete();
 
             if ($invoice) {

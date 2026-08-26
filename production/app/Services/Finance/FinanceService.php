@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class FinanceService
 {
@@ -43,17 +44,17 @@ class FinanceService
         $totalInvoiced = (float) Invoice::whereNotIn('status', ['draft', 'void'])->sum('amount');
         $collected = (float) Payment::sum('amount');
 
-        $openInvoices = Invoice::whereIn('status', ['issued', 'partial', 'overdue'])->get();
-        $outstanding = round($openInvoices->sum(fn (Invoice $i) => $i->balance), 2);
+        $outstanding = (float) Invoice::whereIn('status', ['issued', 'partial', 'overdue'])
+            ->sum(DB::raw('amount - paid_amount'));
 
         $totalExpenses = (float) Expense::sum('amount');
         $budgetAllocated = (float) Budget::sum('allocated_amount');
-        $budgetSpent = (float) Expense::sum('amount');
+        $budgetSpent = (float) Expense::where('approval_status', 'approved')->sum('amount');
 
         return [
             'total_invoiced' => $totalInvoiced,
             'total_collected' => $collected,
-            'outstanding' => $outstanding,
+            'outstanding' => round($outstanding, 2),
             'collections_rate' => $totalInvoiced > 0 ? round(($collected / $totalInvoiced) * 100, 1) : 0,
             'total_expenses' => $totalExpenses,
             'budget_allocated' => $budgetAllocated,
@@ -90,35 +91,53 @@ class FinanceService
 
     public function outstanding(array $filters): LengthAwarePaginator
     {
-        $invoiceIds = Invoice::whereIn('status', ['issued', 'partial', 'overdue'])->get();
-
-        $rows = Student::query()
+        $query = Student::query()
             ->active()
-            ->when(($filters['grade'] ?? null) && ($filters['grade'] !== 'all'), fn ($q, $v) => $q->where('grade', $v))
-            ->when(($filters['search'] ?? null), fn ($q, $v) => $q->search($v))
-            ->get()
-            ->map(function (Student $student) use ($invoiceIds) {
-                $invoices = $invoiceIds->where('student_id', $student->id);
-                $balance = round($invoices->sum(fn (Invoice $i) => $i->balance), 2);
+            ->select('students.*')
+            ->selectRaw('
+                COALESCE(SUM(CASE WHEN invoices.status IN (?, ?, ?) THEN invoices.amount ELSE 0 END), 0) as invoiced,
+                COALESCE(SUM(CASE WHEN invoices.status IN (?, ?, ?) THEN invoices.paid_amount ELSE 0 END), 0) as paid,
+                COALESCE(SUM(CASE WHEN invoices.status IN (?, ?, ?) THEN (invoices.amount - invoices.paid_amount) ELSE 0 END), 0) as balance,
+                COUNT(CASE WHEN invoices.status IN (?, ?, ?) THEN 1 END) as open_invoices
+            ', ['issued', 'partial', 'overdue', 'issued', 'partial', 'overdue', 'issued', 'partial', 'overdue', 'issued', 'partial', 'overdue'])
+            ->leftJoin('invoices', 'students.id', '=', 'invoices.student_id')
+            ->when(($filters['grade'] ?? null) && ($filters['grade'] !== 'all'), fn ($q, $v) => $q->where('students.grade', $v))
+            ->when(($filters['search'] ?? null), fn ($q, $v) => $q->where(function ($sq) use ($v) {
+                $sq->where('students.first_name', 'like', "%{$v}%")
+                    ->orWhere('students.last_name', 'like', "%{$v}%")
+                    ->orWhere('students.student_id', 'like', "%{$v}%");
+            }))
+            ->groupBy('students.id')
+            ->havingRaw('balance > 0')
+            ->orderByDesc('balance');
 
-                return [
-                    'student' => [
-                        'id' => $student->id,
-                        'student_id' => $student->student_id,
-                        'full_name' => $student->full_name,
-                        'grade' => $student->grade,
-                    ],
-                    'open_invoices' => $invoices->count(),
-                    'invoiced' => round($invoices->sum(fn (Invoice $i) => $i->amount), 2),
-                    'paid' => round($invoices->sum(fn (Invoice $i) => (float) $i->paid_amount), 2),
-                    'balance' => $balance,
-                ];
-            })
-            ->filter(fn ($row) => $row['balance'] > 0)
-            ->sortByDesc('balance')
-            ->values();
+        $perPage = (int) ($filters['per_page'] ?? 15);
+        $page = (int) ($filters['page'] ?? 1);
 
-        return $this->manualPaginate($rows, $filters);
+        $paginator = $query->paginate($perPage, ['*'], 'page', $page);
+
+        $mapped = $paginator->getCollection()->map(function ($student) {
+            return [
+                'student' => [
+                    'id' => $student->id,
+                    'student_id' => $student->student_id,
+                    'full_name' => $student->full_name,
+                    'grade' => $student->grade,
+                ],
+                'open_invoices' => (int) $student->open_invoices,
+                'invoiced' => round((float) $student->invoiced, 2),
+                'paid' => round((float) $student->paid, 2),
+                'balance' => round((float) $student->balance, 2),
+            ];
+        });
+
+        return new LengthAwarePaginator(
+            $mapped,
+            $paginator->total(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
     }
 
     /**
@@ -199,47 +218,48 @@ class FinanceService
 
     /**
      * Unified financial ledger (payments + expenses), newest first.
+     * Uses DB-level queries to avoid loading all records into memory.
      */
     public function transactions(array $filters): LengthAwarePaginator
     {
-        $payments = Payment::query()
-            ->with(['invoice.student', 'fee.student'])
-            ->get()
-            ->map(function (Payment $p) {
-                return [
-                    'id' => $p->id,
-                    'type' => 'payment',
-                    'date' => $p->paid_at?->toDateString(),
-                    'reference' => $p->receipt_no,
-                    'amount' => (float) $p->amount,
-                    'direction' => 'in',
-                    'method' => $p->method,
-                    'description' => $p->invoice?->student?->full_name
-                        ?? $p->fee?->student?->full_name
-                        ?? 'Payment',
-                ];
-            });
+        $from = $filters['from'] ?? null;
+        $to = $filters['to'] ?? null;
+        $search = $filters['search'] ?? null;
+        $perPage = (int) ($filters['per_page'] ?? 15);
 
-        $expenses = Expense::query()
-            ->get()
-            ->map(function (Expense $e) {
-                return [
-                    'id' => $e->id,
-                    'type' => 'expense',
-                    'date' => $e->expense_date?->toDateString(),
-                    'reference' => $e->receipt_ref,
-                    'amount' => (float) $e->amount,
-                    'direction' => 'out',
-                    'method' => null,
-                    'description' => $e->title . ($e->category ? ' (' . $e->category . ')' : ''),
-                ];
-            });
+        $paymentsQuery = Payment::query()
+            ->select('id', 'receipt_no as reference', 'amount', 'method', 'paid_at as date')
+            ->selectRaw("'payment' as type, 'in' as direction")
+            ->when($from, fn ($q, $v) => $q->whereDate('paid_at', '>=', $v))
+            ->when($to, fn ($q, $v) => $q->whereDate('paid_at', '<=', $v));
 
-        $all = $payments->concat($expenses)
-            ->sortByDesc('date')
-            ->values();
+        $expensesQuery = Expense::query()
+            ->select('id', 'receipt_ref as reference', 'amount', 'expense_date as date')
+            ->selectRaw("'expense' as type, 'out' as direction, null as method")
+            ->when($from, fn ($q, $v) => $q->whereDate('expense_date', '>=', $v))
+            ->when($to, fn ($q, $v) => $q->whereDate('expense_date', '<=', $v));
 
-        return $this->manualPaginate($all, $filters);
+        $combined = $paymentsQuery->unionAll($expensesQuery);
+
+        $query = DB::query()->fromSub($combined, 'combined');
+
+        $total = (clone $query)->count();
+
+        $page = max(1, (int) ($filters['page'] ?? 1));
+        $offset = ($page - 1) * $perPage;
+
+        $items = $query->orderByDesc('date')
+            ->offset($offset)
+            ->limit($perPage)
+            ->get();
+
+        return new Paginator(
+            $items->toArray(),
+            $total,
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
     }
 
     private function manualPaginate(Collection $rows, array $filters): LengthAwarePaginator

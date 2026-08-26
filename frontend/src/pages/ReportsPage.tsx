@@ -67,19 +67,19 @@ export default function ReportsPage() {
 
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-  const { data: userReport, isLoading: userLoading } = useQuery({
+  const { data: userReport, isLoading: userLoading, isError: userError } = useQuery({
     queryKey: ['report', 'users'],
     queryFn: () => reportsApi.getUserReport(),
     enabled: reportType === 'users',
   });
 
-  const { data: courseReport, isLoading: courseLoading } = useQuery({
+  const { data: courseReport, isLoading: courseLoading, isError: courseError } = useQuery({
     queryKey: ['report', 'courses'],
     queryFn: () => reportsApi.getCourseReport(),
     enabled: reportType === 'courses',
   });
 
-  const { data: enrollmentReport, isLoading: enrollmentLoading } = useQuery({
+  const { data: enrollmentReport, isLoading: enrollmentLoading, isError: enrollmentError } = useQuery({
     queryKey: ['report', 'enrollments'],
     queryFn: () => reportsApi.getEnrollmentReport(),
     enabled: reportType === 'enrollments',
@@ -137,7 +137,9 @@ export default function ReportsPage() {
               <CardTitle>User Growth Report</CardTitle>
             </CardHeader>
             <CardContent>
-              {userChartData.length > 0 ? (
+              {userError ? (
+                <p className="text-center py-8 text-red-500">Failed to load user report. Please try again.</p>
+              ) : userChartData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={userChartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -160,7 +162,9 @@ export default function ReportsPage() {
               <CardTitle>Course Performance Report</CardTitle>
             </CardHeader>
             <CardContent>
-              {courseChartData.length > 0 ? (
+              {courseError ? (
+                <p className="text-center py-8 text-red-500">Failed to load course report. Please try again.</p>
+              ) : courseChartData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={courseChartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -183,7 +187,9 @@ export default function ReportsPage() {
               <CardTitle>Enrollment Report</CardTitle>
             </CardHeader>
             <CardContent>
-              {enrollmentChartData.length > 0 ? (
+              {enrollmentError ? (
+                <p className="text-center py-8 text-red-500">Failed to load enrollment report. Please try again.</p>
+              ) : enrollmentChartData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={enrollmentChartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -250,7 +256,7 @@ export default function ReportsPage() {
 
           {generatedReports?.results && generatedReports.results.length > 0 ? (
             <div className="space-y-2">
-              {generatedReports.results.map((report: any) => (
+              {generatedReports.results.map((report: { id: number; month: number; year: number; status?: string; created_at?: string }) => (
                 <div
                   key={report.id}
                   className="flex items-center justify-between rounded-lg border border-slate-200 p-4 hover:bg-slate-50 transition-colors"

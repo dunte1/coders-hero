@@ -4,14 +4,12 @@ namespace App\Http\Controllers\Api\Parent;
 
 use App\Http\Controllers\Controller;
 use App\Models\Fee;
-use App\Models\Payment;
 use App\Services\Finance\PaymentService;
 use App\Services\Parents\ParentPortalService;
 use App\Services\Pdf\DocumentPdfService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ParentPaymentController extends Controller
@@ -50,25 +48,20 @@ class ParentPaymentController extends Controller
 
         $payAmount = isset($validated['amount']) ? (float) $validated['amount'] : $outstanding;
 
-        $payment = Payment::create([
-            'fee_id' => $fee->id,
-            'receipt_no' => 'RCPT-' . strtoupper(Str::random(10)),
-            'amount' => $payAmount,
-            'method' => $validated['method'] ?? 'online',
-            'reference' => $validated['reference'] ?? 'PAY-' . strtoupper(Str::random(10)),
-            'paid_at' => now()->toDateString(),
-            'paid_by_user_id' => auth()->id(),
-        ]);
-
-        $newBalance = $outstanding - $payAmount;
-        $fee->update(['status' => $newBalance <= 0 ? 'paid' : 'partial']);
+        $payment = $this->paymentService->recordForFee(
+            auth()->user(),
+            $fee,
+            $payAmount,
+            $validated['method'] ?? 'online',
+            $validated['reference'] ?? null
+        );
 
         return $this->createdResponse($payment->load('fee.student'), 'Payment successful. Receipt generated.');
     }
 
     public function show(int $id): JsonResponse
     {
-        $payment = Payment::with(['fee.student'])->find($id);
+        $payment = \App\Models\Payment::with(['fee.student'])->find($id);
 
         if (!$payment) {
             return $this->notFoundResponse('Receipt not found.');
@@ -83,7 +76,7 @@ class ParentPaymentController extends Controller
 
     public function pdf(int $id): StreamedResponse
     {
-        $payment = Payment::with(['fee.student'])->find($id);
+        $payment = \App\Models\Payment::with(['fee.student'])->find($id);
 
         if (!$payment) {
             abort(404, 'Receipt not found.');

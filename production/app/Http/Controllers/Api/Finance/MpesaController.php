@@ -114,6 +114,16 @@ class MpesaController extends Controller
      */
     public function callback(Request $request): JsonResponse
     {
+        $allowedIps = config('mpesa.allowed_callback_ips', []);
+
+        if (!empty($allowedIps)) {
+            $clientIp = $request->ip();
+            if (!in_array($clientIp, $allowedIps)) {
+                \Log::warning('M-Pesa callback from unauthorized IP', ['ip' => $clientIp]);
+                return $this->errorResponse('Unauthorized.', 403);
+            }
+        }
+
         try {
             $transaction = $this->callbackService->handle($request->all());
         } catch (\RuntimeException $e) {

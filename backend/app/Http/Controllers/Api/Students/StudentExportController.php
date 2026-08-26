@@ -15,6 +15,8 @@ class StudentExportController extends Controller
 {
     use ApiResponse;
 
+    private const MAX_EXPORT_ROWS = 10000;
+
     public function __construct(
         private AttendanceService $attendanceService,
         private DocumentPdfService $pdf
@@ -24,17 +26,16 @@ class StudentExportController extends Controller
     {
         $this->authorize('viewAny', Student::class);
 
-        $students = Student::query()
+        $query = Student::query()
             ->with('guardian')
             ->search($request->get('search'))
             ->byStatus($request->get('status'))
             ->byGrade($request->get('grade'))
-            ->orderBy('student_id')
-            ->get();
+            ->orderBy('student_id');
 
         $filename = 'students-' . now()->format('Y-m-d-His') . '.csv';
 
-        return Response::streamDownload(function () use ($students) {
+        return Response::streamDownload(function () use ($query) {
             $handle = fopen('php://output', 'w');
 
             fputcsv($handle, [
@@ -52,22 +53,27 @@ class StudentExportController extends Controller
                 'Graduation Date',
             ]);
 
-            foreach ($students as $student) {
-                fputcsv($handle, [
-                    $student->student_id,
-                    $student->full_name,
-                    $student->gender ?? '',
-                    $student->date_of_birth?->format('Y-m-d') ?? '',
-                    $student->age ?? '',
-                    $student->grade ?? '',
-                    $student->branch ?? '',
-                    $student->guardian?->full_name ?? '',
-                    $student->guardian?->phone ?? '',
-                    $student->status,
-                    $student->admission_date?->format('Y-m-d') ?? '',
-                    $student->graduation_date?->format('Y-m-d') ?? '',
-                ]);
-            }
+            $count = 0;
+            $query->chunk(500, function ($students) use ($handle, &$count) {
+                foreach ($students as $student) {
+                    if ($count >= self::MAX_EXPORT_ROWS) return;
+                    fputcsv($handle, [
+                        $student->student_id,
+                        $student->full_name,
+                        $student->gender ?? '',
+                        $student->date_of_birth?->format('Y-m-d') ?? '',
+                        $student->age ?? '',
+                        $student->grade ?? '',
+                        $student->branch ?? '',
+                        $student->guardian?->full_name ?? '',
+                        $student->guardian?->phone ?? '',
+                        $student->status,
+                        $student->admission_date?->format('Y-m-d') ?? '',
+                        $student->graduation_date?->format('Y-m-d') ?? '',
+                    ]);
+                    $count++;
+                }
+            });
 
             fclose($handle);
         }, $filename, [
@@ -126,28 +132,31 @@ class StudentExportController extends Controller
     {
         $this->authorize('viewAny', Student::class);
 
-        $students = Student::query()
+        $rows = [];
+        Student::query()
             ->with('guardian')
             ->search($request->get('search'))
             ->byStatus($request->get('status'))
             ->byGrade($request->get('grade'))
             ->orderBy('student_id')
-            ->get();
-
-        $rows = $students->map(fn (Student $student) => [
-            $student->student_id,
-            $student->full_name,
-            $student->gender ?? '',
-            $student->date_of_birth?->format('Y-m-d') ?? '',
-            $student->age ?? '',
-            $student->grade ?? '',
-            $student->branch ?? '',
-            $student->guardian?->full_name ?? '',
-            $student->guardian?->phone ?? '',
-            $student->status,
-            $student->admission_date?->format('Y-m-d') ?? '',
-            $student->graduation_date?->format('Y-m-d') ?? '',
-        ])->all();
+            ->chunk(500, function ($students) use (&$rows) {
+                foreach ($students as $student) {
+                    $rows[] = [
+                        $student->student_id,
+                        $student->full_name,
+                        $student->gender ?? '',
+                        $student->date_of_birth?->format('Y-m-d') ?? '',
+                        $student->age ?? '',
+                        $student->grade ?? '',
+                        $student->branch ?? '',
+                        $student->guardian?->full_name ?? '',
+                        $student->guardian?->phone ?? '',
+                        $student->status,
+                        $student->admission_date?->format('Y-m-d') ?? '',
+                        $student->graduation_date?->format('Y-m-d') ?? '',
+                    ];
+                }
+            });
 
         $content = $this->pdf->table(
             ['Student ID', 'Full Name', 'Gender', 'Date of Birth', 'Age', 'Grade', 'Branch', 'Guardian', 'Guardian Phone', 'Status', 'Admission Date', 'Graduation Date'],

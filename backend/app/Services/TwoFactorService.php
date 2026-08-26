@@ -66,7 +66,7 @@ class TwoFactorService
         return true;
     }
 
-    public function disable(User $user, string $password, ?string $code = null): bool
+    public function disable(User $user, string $password, string $code): bool
     {
         if (! Hash::check($password, $user->password)) {
             throw ValidationException::withMessages([
@@ -74,7 +74,7 @@ class TwoFactorService
             ]);
         }
 
-        if ($code !== null && $code !== '' && ! $this->verifyCode($user, $code)) {
+        if (! $this->verifyCode($user, $code)) {
             throw ValidationException::withMessages([
                 'code' => ['The two-factor code is invalid.'],
             ]);

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -17,6 +17,7 @@ import type { Column } from '@/components/ui/DataTable';
 export default function TeacherAssignmentDetailPage() {
   const { id } = useParams<{ id: string }>();
   const assignmentId = Number(id);
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState('');
   const [editOpen, setEditOpen] = useState(false);
@@ -94,7 +95,7 @@ export default function TeacherAssignmentDetailPage() {
               size="sm"
               onClick={() => {
                 if (confirm('Delete this assignment and its submissions?')) {
-                  deleteAssignment.mutate(assignmentId, { onSuccess: () => (window.location.href = '/teacher/assignments') });
+                  deleteAssignment.mutate(assignmentId, { onSuccess: () => navigate('/teacher/assignments') });
                 }
               }}
             >

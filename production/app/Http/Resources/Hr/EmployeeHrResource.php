@@ -9,6 +9,9 @@ class EmployeeHrResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $isOwner = $request->user() && $request->user()->id === $this->user_id;
+        $isAdmin = $request->user() && $request->user()->hasAnyRole(['admin', 'super_admin', 'hr_officer']);
+
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
@@ -22,12 +25,12 @@ class EmployeeHrResource extends JsonResource
             'tenure' => $this->tenure,
             'date_of_birth' => $this->date_of_birth?->toDateString(),
             'gender' => $this->gender,
-            'national_id' => $this->national_id,
+            'national_id' => ($isOwner || $isAdmin) ? $this->national_id : $this->maskSensitive($this->national_id),
             'address' => $this->address,
             'emergency_contact' => $this->emergency_contact,
             'emergency_phone' => $this->emergency_phone,
             'bank_name' => $this->bank_name,
-            'bank_account_number' => $this->bank_account_number,
+            'bank_account_number' => ($isOwner || $isAdmin) ? $this->bank_account_number : $this->maskSensitive($this->bank_account_number),
             'user' => new \App\Http\Resources\UserResource($this->whenLoaded('user')),
             'department' => new \App\Http\Resources\DepartmentResource($this->whenLoaded('department')),
             'position' => new \App\Http\Resources\PositionResource($this->whenLoaded('position')),
@@ -45,5 +48,14 @@ class EmployeeHrResource extends JsonResource
             'created_at' => $this->created_at->toISOString(),
             'updated_at' => $this->updated_at->toISOString(),
         ];
+    }
+
+    private function maskSensitive(?string $value): ?string
+    {
+        if (!$value || strlen($value) < 4) {
+            return $value ? '****' : null;
+        }
+
+        return str_repeat('*', strlen($value) - 4) . substr($value, -4);
     }
 }

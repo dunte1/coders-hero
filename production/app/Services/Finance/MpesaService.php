@@ -63,7 +63,7 @@ class MpesaService
             'Password' => $password,
             'Timestamp' => $timestamp,
             'TransactionType' => 'CustomerPayBillOnline',
-            'Amount' => (int) round($amount),
+            'Amount' => (int) round($amount, 0),
             'PartyA' => $phone,
             'PartyB' => $shortcode,
             'PhoneNumber' => $phone,

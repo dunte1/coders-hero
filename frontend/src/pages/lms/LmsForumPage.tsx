@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Pin, Lock } from 'lucide-react';
+import { Plus, Pin, Lock, MessageSquare } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -9,16 +9,22 @@ import { Textarea } from '@/components/ui/Textarea';
 import { DialogRoot, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/Dialog';
 import { DataTable } from '@/components/ui/DataTable';
 import { formatRelativeDate } from '@/lib/utils';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { SelectRoot, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/Select';
 import { useForumThreads, useCreateThread } from '@/hooks/useLms';
+import { useCourses } from '@/hooks/useCourses';
 import type { ForumThread } from '@/types/lms';
 import type { Column } from '@/components/ui/DataTable';
 
 export default function LmsForumPage() {
-  const courseId = Number(new URLSearchParams(window.location.search).get('course_id') ?? 0);
+  const urlCourseId = Number(new URLSearchParams(window.location.search).get('course_id') ?? 0);
+  const { data: coursesData } = useCourses({ per_page: 100 });
+  const courses = coursesData?.results ?? [];
+  const [selectedCourseId, setSelectedCourseId] = useState<number>(urlCourseId);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
-  const { data, isLoading } = useForumThreads(courseId || 1, { page, search });
-  const createThread = useCreateThread(courseId || 1);
+  const { data, isLoading } = useForumThreads(selectedCourseId, { page, search });
+  const createThread = useCreateThread(selectedCourseId);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ title: '', content: '' });
 
@@ -85,6 +91,24 @@ export default function LmsForumPage() {
         }
       />
 
+      {!selectedCourseId && courses.length > 0 && (
+        <Card>
+          <CardContent className="flex flex-col items-center gap-4 py-12">
+            <MessageSquare className="h-10 w-10 text-slate-300" />
+            <p className="text-sm text-slate-500">Select a course to view its discussion forum.</p>
+            <SelectRoot value={String(selectedCourseId)} onValueChange={(v) => { setSelectedCourseId(Number(v)); setPage(1); }}>
+              <SelectTrigger className="w-72"><SelectValue placeholder="Choose a course" /></SelectTrigger>
+              <SelectContent>
+                {courses.map((c) => (
+                  <SelectItem key={c.id} value={String(c.id)}>{c.title}</SelectItem>
+                ))}
+              </SelectContent>
+            </SelectRoot>
+          </CardContent>
+        </Card>
+      )}
+
+      {selectedCourseId > 0 && (
       <Card>
         <CardHeader>
           <CardTitle>Threads</CardTitle>
@@ -102,6 +126,7 @@ export default function LmsForumPage() {
           />
         </CardContent>
       </Card>
+      )}
     </div>
   );
 }

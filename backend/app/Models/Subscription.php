@@ -4,14 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Subscription extends Model
 {
+    use SoftDeletes;
     protected $fillable = [
         'user_id',
         'plan',
         'amount',
         'status',
+        'payment_method',
+        'payment_reference',
         'starts_at',
         'ends_at',
         'next_billing_date',

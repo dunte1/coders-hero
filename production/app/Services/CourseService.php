@@ -94,7 +94,11 @@ class CourseService
             'total_enrollments' => $course->enrollments->count(),
             'completed_enrollments' => $course->enrollments()->where('status', 'completed')->count(),
             'average_progress' => round($course->enrollments->avg('progress') ?? 0, 2),
-            'total_revenue' => $course->enrollments->count() * $course->price,
+            'total_revenue' => \App\Models\Payment::whereHas('invoice', function ($q) use ($courseId) {
+                $q->where('student_id', 'in', function ($sub) use ($courseId) {
+                    $sub->select('student_id')->from('enrollments')->where('course_id', $courseId);
+                });
+            })->sum('amount'),
         ];
     }
 

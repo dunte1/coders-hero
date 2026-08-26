@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/Badge';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Pagination } from '@/components/ui/Pagination';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs';
+import { ConfirmDelete } from '@/components/cms/ConfirmDelete';
 import { BookOpen, CalendarClock, History } from 'lucide-react';
 
 const formatDate = (v?: string | null) => (v ? new Date(v).toLocaleDateString() : '—');
@@ -23,10 +24,16 @@ export default function MyLibraryPage() {
   const { data: reservationsData, isLoading: reservationsLoading } = useMyReservations({ page: reservePage, per_page: 10 });
   const { data: historyData, isLoading: historyLoading } = useMyHistory({ page: historyPage, per_page: 10 });
   const cancelReservation = useCancelMyReservation();
+  const [cancelTarget, setCancelTarget] = useState<{ id: number; title: string } | null>(null);
 
-  const handleCancel = async (id: number) => {
-    if (!window.confirm('Cancel this reservation?')) return;
-    await cancelReservation.mutateAsync(id);
+  const handleCancel = async (id: number, title: string) => {
+    setCancelTarget({ id, title });
+  };
+
+  const confirmCancel = async () => {
+    if (!cancelTarget) return;
+    await cancelReservation.mutateAsync(cancelTarget.id);
+    setCancelTarget(null);
   };
 
   return (
@@ -124,7 +131,7 @@ export default function MyLibraryPage() {
                           <Badge variant="secondary">Cancelled</Badge>
                         )}
                         {r.status === 'pending' && (
-                          <Button variant="ghost" size="sm" className="text-red-600" onClick={() => handleCancel(r.id)}>
+                          <Button variant="ghost" size="sm" className="text-red-600" onClick={() => handleCancel(r.id, r.resource?.title ?? `Resource #${r.resource_id}`)}>
                             Cancel
                           </Button>
                         )}
@@ -184,6 +191,16 @@ export default function MyLibraryPage() {
           )}
         </TabsContent>
       </Tabs>
+
+      <ConfirmDelete
+        open={!!cancelTarget}
+        onOpenChange={() => setCancelTarget(null)}
+        title="Cancel Reservation"
+        description={`Are you sure you want to cancel your reservation for "${cancelTarget?.title ?? ''}"?`}
+        confirmLabel="Cancel Reservation"
+        loading={cancelReservation.isPending}
+        onConfirm={confirmCancel}
+      />
     </div>
   );
 }

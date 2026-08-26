@@ -21,6 +21,8 @@ class ExpenseController extends Controller
 
     public function index(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', Expense::class);
+
         return $this->paginatedResponse(
             $this->financeService->expenses($request->only(['category', 'approval_status', 'from', 'to', 'search', 'per_page', 'page'])),
             'Expenses retrieved successfully.'
@@ -29,6 +31,8 @@ class ExpenseController extends Controller
 
     public function store(StoreExpenseRequest $request): JsonResponse
     {
+        $this->authorize('create', Expense::class);
+
         $expense = Expense::create(array_merge(
             $request->validated(),
             ['recorded_by_user_id' => auth()->id()]
@@ -45,6 +49,8 @@ class ExpenseController extends Controller
             return $this->notFoundResponse('Expense not found.');
         }
 
+        $this->authorize('view', $expense);
+
         return $this->successResponse($expense, 'Expense retrieved successfully.');
     }
 
@@ -55,6 +61,8 @@ class ExpenseController extends Controller
         if (!$expense) {
             return $this->notFoundResponse('Expense not found.');
         }
+
+        $this->authorize('update', $expense);
 
         $expense->update($request->validated());
 
@@ -69,6 +77,8 @@ class ExpenseController extends Controller
             return $this->notFoundResponse('Expense not found.');
         }
 
+        $this->authorize('delete', $expense);
+
         $expense->delete();
 
         return $this->noContentResponse('Expense deleted.');
@@ -82,11 +92,19 @@ class ExpenseController extends Controller
             return $this->notFoundResponse('Expense not found.');
         }
 
+        $this->authorize('approve', $expense);
+
         $expense->update([
             'approval_status' => 'approved',
             'approved_by' => auth()->id(),
             'approved_at' => now(),
         ]);
+
+        if ($expense->category) {
+            \App\Models\Budget::where('category', $expense->category)
+                ->where('fiscal_year', (int) $expense->expense_date->format('Y'))
+                ->increment('spent_amount', (float) $expense->amount);
+        }
 
         return $this->successResponse($expense->fresh(['recordedBy', 'submitter', 'approver']), 'Expense approved.');
     }
@@ -103,11 +121,21 @@ class ExpenseController extends Controller
             return $this->notFoundResponse('Expense not found.');
         }
 
+        $this->authorize('reject', $expense);
+
+        $wasApproved = $expense->approval_status === 'approved';
+
         $expense->update([
             'approval_status' => 'rejected',
             'approved_by' => auth()->id(),
             'rejection_reason' => $validated['rejection_reason'],
         ]);
+
+        if ($wasApproved && $expense->category) {
+            \App\Models\Budget::where('category', $expense->category)
+                ->where('fiscal_year', (int) $expense->expense_date->format('Y'))
+                ->decrement('spent_amount', (float) $expense->amount);
+        }
 
         return $this->successResponse($expense->fresh(['recordedBy', 'submitter', 'approver']), 'Expense rejected.');
     }

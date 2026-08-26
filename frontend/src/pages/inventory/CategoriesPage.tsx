@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { Badge } from '@/components/ui/Badge';
+import { ConfirmDelete } from '@/components/cms/ConfirmDelete';
 import {
   DialogRoot,
   DialogContent,
@@ -28,6 +29,7 @@ export default function CategoriesPage() {
   const [editing, setEditing] = useState<AssetCategory | null>(null);
   const [form, setForm] = useState<CategoryInput>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<AssetCategory | null>(null);
 
   const { data, isLoading } = useInventoryCategories({ page });
   const createCategory = useCreateCategory();
@@ -64,8 +66,7 @@ export default function CategoriesPage() {
   };
 
   const handleDelete = async (c: AssetCategory) => {
-    if (!window.confirm(`Delete category "${c.name}"?`)) return;
-    await deleteCategory.mutateAsync(c.id);
+    setDeleteTarget(c);
   };
 
   const columns: Column<AssetCategory>[] = [
@@ -143,6 +144,17 @@ export default function CategoriesPage() {
           </DialogFooter>
         </DialogContent>
       </DialogRoot>
+
+      <ConfirmDelete
+        open={!!deleteTarget}
+        onOpenChange={() => setDeleteTarget(null)}
+        title="Delete Category"
+        description={`Are you sure you want to delete "${deleteTarget?.name}"? This action cannot be undone.`}
+        loading={deleteCategory.isPending}
+        onConfirm={() => {
+          if (deleteTarget) deleteCategory.mutate(deleteTarget.id);
+        }}
+      />
     </div>
   );
 }

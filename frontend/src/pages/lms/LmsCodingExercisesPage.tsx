@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Code2, Bookmark } from 'lucide-react';
+import { Code2, Bookmark, BookOpen } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { SelectRoot, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/Select';
 import { DataTable } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { useCodingExercises } from '@/hooks/useLms';
 import { useToggleBookmark } from '@/hooks/useLms';
+import { useCourses } from '@/hooks/useCourses';
 import type { CodingExercise } from '@/types/lms';
 import type { Column } from '@/components/ui/DataTable';
 
@@ -19,10 +21,13 @@ const difficultyColors: Record<string, 'success' | 'warning' | 'destructive'> = 
 };
 
 export default function LmsCodingExercisesPage() {
-  const courseId = Number(new URLSearchParams(window.location.search).get('course_id') ?? 0);
+  const urlCourseId = Number(new URLSearchParams(window.location.search).get('course_id') ?? 0);
+  const { data: coursesData } = useCourses({ per_page: 100 });
+  const courses = coursesData?.results ?? [];
+  const [selectedCourseId, setSelectedCourseId] = useState<number>(urlCourseId);
   const [page, setPage] = useState(1);
   const [difficulty, setDifficulty] = useState('');
-  const { data, isLoading } = useCodingExercises(courseId || 1, { page, difficulty: difficulty || undefined });
+  const { data, isLoading } = useCodingExercises(selectedCourseId, { page, difficulty: difficulty || undefined });
   const toggleBookmark = useToggleBookmark();
 
   const exercises = data?.results ?? [];
@@ -65,6 +70,24 @@ export default function LmsCodingExercisesPage() {
         description="Practice coding problems tied to your course."
       />
 
+      {!selectedCourseId && courses.length > 0 && (
+        <Card>
+          <CardContent className="flex flex-col items-center gap-4 py-12">
+            <BookOpen className="h-10 w-10 text-slate-300" />
+            <p className="text-sm text-slate-500">Select a course to view its coding exercises.</p>
+            <SelectRoot value={String(selectedCourseId)} onValueChange={(v) => { setSelectedCourseId(Number(v)); setPage(1); }}>
+              <SelectTrigger className="w-72"><SelectValue placeholder="Choose a course" /></SelectTrigger>
+              <SelectContent>
+                {courses.map((c) => (
+                  <SelectItem key={c.id} value={String(c.id)}>{c.title}</SelectItem>
+                ))}
+              </SelectContent>
+            </SelectRoot>
+          </CardContent>
+        </Card>
+      )}
+
+      {selectedCourseId > 0 && (
       <Card>
         <CardHeader className="flex-row items-center justify-between space-y-0">
           <CardTitle>Exercises</CardTitle>
@@ -100,6 +123,7 @@ export default function LmsCodingExercisesPage() {
           />
         </CardContent>
       </Card>
+      )}
     </div>
   );
 }

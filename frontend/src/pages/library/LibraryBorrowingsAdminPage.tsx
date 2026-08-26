@@ -7,6 +7,14 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { Badge } from '@/components/ui/Badge';
 import {
+  DialogRoot,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/Dialog';
+import {
   SelectRoot,
   SelectTrigger,
   SelectContent,
@@ -22,15 +30,21 @@ export default function LibraryBorrowingsAdminPage() {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<'all' | string>('all');
   const [overdueOnly, setOverdueOnly] = useState(false);
+  const [returnTarget, setReturnTarget] = useState<LibraryBorrowing | null>(null);
 
   const { data, isLoading } = useBorrowings({ page, status, overdue: overdueOnly ? '1' : undefined });
   const returnBorrowing = useReturnBorrowing();
 
   const borrowings = data?.results || [];
 
-  const handleReturn = async (id: number) => {
-    if (!window.confirm('Confirm this resource has been returned?')) return;
-    await returnBorrowing.mutateAsync(id);
+  const handleReturn = async (b: LibraryBorrowing) => {
+    setReturnTarget(b);
+  };
+
+  const confirmReturn = async () => {
+    if (!returnTarget) return;
+    await returnBorrowing.mutateAsync(returnTarget.id);
+    setReturnTarget(null);
   };
 
   const columns: Column<LibraryBorrowing>[] = [
@@ -103,7 +117,7 @@ export default function LibraryBorrowingsAdminPage() {
             }
             rowActions={(b) =>
               b.status !== 'returned' ? (
-                <Button variant="outline" size="sm" onClick={() => handleReturn(b.id)}>
+                <Button variant="outline" size="sm" onClick={() => handleReturn(b)}>
                   <Undo2 className="h-3.5 w-3.5 mr-1" /> Return
                 </Button>
               ) : undefined
@@ -111,6 +125,23 @@ export default function LibraryBorrowingsAdminPage() {
           />
         </CardContent>
       </Card>
+
+      <DialogRoot open={!!returnTarget} onOpenChange={() => setReturnTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Return</DialogTitle>
+            <DialogDescription>
+              {returnTarget ? `Mark "${returnTarget.resource?.title ?? `#${returnTarget.resource_id}`}" as returned?` : 'Confirm this resource has been returned.'}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setReturnTarget(null)}>Cancel</Button>
+            <Button onClick={confirmReturn} loading={returnBorrowing.isPending}>
+              Confirm Return
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </DialogRoot>
     </div>
   );
 }

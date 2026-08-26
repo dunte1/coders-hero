@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useInventorySummary } from '@/hooks/useInventory';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageSpinner } from '@/components/ui/Spinner';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { StatsCard } from '@/components/ui/StatsCard';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -31,9 +32,15 @@ const sections = [
 
 export default function InventoryOverviewPage() {
   const navigate = useNavigate();
-  const { data: summary, isLoading } = useInventorySummary();
+  const { data: summary, isLoading, isError } = useInventorySummary();
 
   if (isLoading) return <PageSpinner />;
+  if (isError || !summary) return (
+    <div className="space-y-6">
+      <PageHeader title="Inventory" description="Assets, stock items, locations and maintenance" breadcrumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Inventory' }]} />
+      <EmptyState title="Could not load inventory data" description="Please try again later." />
+    </div>
+  );
 
   const statusColors: Record<string, string> = {
     available: 'bg-emerald-500',

@@ -10,6 +10,7 @@ import { StatsCard } from '@/components/ui/StatsCard';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { SearchInput } from '@/components/ui/SearchInput';
+import { Pagination } from '@/components/ui/Pagination';
 import {
   SelectRoot,
   SelectTrigger,
@@ -32,8 +33,10 @@ export default function CompetitionsPage() {
   const [type, setType] = useState<CompetitionType | 'all'>('all');
   const [status, setStatus] = useState<CompetitionStatus | 'all'>('all');
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
 
-  const { data, isLoading } = useCompetitions({
+  const { data, isLoading, isError } = useCompetitions({
+    page,
     type: type === 'all' ? undefined : type,
     status: status === 'all' ? undefined : status,
     search: search || undefined,
@@ -41,6 +44,8 @@ export default function CompetitionsPage() {
   const { data: summary } = useCompetitionSummary();
 
   const competitions = data?.results || [];
+  const totalPages = data?.meta?.last_page ?? 1;
+  const totalCount = data?.meta?.total ?? 0;
 
   return (
     <div className="space-y-6">
@@ -90,6 +95,8 @@ export default function CompetitionsPage() {
 
       {isLoading ? (
         <PageSpinner />
+      ) : isError ? (
+        <EmptyState icon={Trophy} title="Could not load competitions" description="Please try again later." />
       ) : competitions.length === 0 ? (
         <EmptyState icon={Trophy} title="No competitions found" description="Try adjusting your filters." />
       ) : (
@@ -118,6 +125,16 @@ export default function CompetitionsPage() {
             </Card>
           ))}
         </div>
+      )}
+
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          totalCount={totalCount}
+          pageSize={15}
+        />
       )}
     </div>
   );

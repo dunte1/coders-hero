@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/Dialog';
 import { Plus, Pencil, Trash2, Star } from 'lucide-react';
 import type { CertificateTemplate, TemplateInput } from '@/types/certificates';
+import { ConfirmDelete } from '@/components/cms/ConfirmDelete';
 
 interface TemplateForm extends TemplateInput {
   name: string;
@@ -47,6 +48,7 @@ export default function CertificateTemplatesPage() {
   const [editing, setEditing] = useState<CertificateTemplate | null>(null);
   const [form, setForm] = useState<TemplateForm>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 
   const { data, isLoading } = useTemplates({ per_page: 50 });
   const createTemplate = useCreateTemplate();
@@ -150,9 +152,7 @@ export default function CertificateTemplatesPage() {
             variant="ghost"
             size="sm"
             disabled={t.certificates_count && t.certificates_count > 0 ? true : false}
-            onClick={() => {
-              if (window.confirm(`Delete template "${t.name}"?`)) deleteTemplate.mutate(t.id);
-            }}
+            onClick={() => setConfirmDeleteId(t.id)}
           >
             <Trash2 className="h-4 w-4 text-red-600" />
           </Button>
@@ -295,6 +295,17 @@ export default function CertificateTemplatesPage() {
           </DialogFooter>
         </DialogContent>
       </DialogRoot>
+
+      <ConfirmDelete
+        open={!!confirmDeleteId}
+        onOpenChange={() => setConfirmDeleteId(null)}
+        title="Delete Template"
+        description="Are you sure you want to delete this template?"
+        loading={deleteTemplate.isPending}
+        onConfirm={() => {
+          if (confirmDeleteId) deleteTemplate.mutate(confirmDeleteId, { onSettled: () => setConfirmDeleteId(null) });
+        }}
+      />
     </div>
   );
 }

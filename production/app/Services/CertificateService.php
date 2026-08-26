@@ -158,6 +158,10 @@ class CertificateService
     {
         $enrollment = Enrollment::with(['user', 'course'])->findOrFail($enrollmentId);
 
+        if ($enrollment->status !== 'completed' && $enrollment->progress < 100) {
+            throw new \InvalidArgumentException('Certificate can only be issued for completed enrollments (100% progress).');
+        }
+
         $existing = Certificate::where('enrollment_id', $enrollmentId)->first();
         if ($existing) {
             return $existing;

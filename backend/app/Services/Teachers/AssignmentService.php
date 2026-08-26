@@ -133,7 +133,7 @@ class AssignmentService
             $submission->assignment->schoolClass?->gradebookEntries()->updateOrCreate(
                 [
                     'student_id' => $submission->student_id,
-                    'course_id' => null,
+                    'course_id' => $submission->assignment->course_id,
                     'component' => 'assignment',
                     'title' => $submission->assignment->title,
                 ],
@@ -141,6 +141,7 @@ class AssignmentService
                     'teacher_user_id' => $teacherUserId,
                     'score' => $submission->score ?? 0,
                     'max_score' => $submission->assignment->max_score,
+                    'weight' => $submission->assignment->weight ?? 1.0,
                     'graded_on' => now()->toDateString(),
                 ]
             );

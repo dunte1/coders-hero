@@ -48,8 +48,8 @@ export function useUnenroll() {
 export function useUpdateProgress() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ enrollmentId, progress }: { enrollmentId: number; progress: number }) =>
-      enrollmentsApi.updateProgress(enrollmentId, progress),
+    mutationFn: ({ lessonId }: { lessonId: number }) =>
+      enrollmentsApi.updateProgress(lessonId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['enrollments'] });
       queryClient.invalidateQueries({ queryKey: ['myCourses'] });

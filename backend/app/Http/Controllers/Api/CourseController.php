@@ -66,6 +66,14 @@ class CourseController extends Controller
 
     public function update(UpdateCourseRequest $request, int $id): JsonResponse
     {
+        $course = $this->courseService->getById($id);
+
+        if (!$course) {
+            return $this->notFoundResponse('Course not found.');
+        }
+
+        $this->authorize('update', $course);
+
         $course = $this->courseService->update($id, $request->validated());
 
         return $this->successResponse(
@@ -76,6 +84,14 @@ class CourseController extends Controller
 
     public function destroy(int $id): JsonResponse
     {
+        $course = $this->courseService->getById($id);
+
+        if (!$course) {
+            return $this->notFoundResponse('Course not found.');
+        }
+
+        $this->authorize('delete', $course);
+
         $this->courseService->delete($id);
 
         return $this->noContentResponse('Course deleted successfully.');
@@ -83,6 +99,14 @@ class CourseController extends Controller
 
     public function publish(int $id): JsonResponse
     {
+        $course = $this->courseService->getById($id);
+
+        if (!$course) {
+            return $this->notFoundResponse('Course not found.');
+        }
+
+        $this->authorize('publish', $course);
+
         $course = $this->courseService->publish($id);
 
         return $this->successResponse(
@@ -93,6 +117,14 @@ class CourseController extends Controller
 
     public function archive(int $id): JsonResponse
     {
+        $course = $this->courseService->getById($id);
+
+        if (!$course) {
+            return $this->notFoundResponse('Course not found.');
+        }
+
+        $this->authorize('archive', $course);
+
         $course = $this->courseService->archive($id);
 
         return $this->successResponse(

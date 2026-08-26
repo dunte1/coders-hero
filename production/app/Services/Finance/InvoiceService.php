@@ -219,7 +219,21 @@ class InvoiceService
 
     private function nextInvoiceNumber(): string
     {
-        return 'INV-' . now()->format('Y') . '-' . strtoupper(Str::random(8));
+        $year = now()->format('Y');
+        $prefix = 'INV-' . $year . '-';
+
+        $lastInvoice = Invoice::where('invoice_no', 'like', $prefix . '%')
+            ->orderByDesc('invoice_no')
+            ->value('invoice_no');
+
+        if ($lastInvoice) {
+            $lastSequence = (int) substr($lastInvoice, strlen($prefix));
+            $nextSequence = $lastSequence + 1;
+        } else {
+            $nextSequence = 1;
+        }
+
+        return $prefix . str_pad((string) $nextSequence, 6, '0', STR_PAD_LEFT);
     }
 
     private function resolveAmount(array $data, array $items): float

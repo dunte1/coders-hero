@@ -434,4 +434,86 @@ class DashboardService
             'avatar' => $user->avatar,
         ];
     }
+
+    public function getAdminStats(?string $userId = null): array
+    {
+        $totalEnrollments = Enrollment::count();
+        $completedEnrollments = Enrollment::completed()->count();
+        $attendanceToday = Attendance::whereDate('attendance_date', now()->toDateString())->get();
+
+        return [
+            'total_users' => User::count(),
+            'active_users' => User::active()->count(),
+            'total_employees' => Employee::active()->count(),
+            'total_courses' => Course::count(),
+            'published_courses' => Course::published()->count(),
+            'total_enrollments' => $totalEnrollments,
+            'active_enrollments' => Enrollment::active()->count(),
+            'completed_enrollments' => $completedEnrollments,
+            'total_tasks' => Task::count(),
+            'pending_tasks' => Task::where('status', 'pending')->count(),
+            'overdue_tasks' => Task::overdue()->count(),
+            'total_projects' => Project::count(),
+            'active_projects' => Project::active()->count(),
+            'total_students' => Student::count(),
+            'total_teachers' => User::role('teacher')->count(),
+            'active_schools' => Branch::active()->count(),
+            'revenue' => round((float) Payment::where('created_at', '>=', now()->startOfMonth())->sum('amount'), 2),
+            'outstanding_fees' => round((float) Fee::whereNot('status', 'paid')->sum('amount'), 2),
+            'competition_registrations' => CompetitionTeam::count(),
+            'completion_rate' => $totalEnrollments > 0
+                ? round(($completedEnrollments / $totalEnrollments) * 100, 1)
+                : 0,
+            'attendance_summary' => [
+                'date' => now()->toDateString(),
+                'present' => $attendanceToday->where('status', 'present')->count(),
+                'late' => $attendanceToday->where('status', 'late')->count(),
+                'absent' => $attendanceToday->where('status', 'absent')->count(),
+                'excused' => $attendanceToday->where('status', 'excused')->count(),
+                'total' => $attendanceToday->count(),
+            ],
+            'ai_insights' => $this->buildAiInsights(),
+        ];
+    }
+
+    public function getInstructorStats(string $userId): array
+    {
+        $courses = Course::where('instructor_id', $userId);
+        $totalCourses = $courses->count();
+        $totalStudents = Enrollment::whereIn('course_id', $courses->pluck('id'))->count();
+
+        return [
+            'total_courses' => $totalCourses,
+            'total_students' => $totalStudents,
+            'total_tasks' => Task::where('assigner_id', $userId)->count(),
+            'pending_tasks' => Task::where('assigner_id', $userId)->where('status', 'pending')->count(),
+            'ai_insights' => $this->buildAiInsights(),
+        ];
+    }
+
+    public function getEmployeeStats(string $userId): array
+    {
+        return [
+            'total_tasks' => Task::where('assignee_id', $userId)->count(),
+            'pending_tasks' => Task::where('assignee_id', $userId)->where('status', 'pending')->count(),
+            'overdue_tasks' => Task::where('assignee_id', $userId)->overdue()->count(),
+        ];
+    }
+
+    public function getStudentStats(string $userId): array
+    {
+        $enrollments = Enrollment::where('user_id', $userId);
+        $totalEnrollments = $enrollments->count();
+        $completedEnrollments = (clone $enrollments)->completed()->count();
+
+        return [
+            'total_enrollments' => $totalEnrollments,
+            'completed_enrollments' => $completedEnrollments,
+            'completion_rate' => $totalEnrollments > 0
+                ? round(($completedEnrollments / $totalEnrollments) * 100, 1)
+                : 0,
+            'total_tasks' => Task::where('assignee_id', $userId)->count(),
+            'pending_tasks' => Task::where('assignee_id', $userId)->where('status', 'pending')->count(),
+        ];
+    }
 }

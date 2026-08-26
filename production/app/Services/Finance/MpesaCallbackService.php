@@ -21,7 +21,7 @@ class MpesaCallbackService
             throw new \RuntimeException('Invalid callback payload.', 422);
         }
 
-        $transaction = MpesaTransaction::where('checkout_request_id', $checkoutRequestId)->first();
+        $transaction = MpesaTransaction::where('checkout_request_id', $checkoutRequestId)->lockForUpdate()->first();
 
         if (!$transaction) {
             activity()->log('Received M-Pesa callback for unknown CheckoutRequestID: ' . $checkoutRequestId);

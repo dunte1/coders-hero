@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { DataTable, type Column } from '@/components/ui/DataTable';
+import { ConfirmDelete } from '@/components/cms/ConfirmDelete';
 import {
   DialogRoot,
   DialogContent,
@@ -27,6 +28,7 @@ export default function LibraryAuthorsAdminPage() {
   const [editing, setEditing] = useState<LibraryAuthor | null>(null);
   const [form, setForm] = useState<AuthorInput>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<LibraryAuthor | null>(null);
 
   const { data, isLoading } = useLibraryAuthors({ page });
   const createAuthor = useCreateAuthor();
@@ -63,8 +65,7 @@ export default function LibraryAuthorsAdminPage() {
   };
 
   const handleDelete = async (a: LibraryAuthor) => {
-    if (!window.confirm(`Delete author "${a.name}"?`)) return;
-    await deleteAuthor.mutateAsync(a.id);
+    setDeleteTarget(a);
   };
 
   const columns: Column<LibraryAuthor>[] = [
@@ -134,6 +135,17 @@ export default function LibraryAuthorsAdminPage() {
           </DialogFooter>
         </DialogContent>
       </DialogRoot>
+
+      <ConfirmDelete
+        open={!!deleteTarget}
+        onOpenChange={() => setDeleteTarget(null)}
+        title="Delete Author"
+        description={`Are you sure you want to delete "${deleteTarget?.name}"? This action cannot be undone.`}
+        loading={deleteAuthor.isPending}
+        onConfirm={() => {
+          if (deleteTarget) deleteAuthor.mutate(deleteTarget.id);
+        }}
+      />
     </div>
   );
 }

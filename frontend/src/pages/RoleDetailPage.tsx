@@ -20,9 +20,11 @@ import { Separator } from '@/components/ui/Separator';
 import { getInitials } from '@/lib/utils';
 import { formatDate } from '@/lib/utils';
 import { Pencil, Shield, Trash2, Users } from 'lucide-react';
+import { ConfirmDelete } from '@/components/cms/ConfirmDelete';
 import type { User } from '@/types';
 
 export default function RoleDetailPage() {
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const { id } = useParams<{ id: string }>();
   const roleId = parseInt(id || '0', 10);
   const navigate = useNavigate();
@@ -116,19 +118,26 @@ export default function RoleDetailPage() {
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              onClick={() => {
-                if (window.confirm('Delete this role? Users assigned this role will lose its permissions.')) {
-                  deleteRole.mutate(roleId, {
-                    onSuccess: () => navigate('/settings/roles'),
-                  });
-                }
-              }}
+              onClick={() => setConfirmDelete(true)}
             >
               <Trash2 className="mr-2 h-4 w-4 text-red-500" />
               Delete
             </Button>
           </div>
         }
+      />
+
+      <ConfirmDelete
+        open={confirmDelete}
+        onOpenChange={setConfirmDelete}
+        title="Delete Role"
+        description="Delete this role? Users assigned this role will lose its permissions."
+        loading={deleteRole.isPending}
+        onConfirm={() => {
+          deleteRole.mutate(roleId, {
+            onSuccess: () => navigate('/settings/roles'),
+          });
+        }}
       />
 
       <Tabs defaultValue="overview">

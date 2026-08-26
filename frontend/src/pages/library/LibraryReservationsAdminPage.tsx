@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { Badge } from '@/components/ui/Badge';
+import { ConfirmDelete } from '@/components/cms/ConfirmDelete';
 import {
   SelectRoot,
   SelectTrigger,
@@ -24,12 +25,18 @@ export default function LibraryReservationsAdminPage() {
 
   const { data, isLoading } = useReservations({ page, status });
   const cancelReservation = useCancelReservation();
+  const [cancelTarget, setCancelTarget] = useState<LibraryReservation | null>(null);
 
   const reservations = data?.results || [];
 
-  const handleCancel = async (id: number) => {
-    if (!window.confirm('Cancel this reservation?')) return;
-    await cancelReservation.mutateAsync(id);
+  const handleCancel = async (r: LibraryReservation) => {
+    setCancelTarget(r);
+  };
+
+  const confirmCancel = async () => {
+    if (!cancelTarget) return;
+    await cancelReservation.mutateAsync(cancelTarget.id);
+    setCancelTarget(null);
   };
 
   const columns: Column<LibraryReservation>[] = [
@@ -90,7 +97,7 @@ export default function LibraryReservationsAdminPage() {
             }
             rowActions={(r) =>
               r.status === 'pending' ? (
-                <Button variant="ghost" size="sm" className="text-red-600" onClick={() => handleCancel(r.id)}>
+                <Button variant="ghost" size="sm" className="text-red-600" onClick={() => handleCancel(r)}>
                   <X className="h-3.5 w-3.5 mr-1" /> Cancel
                 </Button>
               ) : undefined
@@ -98,6 +105,16 @@ export default function LibraryReservationsAdminPage() {
           />
         </CardContent>
       </Card>
+
+      <ConfirmDelete
+        open={!!cancelTarget}
+        onOpenChange={() => setCancelTarget(null)}
+        title="Cancel Reservation"
+        description={`Are you sure you want to cancel this reservation for "${cancelTarget?.resource?.title ?? ''}"?`}
+        confirmLabel="Cancel Reservation"
+        loading={cancelReservation.isPending}
+        onConfirm={confirmCancel}
+      />
     </div>
   );
 }

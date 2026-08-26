@@ -16,6 +16,8 @@ class BudgetController extends Controller
 
     public function index(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', Budget::class);
+
         $budgets = Budget::query()
             ->when($request->get('fiscal_year'), fn ($q, $v) => $q->where('fiscal_year', (int) $v))
             ->when($request->get('category'), fn ($q, $v) => $q->where('category', $v))
@@ -28,6 +30,8 @@ class BudgetController extends Controller
 
     public function store(StoreBudgetRequest $request): JsonResponse
     {
+        $this->authorize('create', Budget::class);
+
         $exists = Budget::where('category', $request->input('category'))
             ->where('fiscal_year', (int) $request->input('fiscal_year'))
             ->exists();
@@ -49,6 +53,8 @@ class BudgetController extends Controller
             return $this->notFoundResponse('Budget not found.');
         }
 
+        $this->authorize('view', $budget);
+
         return $this->successResponse($budget, 'Budget retrieved successfully.');
     }
 
@@ -59,6 +65,8 @@ class BudgetController extends Controller
         if (!$budget) {
             return $this->notFoundResponse('Budget not found.');
         }
+
+        $this->authorize('update', $budget);
 
         $budget->update($request->validated());
 
@@ -72,6 +80,8 @@ class BudgetController extends Controller
         if (!$budget) {
             return $this->notFoundResponse('Budget not found.');
         }
+
+        $this->authorize('delete', $budget);
 
         $budget->delete();
 

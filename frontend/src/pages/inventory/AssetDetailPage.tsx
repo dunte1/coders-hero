@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Textarea } from '@/components/ui/Textarea';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { ConfirmDelete } from '@/components/cms/ConfirmDelete';
 import {
   DialogRoot,
   DialogContent,
@@ -67,6 +68,7 @@ export default function AssetDetailPage() {
   const [checkInNote, setCheckInNote] = useState('');
   const [disposeOpen, setDisposeOpen] = useState(false);
   const [disposeNote, setDisposeNote] = useState('');
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const { data: asset, isLoading } = useInventoryAsset(assetId);
   const { data: assignmentsData } = useAssetAssignments(assetId, { page: 1, per_page: 10 });
@@ -100,8 +102,8 @@ export default function AssetDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Delete this asset permanently?')) return;
     await deleteAsset.mutateAsync(assetId);
+    setDeleteOpen(false);
     navigate('/inventory/assets');
   };
 
@@ -139,7 +141,7 @@ export default function AssetDetailPage() {
             <Button variant="ghost" onClick={() => setSearchParams({ qr: '1' })}>
               <QrCode className="h-4 w-4 mr-2" /> QR
             </Button>
-            <Button variant="destructive" size="icon" onClick={handleDelete}>
+            <Button variant="destructive" size="icon" onClick={() => setDeleteOpen(true)}>
               <Trash2 className="h-4 w-4" />
             </Button>
           </>
@@ -340,6 +342,15 @@ export default function AssetDetailPage() {
           </DialogFooter>
         </DialogContent>
       </DialogRoot>
+
+      <ConfirmDelete
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title="Delete Asset"
+        description="Are you sure you want to delete this asset permanently? This action cannot be undone."
+        loading={deleteAsset.isPending}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }

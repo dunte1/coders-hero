@@ -13,6 +13,7 @@ use App\Services\Finance\InvoiceService;
 use App\Services\Finance\PaymentService;
 use App\Services\Pdf\DocumentPdfService;
 use App\Traits\ApiResponse;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -31,6 +32,8 @@ class InvoiceController extends Controller
 
     public function index(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', Invoice::class);
+
         return $this->paginatedResponse(
             $this->invoiceService->index($request->only(['student_id', 'status', 'term', 'search', 'per_page', 'page'])),
             'Invoices retrieved successfully.'
@@ -39,6 +42,8 @@ class InvoiceController extends Controller
 
     public function store(StoreInvoiceRequest $request): JsonResponse
     {
+        $this->authorize('create', Invoice::class);
+
         try {
             $invoice = $this->invoiceService->create(
                 auth()->user(),
@@ -60,6 +65,8 @@ class InvoiceController extends Controller
             return $this->notFoundResponse('Invoice not found.');
         }
 
+        $this->authorize('view', $invoice);
+
         return $this->successResponse($invoice, 'Invoice retrieved successfully.');
     }
 
@@ -70,6 +77,8 @@ class InvoiceController extends Controller
         } catch (ModelNotFoundException) {
             abort(404, 'Invoice not found.');
         }
+
+        $this->authorize('view', $invoice);
 
         $student = $invoice->student;
         $amount = number_format((float) $invoice->amount, 2);
@@ -121,14 +130,19 @@ class InvoiceController extends Controller
     {
         try {
             $invoice = Invoice::findOrFail($id);
+        } catch (ModelNotFoundException) {
+            return $this->notFoundResponse('Invoice not found.');
+        }
+
+        $this->authorize('update', $invoice);
+
+        try {
             $invoice = $this->invoiceService->update(
                 auth()->user(),
                 $invoice,
                 $request->validated(),
                 $request->input('items', [])
             );
-        } catch (ModelNotFoundException) {
-            return $this->notFoundResponse('Invoice not found.');
         } catch (\RuntimeException $e) {
             return $this->errorResponse($e->getMessage(), 422);
         }
@@ -138,6 +152,8 @@ class InvoiceController extends Controller
 
     public function generate(GenerateInvoicesRequest $request): JsonResponse
     {
+        $this->authorize('generate', Invoice::class);
+
         try {
             $count = $this->invoiceService->generateFromStructure(
                 auth()->user(),
@@ -154,9 +170,15 @@ class InvoiceController extends Controller
     public function issue(int $id): JsonResponse
     {
         try {
-            $invoice = $this->invoiceService->issue(Invoice::findOrFail($id));
+            $invoice = Invoice::findOrFail($id);
         } catch (ModelNotFoundException) {
             return $this->notFoundResponse('Invoice not found.');
+        }
+
+        $this->authorize('issue', $invoice);
+
+        try {
+            $invoice = $this->invoiceService->issue($invoice);
         } catch (\RuntimeException $e) {
             return $this->errorResponse($e->getMessage(), 422);
         }
@@ -167,9 +189,15 @@ class InvoiceController extends Controller
     public function void(int $id): JsonResponse
     {
         try {
-            $invoice = $this->invoiceService->void(Invoice::findOrFail($id));
+            $invoice = Invoice::findOrFail($id);
         } catch (ModelNotFoundException) {
             return $this->notFoundResponse('Invoice not found.');
+        }
+
+        $this->authorize('void', $invoice);
+
+        try {
+            $invoice = $this->invoiceService->void($invoice);
         } catch (\RuntimeException $e) {
             return $this->errorResponse($e->getMessage(), 422);
         }
@@ -181,6 +209,13 @@ class InvoiceController extends Controller
     {
         try {
             $invoice = Invoice::findOrFail($id);
+        } catch (ModelNotFoundException) {
+            return $this->notFoundResponse('Invoice not found.');
+        }
+
+        $this->authorize('recordPayment', $invoice);
+
+        try {
             $payment = $this->paymentService->recordForInvoice(
                 auth()->user(),
                 $invoice,
@@ -189,8 +224,6 @@ class InvoiceController extends Controller
                 $request->input('reference'),
                 $request->input('paid_at')
             );
-        } catch (ModelNotFoundException) {
-            return $this->notFoundResponse('Invoice not found.');
         } catch (\RuntimeException $e) {
             return $this->errorResponse($e->getMessage(), $e->getCode() ?: 422);
         }
@@ -205,15 +238,17 @@ class InvoiceController extends Controller
     {
         try {
             $invoice = Invoice::findOrFail($id);
-
-            if ($invoice->status !== 'draft') {
-                return $this->errorResponse('Only draft invoices can be deleted.', 422);
-            }
-
-            $invoice->delete();
         } catch (ModelNotFoundException) {
             return $this->notFoundResponse('Invoice not found.');
         }
+
+        $this->authorize('delete', $invoice);
+
+        if ($invoice->status !== 'draft') {
+            return $this->errorResponse('Only draft invoices can be deleted.', 422);
+        }
+
+        $invoice->delete();
 
         return $this->noContentResponse('Invoice deleted.');
     }

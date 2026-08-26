@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -22,6 +22,7 @@ import type { Column } from '@/components/ui/DataTable';
 export default function TeacherExamDetailPage() {
   const { id } = useParams<{ id: string }>();
   const examId = Number(id);
+  const navigate = useNavigate();
   const { data, isLoading } = useTeacherExam(examId);
   const gradeExamResults = useGradeExamResults(examId);
   const deleteExam = useDeleteExam();
@@ -88,7 +89,7 @@ export default function TeacherExamDetailPage() {
               size="sm"
               onClick={() => {
                 if (confirm('Delete this exam and its results?')) {
-                  deleteExam.mutate(examId, { onSuccess: () => (window.location.href = '/teacher/exams') });
+                  deleteExam.mutate(examId, { onSuccess: () => navigate('/teacher/exams') });
                 }
               }}
             >

@@ -20,11 +20,16 @@ class EnsureUserHasRole
         }
 
         if (!$user->hasAnyRole($roles)) {
+            \Log::warning('Role access denied', [
+                'user_id' => $user->id,
+                'required_roles' => $roles,
+                'user_roles' => $user->getRoleNames()->toArray(),
+                'path' => request()->path(),
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'You do not have the required role to access this resource.',
-                'required_roles' => $roles,
-                'your_roles' => $user->getRoleNames()->toArray(),
             ], 403);
         }
 
