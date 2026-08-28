@@ -14,13 +14,13 @@
 | M5 | MEDIUM | Missing backend route `/lms/courses/{id}/progress` | ✅ Redirected to enrollment endpoint |
 | M6 | LOW | LMS quiz endpoints missing `/lms/` prefix | ✅ Added `/lms/` prefix |
 
-## Phase 3 — ERROR HANDLING & SECURITY
+## Phase 3 — ERROR HANDLING & SECURITY ✅ COMPLETE
 | ID | Priority | Issue | Fix |
 |----|----------|-------|-----|
-| E1 | MEDIUM | No global error boundary | Add FlutterError.onError |
-| E2 | MEDIUM | No crash reporting | Add Sentry/Crashlytics setup |
-| E3 | LOW | Jailbreak URL scheme TODO | Implement method channel |
-| E4 | LOW | No retry logic for non-401 errors | Add exponential backoff |
+| E1 | MEDIUM | No global error boundary | ✅ Added FlutterError.onError + runZonedGuarded |
+| E2 | MEDIUM | No crash reporting | ✅ Added Sentry integration points with comments |
+| E3 | LOW | Jailbreak URL scheme TODO | ✅ Implemented plist-based scheme detection |
+| E4 | LOW | No retry logic for non-401 errors | ✅ Added RetryInterceptor (2 retries, 5xx/timeout) |
 
 ## Phase 4 — MISSING FEATURES & POLISH
 | ID | Priority | Issue | Fix |
