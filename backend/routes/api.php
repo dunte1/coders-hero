@@ -24,7 +24,12 @@ use App\Http\Controllers\Api\Cms\GalleryItemController;
 use App\Http\Controllers\Api\Cms\ProgramController as CmsProgramController;
 use App\Http\Controllers\Api\Cms\ServiceController as CmsServiceController;
 use App\Http\Controllers\Api\Cms\SiteSectionController;
+use App\Http\Controllers\Api\Cms\PopupController as CmsPopupController;
+use App\Http\Controllers\Api\Cms\JobListingController;
+use App\Http\Controllers\Api\Cms\JobApplicationController;
 use App\Http\Controllers\Api\Cms\SiteSettingsController;
+use App\Http\Controllers\Api\PublicPopupController;
+use App\Http\Controllers\Api\PublicJobController;
 use App\Http\Controllers\Api\Competitions\CompetitionController;
 use App\Http\Controllers\Api\Competitions\CompetitionJudgingController;
 use App\Http\Controllers\Api\Competitions\CompetitionRegistrationController;
@@ -85,6 +90,7 @@ use App\Http\Controllers\Api\Parent\ParentProjectController;
 use App\Http\Controllers\Api\Parent\ParentReportCardController;
 use App\Http\Controllers\Api\Parent\ParentAnnouncementController;
 use App\Http\Controllers\Api\Student\StudentPortfolioController;
+use App\Http\Controllers\Api\CodingLanguageController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DepartmentController;
@@ -140,6 +146,7 @@ use App\Http\Controllers\Api\QuizController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\Reports\ReportDownloadController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\SupportTicketController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\TwoFactorController;
 use App\Http\Controllers\Api\UserController;
@@ -172,7 +179,15 @@ Route::prefix('public')->group(function () {
     Route::get('/certificates/qr/{verificationCode}', [CertificateController::class, 'qrCode']);
     Route::get('/projects', [StudentProjectController::class, 'publicIndex']);
     Route::get('/portfolio/{studentId}', [StudentPortfolioController::class, 'show']);
+    Route::get('/coding-languages', [CodingLanguageController::class, 'publicIndex']);
+    Route::get('/popups', [PublicPopupController::class, 'index']);
+
+    Route::get('/jobs', [PublicJobController::class, 'index']);
+    Route::get('/jobs/{id}', [PublicJobController::class, 'show']);
+    Route::post('/jobs/{id}/apply', [PublicJobController::class, 'apply'])->middleware('throttle:5,1');
 });
+
+Route::post('/support/tickets', [SupportTicketController::class, 'store'])->middleware(['auth:sanctum', 'throttle:10,1']);
 
 Route::post('/free-trial', [\App\Http\Controllers\Api\FreeTrialController::class, 'store'])->middleware('throttle:5,1');
 
@@ -256,6 +271,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/announcements', [AnnouncementController::class, 'index']);
     Route::get('/announcements/{id}', [AnnouncementController::class, 'show']);
+
+    Route::get('/support/tickets', [SupportTicketController::class, 'index']);
+    Route::get('/support/tickets/my-tickets', [SupportTicketController::class, 'myTickets']);
+    Route::get('/support/tickets/{id}', [SupportTicketController::class, 'show']);
+    Route::post('/support/tickets/{id}/reply', [SupportTicketController::class, 'reply']);
 
     Route::get('/courses', [CourseController::class, 'index']);
     Route::get('/courses/featured', [CourseController::class, 'featured']);
@@ -404,6 +424,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroy']);
         Route::put('/announcements/{id}/pin', [AnnouncementController::class, 'pin']);
 
+        Route::get('/support/tickets', [SupportTicketController::class, 'index']);
+        Route::put('/support/tickets/{id}', [SupportTicketController::class, 'updateStatus']);
+
         Route::middleware('role:admin|super_admin|director')->group(function () {
             Route::get('/reports/users', [ReportController::class, 'userReport']);
             Route::get('/reports/courses', [ReportController::class, 'courseReport']);
@@ -455,6 +478,13 @@ Route::middleware('auth:sanctum')->group(function () {
         // Search
         Route::get('/search', [\App\Http\Controllers\Api\Admin\SearchController::class, 'search']);
         Route::get('/free-trial-bookings', [\App\Http\Controllers\Api\FreeTrialController::class, 'index']);
+
+        // Coding Languages
+        Route::get('/coding-languages', [CodingLanguageController::class, 'index']);
+        Route::post('/coding-languages', [CodingLanguageController::class, 'store']);
+        Route::get('/coding-languages/{id}', [CodingLanguageController::class, 'show']);
+        Route::put('/coding-languages/{id}', [CodingLanguageController::class, 'update']);
+        Route::delete('/coding-languages/{id}', [CodingLanguageController::class, 'destroy']);
 
         // Refunds
         Route::prefix('refunds')->group(function () {
@@ -540,6 +570,26 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('/chat-settings', [ChatSettingsController::class, 'show']);
         Route::put('/chat-settings', [ChatSettingsController::class, 'update']);
+
+        Route::get('/popups', [CmsPopupController::class, 'index']);
+        Route::post('/popups', [CmsPopupController::class, 'store']);
+        Route::get('/popups/{id}', [CmsPopupController::class, 'show']);
+        Route::put('/popups/{id}', [CmsPopupController::class, 'update']);
+        Route::delete('/popups/{id}', [CmsPopupController::class, 'destroy']);
+        Route::put('/popups/{id}/toggle-active', [CmsPopupController::class, 'toggleActive']);
+
+        // Job Listings (Careers)
+        Route::get('/jobs', [JobListingController::class, 'index']);
+        Route::post('/jobs', [JobListingController::class, 'store']);
+        Route::get('/jobs/{id}', [JobListingController::class, 'show']);
+        Route::put('/jobs/{id}', [JobListingController::class, 'update']);
+        Route::delete('/jobs/{id}', [JobListingController::class, 'destroy']);
+        Route::put('/jobs/{id}/toggle-featured', [JobListingController::class, 'toggleFeatured']);
+
+        // Job Applications
+        Route::get('/job-applications', [JobApplicationController::class, 'index']);
+        Route::get('/job-applications/{id}', [JobApplicationController::class, 'show']);
+        Route::put('/job-applications/{id}/status', [JobApplicationController::class, 'updateStatus']);
 
 Route::get('/analytics/site', [AnalyticsController::class, 'site']);
 
@@ -669,6 +719,11 @@ Route::post('/', [AttendanceController::class, 'store']);
 Route::post('/bulk', [AttendanceController::class, 'bulkStore']);
 Route::put('/{id}', [AttendanceController::class, 'update']);
 Route::delete('/{id}', [AttendanceController::class, 'destroy']);
+});
+
+// Student self-service routes
+Route::middleware('role:student')->prefix('my')->group(function () {
+    Route::get('/id-card/pdf', [StudentController::class, 'myIdCardPdf']);
 });
 
 // Student assignment submission routes
@@ -1215,6 +1270,7 @@ Route::put('/lessons/{lessonId}/video-progress', [VideoProgressController::class
         Route::get('/payslips/{id}/pdf', [PayrollController::class, 'myPayslipPdf']);
 
         Route::get('/documents', [DocumentController::class, 'myDocuments']);
+        Route::get('/documents/{id}/download', [DocumentController::class, 'myDownload']);
         Route::post('/documents', [DocumentController::class, 'myStore']);
     });
 

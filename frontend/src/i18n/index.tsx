@@ -1,8 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { cmsApi } from '@/lib/cmsApi';
-import { useAuthStore } from '@/store/authStore';
+import { usePublicSiteSettings } from '@/hooks/usePublicSiteSettings';
 import { translations, type Locale } from './translations';
 
 const STORAGE_KEY = 'app_language';
@@ -33,17 +31,13 @@ function readStored(): Locale | undefined {
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  // Only fetch the admin site settings when a user is authenticated — for
-  // public visitors this endpoint would 401 and the axios interceptor would
-  // redirect them to /login, breaking the marketing site.
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const { data: settings } = useQuery({
-    queryKey: ['site-settings'],
-    queryFn: cmsApi.siteSettings.get,
-    enabled: isAuthenticated,
-  });
+  // Read the admin-configured default language from the public site settings,
+  // which are accessible to every user. (The admin-only settings endpoint must
+  // not be called from the app shell, otherwise students/parents hit a 403 on
+  // every page load.)
+  const { data: settings } = usePublicSiteSettings();
 
-  const languageSetting = settings?.settings.find((s) => s.key === 'localization.language')?.value;
+  const languageSetting = settings?.settings?.localization?.language;
 
   const [language, setLanguageState] = useState<Locale>(() => readStored() ?? 'en');
 

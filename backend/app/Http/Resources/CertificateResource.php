@@ -30,6 +30,8 @@ class CertificateResource extends JsonResource
             'user' => new UserResource($this->whenLoaded('user')),
             'course' => new CourseResource($this->whenLoaded('course')),
             'verifications_count' => $this->whenCounted('verifications'),
+            'badge_name' => $this->badge_name,
+            'badge_color' => $this->badge_color,
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

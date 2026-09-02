@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { CheckCircle, Send } from 'lucide-react';
 import { websiteApi } from '@/lib/websiteApi';
 import { usePageMeta, formatSiteTitle } from '@/hooks/usePageMeta';
@@ -16,6 +16,8 @@ interface FormData {
   date_of_birth: string;
   gender: string;
   grade: string;
+  program_of_interest: string;
+  preferred_branch: string;
   parent_name: string;
   parent_phone: string;
   parent_email: string;
@@ -31,6 +33,8 @@ const initialFormData: FormData = {
   date_of_birth: '',
   gender: '',
   grade: '',
+  program_of_interest: '',
+  preferred_branch: '',
   parent_name: '',
   parent_phone: '',
   parent_email: '',
@@ -48,6 +52,13 @@ export default function RegistrationPage() {
 
   const [form, setForm] = useState<FormData>(initialFormData);
   const [submitted, setSubmitted] = useState(false);
+
+  const { data: programs } = useQuery({
+    queryKey: ['public-programs'],
+    queryFn: () => websiteApi.programs.list({ per_page: 50 }),
+  });
+
+  const programList = programs?.data ?? [];
 
   const mutation = useMutation({
     mutationFn: (data: FormData) => websiteApi.admissions.submit(data as unknown as Record<string, unknown>),
@@ -180,7 +191,7 @@ export default function RegistrationPage() {
                     <option value="other">Other</option>
                   </select>
                 </div>
-                <div className="sm:col-span-2">
+                <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Grade/Level *</label>
                   <select
                     name="grade"
@@ -196,6 +207,40 @@ export default function RegistrationPage() {
                     <option value="Junior Secondary">Junior Secondary (Ages 12-14)</option>
                     <option value="Senior Secondary">Senior Secondary (Ages 15-17)</option>
                   </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Program of Interest</label>
+                  <select
+                    name="program_of_interest"
+                    value={form.program_of_interest}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                  >
+                    <option value="">Select a program</option>
+                    {programList.map((program) => (
+                      <option key={program.id} value={program.name}>
+                        {program.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Program & Branch */}
+            <div className="rounded-2xl border border-slate-100 p-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Program & Location</h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Preferred Branch</label>
+                  <input
+                    type="text"
+                    name="preferred_branch"
+                    value={form.preferred_branch}
+                    onChange={handleChange}
+                    placeholder="e.g. Main Campus, Westlands Branch"
+                    className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                  />
                 </div>
               </div>
             </div>

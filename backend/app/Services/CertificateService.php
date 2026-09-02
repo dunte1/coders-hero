@@ -152,9 +152,22 @@ class CertificateService
         return 'data:image/svg+xml;base64,' . base64_encode($svg);
     }
 
+    /**
+     * Renders the QR code as a PNG data URI, which DomPDF renders reliably
+     * (inline SVG is only partially supported by the PDF engine).
+     */
+    public function generateQrPngDataUrl(string $verificationCode): string
+    {
+        $renderer = new \BaconQrCode\Renderer\GDLibRenderer(480, 4, 'png');
+        $writer = new Writer($renderer);
+        $png = $writer->writeString(url('/verify-certificate/' . $verificationCode));
+
+        return 'data:image/png;base64,' . base64_encode($png);
+    }
+
     // ---- Issue ----
 
-    public function issue(int $enrollmentId, ?int $templateId = null, ?string $issuedByUserId = null): Certificate
+    public function issue(int $enrollmentId, ?int $templateId = null, ?string $issuedByUserId = null, ?string $badgeName = null, ?string $badgeColor = null): Certificate
     {
         $enrollment = Enrollment::with(['user', 'course'])->findOrFail($enrollmentId);
 
@@ -188,6 +201,8 @@ class CertificateService
             'digital_signature' => $template?->signature_name ?: null,
             'status' => 'issued',
             'issued_by_user_id' => $issuedByUserId ?? auth()->id(),
+            'badge_name' => $badgeName,
+            'badge_color' => $badgeColor,
         ]);
 
         $this->renderPdf($certificate);
@@ -225,7 +240,7 @@ class CertificateService
         return $certificate->fresh()->load(['user', 'course', 'template']);
     }
 
-    public function bulkGenerate(int $courseId, ?int $templateId = null): array
+    public function bulkGenerate(int $courseId, ?int $templateId = null, ?string $badgeName = null, ?string $badgeColor = null): array
     {
         $completedEnrollments = Enrollment::query()
             ->with(['user', 'course'])
@@ -236,7 +251,7 @@ class CertificateService
 
         $created = 0;
         foreach ($completedEnrollments as $enrollment) {
-            $this->issue($enrollment->id, $templateId);
+            $this->issue($enrollment->id, $templateId, null, $badgeName, $badgeColor);
             $created++;
         }
 
@@ -272,12 +287,14 @@ class CertificateService
             'bodyHtml' => $bodyHtml,
             'accentColor' => $template?->accent_color ?? '#6366f1',
             'fontFamily' => $template?->font_family ?? 'DejaVu Sans',
-            'qrCode' => $this->generateQrSvg($certificate->verification_code),
+            'qrCode' => $this->generateQrPngDataUrl($certificate->verification_code),
             'signatureName' => $template?->signature_name ?? $certificate->digital_signature,
             'signatureTitle' => $template?->signature_title,
             'signatureImage' => $signatureImage,
             'siteName' => SiteSetting::siteName(),
             'siteLogo' => SiteSetting::siteLogo(),
+            'badgeName' => $certificate->badge_name,
+            'badgeColor' => $certificate->badge_color ?? '#6366f1',
         ])->render();
 
         $pdf = Pdf::loadHTML($html);

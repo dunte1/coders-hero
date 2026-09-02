@@ -4,15 +4,10 @@ namespace App\Notifications;
 
 use App\Models\FreeTrialBooking;
 use App\Models\SiteSetting;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class FreeTrialConfirmationNotification extends Notification implements ShouldQueue
+class FreeTrialConfirmationNotification extends BrandedNotification
 {
-    use Queueable;
-
     public function __construct(
         public FreeTrialBooking $booking
     ) {}
@@ -26,14 +21,16 @@ class FreeTrialConfirmationNotification extends Notification implements ShouldQu
     {
         $siteName = SiteSetting::siteName();
 
-        return (new MailMessage)
-            ->subject("Free Trial Booking Confirmed - {$siteName}")
-            ->greeting("Hello {$this->booking->parent_name}!")
-            ->line("Thank you for booking a free trial class at {$siteName}!")
-            ->line("Child's Name: **{$this->booking->child_name}**")
-            ->line("Grade: {$this->booking->grade}")
-            ->line("Our team will contact you shortly to schedule the trial class.")
-            ->line("If you have any questions, please don't hesitate to reach out.")
-            ->line("Best regards,\nThe {$siteName} Team");
+        return $this->brandedMail(
+            "Free Trial Booking Confirmed - {$siteName}",
+            "Hello {$this->booking->parent_name}!",
+            [
+                "Thank you for booking a free trial class at {$siteName}!",
+                "Child's Name: **{$this->booking->child_name}**",
+                "Grade: {$this->booking->grade}",
+                "Our team will contact you shortly to schedule the trial class.",
+                "If you have any questions, please don't hesitate to reach out.",
+            ]
+        );
     }
 }

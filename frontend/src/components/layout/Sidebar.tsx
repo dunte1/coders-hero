@@ -30,7 +30,7 @@ export function Sidebar({ className }: SidebarProps) {
 
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 lg:translate-x-0 lg:static lg:z-auto',
+          'fixed inset-y-0 left-0 z-50 flex min-h-0 flex-col transition-all duration-300 lg:translate-x-0',
           sidebarCollapsed ? 'w-[68px]' : 'w-56',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full',
           className
@@ -73,7 +73,7 @@ export function Sidebar({ className }: SidebarProps) {
         </div>
 
         {/* Nav */}
-        <nav className={cn('flex-1 overflow-y-auto p-3 space-y-1', sidebarCollapsed && 'px-2 pt-3')}>
+        <nav className={cn('min-h-0 flex-1 overflow-y-auto p-3 space-y-1', sidebarCollapsed && 'px-2 pt-3')}>
           {navigation.map((entry) =>
             entry.children ? (
               <SidebarGroup key={entry.label} entry={entry} collapsed={sidebarCollapsed} />

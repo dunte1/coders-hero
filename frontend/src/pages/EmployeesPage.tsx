@@ -6,31 +6,28 @@ import { EmployeeDirectory } from '@/components/features/employees/EmployeeDirec
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageSpinner } from '@/components/ui/Spinner';
 import { SearchInput } from '@/components/ui/SearchInput';
+import { Pagination } from '@/components/ui/Pagination';
 import { Button } from '@/components/ui/Button';
-import type { Employee } from '@/types';
+
+const PAGE_SIZE = 24;
 
 export default function EmployeesPage() {
   const navigate = useNavigate();
+  const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['employees', search],
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['employees', { search, page }],
     queryFn: () =>
-      employeesApi.getEmployees(
-        search ? { search, page_size: 50 } : { page_size: 50 }
-      ),
+      employeesApi.getEmployees({
+        page,
+        page_size: PAGE_SIZE,
+        ...(search ? { search } : {}),
+      }),
   });
 
   const employees = data?.results || [];
-
-  const filtered = search
-    ? employees.filter(
-        (e: Employee) =>
-          `${e.user.first_name} ${e.user.last_name}`.toLowerCase().includes(search.toLowerCase()) ||
-          e.position?.title?.toLowerCase().includes(search.toLowerCase()) ||
-          e.department?.name?.toLowerCase().includes(search.toLowerCase())
-      )
-    : employees;
+  const totalPages = data ? Math.ceil(data.count / PAGE_SIZE) : 0;
 
   return (
     <div className="space-y-6">
@@ -46,18 +43,37 @@ export default function EmployeesPage() {
       <SearchInput
         placeholder="Search by name, position, or department..."
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        onClear={() => setSearch('')}
+        onChange={(e) => {
+          setSearch(e.target.value);
+          setPage(1);
+        }}
+        onClear={() => {
+          setSearch('');
+          setPage(1);
+        }}
         className="max-w-md"
       />
 
       {isLoading ? (
         <PageSpinner />
+      ) : isError ? (
+        <div className="text-center py-12 text-red-500">Failed to load employees. Please try again.</div>
       ) : (
-        <EmployeeDirectory
-          employees={filtered}
-          onEmployeeClick={(emp) => navigate(`/employees/${emp.id}`)}
-        />
+        <>
+          <EmployeeDirectory
+            employees={employees}
+            onEmployeeClick={(emp) => navigate(`/employees/${emp.id}`)}
+          />
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              totalCount={data?.count}
+              pageSize={PAGE_SIZE}
+            />
+          )}
+        </>
       )}
     </div>
   );

@@ -29,6 +29,8 @@ class DatabaseSeeder extends Seeder
             CertificateSeeder::class,
             AiPlatformSeeder::class,
             NotificationSeeder::class,
+            CodingLanguageSeeder::class,
+            PopupSeeder::class,
         ]);
     }
 }

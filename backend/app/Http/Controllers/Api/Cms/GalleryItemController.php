@@ -71,7 +71,7 @@ class GalleryItemController extends Controller
             'title' => ['sometimes', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
             'category' => ['nullable', 'string', 'max:50'],
-            'image' => ['nullable', 'string', 'max:4000'],
+            'image' => ['nullable', 'string', 'max:7000000'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_active' => ['nullable', 'boolean'],
         ]);

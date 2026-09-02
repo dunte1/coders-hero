@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthLogo } from '@/components/features/auth/AuthLogo';
+import { CopyrightFooter } from '@/components/ui/CopyrightFooter';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Eye, EyeOff, ArrowRight, CheckCircle2 } from 'lucide-react';
@@ -230,7 +231,7 @@ export function RegisterForm() {
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-slate-500">
+<p className="mt-6 text-center text-sm text-slate-500">
             Already have an account?{' '}
             <Link
               to="/login"
@@ -239,6 +240,7 @@ export function RegisterForm() {
               Sign in
             </Link>
           </p>
+          <CopyrightFooter />
         </div>
       </div>
     </div>

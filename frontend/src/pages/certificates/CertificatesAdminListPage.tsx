@@ -40,6 +40,8 @@ export default function CertificatesAdminListPage() {
   const [bulkCourseId, setBulkCourseId] = useState('');
   const [bulkTemplateId, setBulkTemplateId] = useState('none');
   const [bulkResult, setBulkResult] = useState<{ generated: number; skipped: number } | null>(null);
+  const [bulkBadgeName, setBulkBadgeName] = useState('');
+  const [bulkBadgeColor, setBulkBadgeColor] = useState('#6366f1');
 
   const { data, isLoading } = useAllCertificates({ page, per_page: 15, search: appliedSearch || undefined, status });
   const revoke = useRevokeCertificate();
@@ -230,6 +232,33 @@ export default function CertificatesAdminListPage() {
                 </SelectContent>
               </SelectRoot>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="bulk-badge-name">Badge Name (optional)</Label>
+              <Input
+                id="bulk-badge-name"
+                value={bulkBadgeName}
+                onChange={(e) => setBulkBadgeName(e.target.value)}
+                placeholder="e.g. Course Completion, Excellence Award"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="bulk-badge-color">Badge Color</Label>
+              <div className="flex gap-2 items-center">
+                <input
+                  id="bulk-badge-color"
+                  type="color"
+                  value={bulkBadgeColor}
+                  onChange={(e) => setBulkBadgeColor(e.target.value)}
+                  className="h-10 w-10 rounded border border-slate-200 cursor-pointer"
+                />
+                <Input
+                  value={bulkBadgeColor}
+                  onChange={(e) => setBulkBadgeColor(e.target.value)}
+                  className="flex-1"
+                  placeholder="#6366f1"
+                />
+              </div>
+            </div>
             {bulkResult && (
               <div className="rounded-lg bg-green-50 border border-green-200 p-3 text-sm text-green-800">
                 Generated {bulkResult.generated} certificate(s).
@@ -243,7 +272,12 @@ export default function CertificatesAdminListPage() {
               disabled={!bulkCourseId || bulk.isPending}
               onClick={() =>
                 bulk.mutate(
-                  { courseId: Number(bulkCourseId), templateId: bulkTemplateId === 'none' ? null : Number(bulkTemplateId) },
+                  {
+                    courseId: Number(bulkCourseId),
+                    templateId: bulkTemplateId === 'none' ? null : Number(bulkTemplateId),
+                    badgeName: bulkBadgeName || null,
+                    badgeColor: bulkBadgeColor || null,
+                  },
                   { onSuccess: (res) => setBulkResult(res) }
                 )
               }

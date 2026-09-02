@@ -8,7 +8,7 @@ import { Award } from 'lucide-react';
 import { downloadFile } from '@/lib/utils';
 
 export default function CertificatesPage() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['certificates'],
     queryFn: () => certificatesApi.getCertificates({ page_size: 50 }),
   });
@@ -25,6 +25,8 @@ export default function CertificatesPage() {
 
       {isLoading ? (
         <PageSpinner />
+      ) : isError ? (
+        <div className="text-center py-12 text-red-500">Failed to load certificates. Please try again.</div>
       ) : certificates.length === 0 ? (
         <EmptyState
           icon={Award}

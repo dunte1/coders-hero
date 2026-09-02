@@ -30,6 +30,9 @@ class Certificate extends Model
         'revoked_reason',
         'issued_by_user_id',
         'meta',
+        'badge_name',
+        'badge_icon',
+        'badge_color',
     ];
 
     protected function casts(): array

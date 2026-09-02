@@ -7,6 +7,7 @@ import { useMutation } from '@tanstack/react-query';
 import { authApi } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { CopyrightFooter } from '@/components/ui/CopyrightFooter';
 import { Rocket, ArrowLeft, Mail, CheckCircle2 } from 'lucide-react';
 
 const schema = z.object({
@@ -122,6 +123,7 @@ export default function ForgotPasswordPage() {
           )}
         </div>
       </div>
+      <CopyrightFooter />
     </div>
   );
 }

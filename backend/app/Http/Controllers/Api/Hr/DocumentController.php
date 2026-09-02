@@ -116,6 +116,29 @@ class DocumentController extends Controller
         );
     }
 
+    public function myDownload(int $id): \Symfony\Component\HttpFoundation\BinaryFileResponse
+    {
+        $employee = $this->hrService->employeeForUser(auth()->user());
+
+        if (!$employee) {
+            abort(403, 'Only employees can access their own documents.');
+        }
+
+        $document = EmployeeDocument::query()
+            ->where('employee_id', $employee->id)
+            ->find($id);
+
+        if (!$document || !Storage::disk('public')->exists($document->file_path)) {
+            abort(404, 'Document not found.');
+        }
+
+        return response()->download(
+            Storage::disk('public')->path($document->file_path),
+            $document->file_name,
+            ['Content-Type' => $document->mime_type]
+        );
+    }
+
     public function myStore(StoreEmployeeDocumentRequest $request): JsonResponse
     {
         $employee = $this->hrService->employeeForUser(auth()->user());

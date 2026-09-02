@@ -44,8 +44,8 @@ export default function NotificationsPage() {
 
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const notifications = data?.results ?? [];
-  const totalPages = data?.meta?.last_page ?? 1;
-  const totalCount = data?.meta?.total ?? 0;
+  const totalPages = data ? Math.ceil(data.count / 20) : 1;
+  const totalCount = data?.count ?? 0;
 
   const handleMarkRead = (id: string) => {
     markRead.mutate(id);

@@ -10,7 +10,7 @@ import { Clock, HelpCircle, Award } from 'lucide-react';
 
 export default function QuizPage() {
   const navigate = useNavigate();
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['quizzes'],
     queryFn: () => quizzesApi.getQuizzes({ page_size: 50 }),
   });
@@ -27,6 +27,8 @@ export default function QuizPage() {
 
       {isLoading ? (
         <PageSpinner />
+      ) : isError ? (
+        <div className="text-center py-12 text-red-500">Failed to load quizzes. Please try again.</div>
       ) : quizzes.length === 0 ? (
         <div className="text-center py-12 text-slate-500">No quizzes available</div>
       ) : (

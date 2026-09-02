@@ -15,14 +15,17 @@ export default function AnnouncementsPage() {
   const navigate = useNavigate();
   const [showCreate, setShowCreate] = useState(false);
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['announcements'],
     queryFn: () => announcementsApi.getAnnouncements({ page_size: 50 }),
   });
 
   const announcements = data?.results || [];
 
+  const [isCreating, setIsCreating] = useState(false);
+
   const handleCreate = async (formData: AnnouncementCreate) => {
+    setIsCreating(true);
     try {
       await announcementsApi.createAnnouncement(formData);
       toast.success('Announcement published');
@@ -30,6 +33,8 @@ export default function AnnouncementsPage() {
       refetch();
     } catch {
       toast.error('Failed to create announcement');
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -46,6 +51,8 @@ export default function AnnouncementsPage() {
 
       {isLoading ? (
         <PageSpinner />
+      ) : isError ? (
+        <div className="text-center py-12 text-red-500">Failed to load announcements. Please try again.</div>
       ) : (
         <AnnouncementList
           announcements={announcements}
@@ -60,7 +67,7 @@ export default function AnnouncementsPage() {
           </DialogHeader>
           <AnnouncementForm
             onSubmit={handleCreate}
-            isLoading={false}
+            isLoading={isCreating}
           />
         </DialogContent>
       </DialogRoot>

@@ -1,6 +1,6 @@
 import { Card, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { Award, Download, ExternalLink } from 'lucide-react';
+import { Award, Download, ExternalLink, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import type { Certificate } from '@/types';
 import { formatDate } from '@/lib/utils';
@@ -14,7 +14,21 @@ export function CertificateCard({ certificate, onDownload }: CertificateCardProp
   return (
     <Card className="overflow-hidden hover:shadow-md transition-shadow">
       <div className="bg-gradient-to-r from-brand-600 to-brand-800 p-6 text-center">
-        <Award className="h-12 w-12 text-white/80 mx-auto mb-3" />
+        {certificate.badge_name ? (
+          <div className="flex flex-col items-center gap-2">
+            <div
+              className="h-12 w-12 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: `${certificate.badge_color ?? '#6366f1'}20` }}
+            >
+              <ShieldCheck className="h-7 w-7" style={{ color: certificate.badge_color ?? '#6366f1' }} />
+            </div>
+            <span className="text-white/90 text-xs font-semibold uppercase tracking-wider">
+              {certificate.badge_name}
+            </span>
+          </div>
+        ) : (
+          <Award className="h-12 w-12 text-white/80 mx-auto mb-3" />
+        )}
         <h3 className="text-white font-bold text-lg">{certificate.course?.title}</h3>
       </div>
       <CardContent className="p-5">

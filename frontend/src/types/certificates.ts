@@ -31,6 +31,8 @@ export interface Certificate {
   user?: CertificateHolder | null;
   course?: Course | null;
   verifications_count?: number;
+  badge_name?: string | null;
+  badge_color?: string | null;
   created_at: string | null;
   updated_at: string | null;
 }

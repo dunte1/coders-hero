@@ -185,7 +185,7 @@ export function Footer() {
         </div>
 
         <div className="mt-10 border-t border-slate-800 pt-6 text-center text-xs text-slate-500">
-          © {new Date().getFullYear()} {siteName}. All rights reserved.
+          © {new Date().getFullYear()} {siteName}. Developed by Duncoweb Solutions. All rights reserved.
         </div>
       </div>
     </footer>

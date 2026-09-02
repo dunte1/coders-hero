@@ -1,13 +1,7 @@
-# Set React app as default index
-DirectoryIndex build/index.html index.php index.html
-
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Serve frontend assets from build directory
-    RewriteRule ^assets/(.+)$ build/assets/$1 [L]
-
-    # Serve existing files (vite.svg, etc)
+    # Serve existing files directly (assets, vite.svg, etc.)
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ - [L]
 
@@ -23,5 +17,5 @@ DirectoryIndex build/index.html index.php index.html
     RewriteRule ^robots\.txt$ index.php [L]
 
     # React SPA routes - fallback to index.html
-    RewriteRule ^ build/index.html [L]
+    RewriteRule ^ index.html [L]
 </IfModule>

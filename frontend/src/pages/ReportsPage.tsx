@@ -65,8 +65,6 @@ export default function ReportsPage() {
     }
   };
 
-  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
   const { data: userReport, isLoading: userLoading, isError: userError } = useQuery({
     queryKey: ['report', 'users'],
     queryFn: () => reportsApi.getUserReport(),
@@ -256,7 +254,7 @@ export default function ReportsPage() {
 
           {generatedReports?.results && generatedReports.results.length > 0 ? (
             <div className="space-y-2">
-              {generatedReports.results.map((report: { id: number; month: number; year: number; status?: string; created_at?: string }) => (
+              {generatedReports.results.map((report) => (
                 <div
                   key={report.id}
                   className="flex items-center justify-between rounded-lg border border-slate-200 p-4 hover:bg-slate-50 transition-colors"

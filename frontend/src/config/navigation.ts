@@ -23,6 +23,7 @@ import {
   GraduationCap,
   HelpCircle as HelpCircleIcon,
   History,
+  IdCard,
   Image,
   KeyRound,
   LayoutDashboard,
@@ -234,6 +235,7 @@ export const navigation: NavEntry[] = [
       { label: 'My Assignments', href: '/student/assignments', icon: ClipboardList, roles: ['student'] },
       { label: 'My Projects', href: '/student/projects', icon: FolderKanban, roles: ['student'] },
       { label: 'My Exams', href: '/student/exams', icon: FileText, roles: ['student'] },
+      { label: 'My ID Card', href: '/my/id-card', icon: IdCard, roles: ['student'] },
       { label: 'My Progress', href: '/lms/analytics', icon: BarChart3, roles: ['student'] },
       { label: 'Quizzes', href: '/quizzes', icon: FileText },
       { label: 'Forum', href: '/lms/forum', icon: MessageSquare },
@@ -252,6 +254,13 @@ export const navigation: NavEntry[] = [
       { label: 'Challenges', href: '/lms/coding-exercises', icon: CheckSquare },
       { label: 'Leaderboard', href: '/lms/coding-leaderboard', icon: Trophy },
     ],
+  },
+
+  {
+    label: 'Coding Languages',
+    href: '/admin/coding-languages',
+    icon: Code2,
+    roles: ['admin', 'super_admin'],
   },
 
   {
@@ -394,6 +403,9 @@ export const navigation: NavEntry[] = [
       { label: 'FAQs', href: '/cms/faqs', icon: HelpCircleIcon },
       { label: 'Contact Messages', href: '/cms/contact-messages', icon: Mail },
       { label: 'Chat Widget', href: '/cms/chat-widget', icon: MessageSquare },
+      { label: 'Popups', href: '/cms/popups', icon: Megaphone },
+      { label: 'Careers / Jobs', href: '/cms/jobs', icon: Briefcase },
+      { label: 'Job Applications', href: '/cms/jobs/applications', icon: ClipboardList },
       { label: 'Analytics', href: '/cms/analytics', icon: BarChart3 },
     ],
   },
@@ -454,6 +466,15 @@ export const navigation: NavEntry[] = [
       { label: 'System Health', href: '/admin/system-health', icon: ActivityIcon, roles: ['super_admin'] },
       { label: 'Backups', href: '/admin/backups', icon: Save, roles: ['super_admin'] },
       { label: 'System Logs', href: '/admin/system-logs', icon: FileText, roles: ['super_admin'] },
+    ],
+  },
+
+  {
+    label: 'Support',
+    icon: HelpCircleIcon,
+    roles: ['student', 'teacher', 'instructor', 'employee', 'parent', 'admin', 'super_admin'],
+    children: [
+      { label: 'Help & Support', href: '/support', icon: HelpCircleIcon },
     ],
   },
 

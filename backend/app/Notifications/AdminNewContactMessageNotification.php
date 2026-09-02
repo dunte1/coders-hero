@@ -4,15 +4,10 @@ namespace App\Notifications;
 
 use App\Models\ContactMessage;
 use App\Models\SiteSetting;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
-class AdminNewContactMessageNotification extends Notification implements ShouldQueue
+class AdminNewContactMessageNotification extends BrandedNotification
 {
-    use Queueable;
-
     public function __construct(
         public ContactMessage $message
     ) {}
@@ -27,16 +22,18 @@ class AdminNewContactMessageNotification extends Notification implements ShouldQ
         $siteName = SiteSetting::siteName();
         $adminUrl = config('app.frontend_url', 'http://localhost:5173') . '/admin/contact-messages';
 
-        return (new MailMessage)
-            ->subject("New Contact Message - {$siteName}")
-            ->greeting("New Contact Message Received!")
-            ->line("A new message has been submitted through the contact form.")
-            ->line("From: **{$this->message->name}**")
-            ->line("Email: {$this->message->email}")
-            ->line("Subject: {$this->message->subject}")
-            ->line("Message:")
-            ->line($this->message->message)
-            ->action('View Message', $adminUrl)
-            ->line("Best regards,\n{$siteName} System");
+        return $this->brandedMail(
+            "New Contact Message - {$siteName}",
+            "New Contact Message Received!",
+            [
+                "A new message has been submitted through the contact form.",
+                "From: **{$this->message->name}**",
+                "Email: {$this->message->email}",
+                "Subject: {$this->message->subject}",
+                "Message: {$this->message->message}",
+            ],
+            $adminUrl,
+            'View Message'
+        );
     }
 }

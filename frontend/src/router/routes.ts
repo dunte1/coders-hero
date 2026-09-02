@@ -111,6 +111,11 @@ export const routes: RouteConfig[] = [
     meta: { title: 'Login', public: true },
   },
   {
+    path: '/register',
+    element: React.lazy(() => import('@/pages/RegisterPage')),
+    meta: { title: 'Register', public: true },
+  },
+  {
     path: '/verify-email',
     element: React.lazy(() => import('@/pages/VerifyEmailPage')),
     meta: { title: 'Verify Email', public: true },
@@ -301,6 +306,18 @@ export const routes: RouteConfig[] = [
     meta: { title: 'Verification History', roles: ['admin', 'super_admin'] },
   },
 
+  // Support
+  {
+    path: '/support',
+    element: React.lazy(() => import('@/pages/support/SupportTicketsPage')),
+    meta: { title: 'Support' },
+  },
+  {
+    path: '/support/:id',
+    element: React.lazy(() => import('@/pages/support/SupportTicketDetailPage')),
+    meta: { title: 'Support Ticket' },
+  },
+
   // Competitions
   {
     path: '/competitions',
@@ -379,6 +396,13 @@ export const routes: RouteConfig[] = [
     path: '/profile',
     element: React.lazy(() => import('@/pages/ProfilePage')),
     meta: { title: 'Profile' },
+  },
+
+  // Student ID Card
+  {
+    path: '/my/id-card',
+    element: React.lazy(() => import('@/pages/MyIdCardPage')),
+    meta: { title: 'My ID Card' },
   },
 
   // Settings
@@ -514,6 +538,51 @@ export const routes: RouteConfig[] = [
     path: '/cms/chat-widget',
     element: React.lazy(() => import('@/pages/cms/ChatWidgetSettingsPage')),
     meta: { title: 'Chat Widget', roles: ['admin', 'super_admin'] },
+  },
+  {
+    path: '/cms/popups',
+    element: React.lazy(() => import('@/pages/cms/PopupsAdminPage')),
+    meta: { title: 'Popups', roles: ['admin', 'super_admin'] },
+  },
+  {
+    path: '/cms/popups/new',
+    element: React.lazy(() => import('@/pages/cms/PopupEditPage')),
+    meta: { title: 'New Popup', roles: ['admin', 'super_admin'] },
+  },
+  {
+    path: '/cms/popups/:id/edit',
+    element: React.lazy(() => import('@/pages/cms/PopupEditPage')),
+    meta: { title: 'Edit Popup', roles: ['admin', 'super_admin'] },
+  },
+  {
+    path: '/cms/jobs',
+    element: React.lazy(() => import('@/pages/cms/JobsAdminPage')),
+    meta: { title: 'Job Listings', roles: ['admin', 'super_admin'] },
+  },
+  {
+    path: '/cms/jobs/new',
+    element: React.lazy(() => import('@/pages/cms/JobEditPage')),
+    meta: { title: 'New Job', roles: ['admin', 'super_admin'] },
+  },
+  {
+    path: '/cms/jobs/:id/edit',
+    element: React.lazy(() => import('@/pages/cms/JobEditPage')),
+    meta: { title: 'Edit Job', roles: ['admin', 'super_admin'] },
+  },
+  {
+    path: '/cms/jobs/applications',
+    element: React.lazy(() => import('@/pages/cms/JobApplicationsPage')),
+    meta: { title: 'Job Applications', roles: ['admin', 'super_admin'] },
+  },
+  {
+    path: '/careers',
+    element: React.lazy(() => import('@/pages/careers/CareersPage')),
+    meta: { title: 'Careers', public: true },
+  },
+  {
+    path: '/careers/:id',
+    element: React.lazy(() => import('@/pages/careers/CareerDetailPage')),
+    meta: { title: 'Job Detail', public: true },
   },
   {
     path: '/cms/analytics',
@@ -1289,6 +1358,11 @@ export const routes: RouteConfig[] = [
     path: '/admin',
     element: React.lazy(() => import('@/pages/admin/AdminOverviewPage')),
     meta: { title: 'Administration', roles: ['admin', 'super_admin'] },
+  },
+  {
+    path: '/admin/coding-languages',
+    element: React.lazy(() => import('@/pages/admin/CodingLanguagesAdminPage')),
+    meta: { title: 'Coding Languages', roles: ['admin', 'super_admin'] },
   },
   {
     path: '/admin/activity-logs',

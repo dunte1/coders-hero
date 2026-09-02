@@ -114,6 +114,8 @@ interface RawUser {
   created_at: string;
   updated_at?: string;
   roles?: RawRole[];
+  student_id?: string;
+  employee_id?: string;
 }
 
 interface LoginPayload {
@@ -138,6 +140,8 @@ function normalizeUser(raw: RawUser): User {
     date_joined: raw.created_at,
     last_login: raw.last_login_at ?? undefined,
     email_verified_at: raw.email_verified_at ?? null,
+    student_id: raw.student_id ?? undefined,
+    employee_id: raw.employee_id ?? undefined,
   };
 }
 
@@ -600,13 +604,21 @@ export const parentAnnouncementsApi = {
 };
 
 // Reports — generated
+export interface GeneratedReport {
+  id: number;
+  month: number;
+  year: number;
+  status?: string;
+  created_at?: string;
+}
+
 export const reportsGeneratedApi = {
   generateReport: (data: { month: number; year: number }) =>
     api.post('/admin/reports/generated', data).then(r => handleResponse(r)),
   downloadReport: (id: number) =>
     api.get(`/admin/reports/download/${id}`, { responseType: 'blob' }).then(r => r.data),
   listGenerated: (params?: Record<string, string | number | boolean>) =>
-    api.get('/admin/reports/generated', { params }).then(r => unwrapPage(r)),
+    api.get('/admin/reports/generated', { params }).then(r => unwrapPage<GeneratedReport>(r)),
 };
 
 // Class Sessions (Live Classes)

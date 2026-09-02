@@ -23,6 +23,8 @@ class UserResource extends JsonResource
             'updated_at' => $this->updated_at->toISOString(),
             'roles' => RoleResource::collection($this->whenLoaded('roles')),
             'employee' => new EmployeeResource($this->whenLoaded('employee')),
+            'employee_id' => $this->whenLoaded('employee', fn () => $this->employee->employee_id),
+            'student_id' => $this->whenLoaded('student', fn () => $this->student->student_id),
         ];
     }
 }

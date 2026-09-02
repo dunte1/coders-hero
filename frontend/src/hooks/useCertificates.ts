@@ -34,8 +34,8 @@ export function useTemplateOptions() {
 export function useIssueCertificate() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ enrollmentId, templateId }: { enrollmentId: number; templateId?: number | null }) =>
-      certificatesApi.issue(enrollmentId, templateId),
+    mutationFn: ({ enrollmentId, templateId, badgeName, badgeColor }: { enrollmentId: number; templateId?: number | null; badgeName?: string | null; badgeColor?: string | null }) =>
+      certificatesApi.issue(enrollmentId, templateId, badgeName, badgeColor),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['certificates'] });
       toast.success('Certificate issued');
@@ -47,8 +47,8 @@ export function useIssueCertificate() {
 export function useBulkGenerate() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ courseId, templateId }: { courseId: number; templateId?: number | null }) =>
-      certificatesApi.bulkGenerate(courseId, templateId),
+    mutationFn: ({ courseId, templateId, badgeName, badgeColor }: { courseId: number; templateId?: number | null; badgeName?: string | null; badgeColor?: string | null }) =>
+      certificatesApi.bulkGenerate(courseId, templateId, badgeName, badgeColor),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['certificates'] });
       toast.success('Bulk generation completed');

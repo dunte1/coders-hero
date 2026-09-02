@@ -93,7 +93,7 @@ function ProfileSkeleton() {
 }
 
 export default function ProfilePage() {
-  const { user, setUser, resendEmailVerification, isLoading: authLoading } = useAuth();
+  const { user, profile, setUser, resendEmailVerification, isLoading: authLoading } = useAuth();
   const [isUpdating, setIsUpdating] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -196,9 +196,11 @@ export default function ProfilePage() {
     return <ProfileSkeleton />;
   }
 
-  const emailVerified = !!user.email_verified_at;
-  const memberSince = user.date_joined ? new Date(user.date_joined).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : null;
-  const lastLogin = user.last_login ? new Date(user.last_login).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : null;
+  const emailVerified = !!(user.email_verified_at || profile?.email_verified_at);
+  const studentId = profile?.student_id ?? user.student_id;
+  const employeeId = profile?.employee_id ?? user.employee_id;
+  const memberSince = (profile?.date_joined ?? user.date_joined) ? new Date(profile?.date_joined ?? user.date_joined!).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : null;
+  const lastLogin = (profile?.last_login ?? user.last_login) ? new Date(profile?.last_login ?? user.last_login!).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : null;
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -243,6 +245,8 @@ export default function ProfilePage() {
             <p className="text-sm text-slate-500">{user.email}</p>
             <div className="mt-1.5 flex flex-wrap items-center gap-2">
               <Badge variant="secondary">{user.role?.display_name || user.role?.name}</Badge>
+              {studentId && <Badge variant="outline">{studentId}</Badge>}
+              {employeeId && <Badge variant="outline">{employeeId}</Badge>}
               <Badge variant={emailVerified ? 'success' : 'warning'}>
                 {emailVerified ? 'Email verified' : 'Email not verified'}
               </Badge>

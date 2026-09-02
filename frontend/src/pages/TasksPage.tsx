@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTasks, useChangeTaskStatus } from '@/hooks/useTasks';
 import { TaskBoard } from '@/components/features/tasks/TaskBoard';
@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { PageSpinner } from '@/components/ui/Spinner';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/Button';
+import { SearchInput } from '@/components/ui/SearchInput';
 import { LayoutGrid, List } from 'lucide-react';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { Badge } from '@/components/ui/Badge';
@@ -15,10 +16,22 @@ import type { Task } from '@/types';
 export default function TasksPage() {
   const navigate = useNavigate();
   const [view, setView] = useState<'board' | 'list'>('board');
+  const [search, setSearch] = useState('');
   const { data, isLoading, isError } = useTasks();
   const changeStatus = useChangeTaskStatus();
 
-  const tasks = data?.results || [];
+  const tasks = useMemo(() => {
+    const all = data?.results || [];
+    const q = search.trim().toLowerCase();
+    if (!q) return all;
+    return all.filter(
+      (t) =>
+        t.title.toLowerCase().includes(q) ||
+        t.priority.toLowerCase().includes(q) ||
+        t.status.replace(/_/g, ' ').toLowerCase().includes(q) ||
+        (t.assignee && `${t.assignee.first_name} ${t.assignee.last_name}`.toLowerCase().includes(q))
+    );
+  }, [data, search]);
 
   const listColumns: Column<Task>[] = [
     {
@@ -70,6 +83,14 @@ export default function TasksPage() {
         }
       />
 
+      <SearchInput
+        placeholder="Search by title, priority, or assignee..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        onClear={() => setSearch('')}
+        className="w-full sm:w-72"
+      />
+
       {isLoading ? (
         <PageSpinner />
       ) : isError ? (
@@ -84,7 +105,7 @@ export default function TasksPage() {
         <DataTable
           columns={listColumns}
           data={tasks}
-          totalCount={data?.count || 0}
+          totalCount={tasks.length}
           onRowClick={(item) => navigate(`/tasks/${item.id}`)}
         />
       )}

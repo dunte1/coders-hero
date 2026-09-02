@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { AuthLogo } from '@/components/features/auth/AuthLogo';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { CopyrightFooter } from '@/components/ui/CopyrightFooter';
 import { Eye, EyeOff, ArrowRight, Shield, BookOpen, Users, AlertTriangle, Info } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -170,6 +171,7 @@ export function LoginForm() {
               Create one free
             </Link>
           </p>
+          <CopyrightFooter />
         </div>
       </div>
     </div>

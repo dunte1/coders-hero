@@ -13,6 +13,8 @@ export interface User {
   created_at?: string;
   last_login?: string;
   email_verified_at?: string | null;
+  student_id?: string;
+  employee_id?: string;
 }
 
 export interface UserCreate {
@@ -322,6 +324,8 @@ export interface Certificate {
   issued_at: string;
   expiry_date?: string;
   is_valid: boolean;
+  badge_name?: string | null;
+  badge_color?: string | null;
 }
 
 export interface Announcement {

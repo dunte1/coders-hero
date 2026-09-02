@@ -32,9 +32,11 @@ export const certificatesApi = {
   qrCode: (verificationCode: string) =>
     api.get<{ data: { qr_code_url: string } }>(`/certificates/qr/${verificationCode}`).then(unwrap),
 
-  issue: (enrollmentId: number, templateId?: number | null) =>
+  issue: (enrollmentId: number, templateId?: number | null, badgeName?: string | null, badgeColor?: string | null) =>
     api.post<{ data: Certificate }>(`/certificates/generate/${enrollmentId}`, {
       template_id: templateId ?? undefined,
+      badge_name: badgeName ?? undefined,
+      badge_color: badgeColor ?? undefined,
     }).then(unwrap),
 
   verify: (verificationCode: string) =>
@@ -63,10 +65,12 @@ export const certificatesApi = {
   unrevoke: (id: number) =>
     api.put<{ data: Certificate }>(`/admin/certificates/${id}/unrevoke`).then(unwrap),
 
-  bulkGenerate: (courseId: number, templateId?: number | null) =>
+  bulkGenerate: (courseId: number, templateId?: number | null, badgeName?: string | null, badgeColor?: string | null) =>
     api.post<{ data: { generated: number; skipped: number } }>('/admin/certificates/bulk-generate', {
       course_id: courseId,
       template_id: templateId ?? undefined,
+      badge_name: badgeName ?? undefined,
+      badge_color: badgeColor ?? undefined,
     }).then(unwrap),
 
   // Templates
