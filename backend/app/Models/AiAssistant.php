@@ -37,7 +37,7 @@ class AiAssistant extends Model
 
     public function conversations(): HasMany
     {
-        return $this->hasMany(AiConversation::class);
+        return $this->hasMany(AiConversation::class, 'assistant_id');
     }
 
     public function createdBy(): BelongsTo

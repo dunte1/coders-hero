@@ -485,8 +485,8 @@ class DashboardService
         return [
             'total_courses' => $totalCourses,
             'total_students' => $totalStudents,
-            'total_tasks' => Task::where('assigner_id', $userId)->count(),
-            'pending_tasks' => Task::where('assigner_id', $userId)->where('status', 'pending')->count(),
+            'total_tasks' => Task::where('assigned_by', $userId)->count(),
+            'pending_tasks' => Task::where('assigned_by', $userId)->where('status', 'pending')->count(),
             'ai_insights' => $this->buildAiInsights(),
         ];
     }
@@ -494,9 +494,9 @@ class DashboardService
     public function getEmployeeStats(string $userId): array
     {
         return [
-            'total_tasks' => Task::where('assignee_id', $userId)->count(),
-            'pending_tasks' => Task::where('assignee_id', $userId)->where('status', 'pending')->count(),
-            'overdue_tasks' => Task::where('assignee_id', $userId)->overdue()->count(),
+            'total_tasks' => Task::where('assigned_to', $userId)->count(),
+            'pending_tasks' => Task::where('assigned_to', $userId)->where('status', 'pending')->count(),
+            'overdue_tasks' => Task::where('assigned_to', $userId)->overdue()->count(),
         ];
     }
 
@@ -512,8 +512,8 @@ class DashboardService
             'completion_rate' => $totalEnrollments > 0
                 ? round(($completedEnrollments / $totalEnrollments) * 100, 1)
                 : 0,
-            'total_tasks' => Task::where('assignee_id', $userId)->count(),
-            'pending_tasks' => Task::where('assignee_id', $userId)->where('status', 'pending')->count(),
+            'total_tasks' => Task::where('assigned_to', $userId)->count(),
+            'pending_tasks' => Task::where('assigned_to', $userId)->where('status', 'pending')->count(),
         ];
     }
 }

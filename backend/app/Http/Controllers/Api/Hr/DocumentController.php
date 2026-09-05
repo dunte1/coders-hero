@@ -98,7 +98,18 @@ class DocumentController extends Controller
 
     public function myDocuments(Request $request): JsonResponse
     {
-        $employee = $this->hrService->employeeForUser(auth()->user());
+        $user = auth()->user();
+        $employee = $this->hrService->employeeForUser($user);
+
+        if (!$employee && $user->hasAnyRole(['admin', 'super_admin'])) {
+            return $this->successResponse(
+                [
+                    'data' => [],
+                    'meta' => ['current_page' => 1, 'last_page' => 1, 'per_page' => 15, 'total' => 0, 'from' => null, 'to' => null],
+                ],
+                'Documents retrieved successfully.'
+            );
+        }
 
         if (!$employee) {
             return $this->forbiddenResponse('Only employees can access their own documents.');
@@ -118,7 +129,12 @@ class DocumentController extends Controller
 
     public function myDownload(int $id): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
-        $employee = $this->hrService->employeeForUser(auth()->user());
+        $user = auth()->user();
+        $employee = $this->hrService->employeeForUser($user);
+
+        if (!$employee && $user->hasAnyRole(['admin', 'super_admin'])) {
+            abort(403, 'Admin users cannot access employee documents through this endpoint.');
+        }
 
         if (!$employee) {
             abort(403, 'Only employees can access their own documents.');
@@ -141,7 +157,12 @@ class DocumentController extends Controller
 
     public function myStore(StoreEmployeeDocumentRequest $request): JsonResponse
     {
-        $employee = $this->hrService->employeeForUser(auth()->user());
+        $user = auth()->user();
+        $employee = $this->hrService->employeeForUser($user);
+
+        if (!$employee && $user->hasAnyRole(['admin', 'super_admin'])) {
+            return $this->forbiddenResponse('Admin users cannot upload documents for themselves through this endpoint.');
+        }
 
         if (!$employee) {
             return $this->forbiddenResponse('Only employees can upload their own documents.');

@@ -843,7 +843,7 @@ Route::middleware('role:instructor|teacher|admin')->prefix('instructor')->group(
     });
 
     // Parent-teacher chat
-    Route::middleware('role:parent|teacher|instructor|student|admin|super_admin')->prefix('chat')->group(function () {
+    Route::middleware('role:parent|teacher|instructor|student|admin|super_admin|employee|hr_officer')->prefix('chat')->group(function () {
 
         Route::get('/', [ChatController::class, 'index']);
         Route::post('/', [ChatController::class, 'store']);

@@ -35,7 +35,7 @@ class AiConversation extends Model
 
     public function assistant(): BelongsTo
     {
-        return $this->belongsTo(AiAssistant::class);
+        return $this->belongsTo(AiAssistant::class, 'assistant_id');
     }
 
     public function messages(): HasMany

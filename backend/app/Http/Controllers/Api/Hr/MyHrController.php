@@ -18,21 +18,37 @@ class MyHrController extends Controller
 
     public function summary(): JsonResponse
     {
-        $employee = $this->hrService->employeeForUser(auth()->user());
+        $user = auth()->user();
+        $employee = $this->hrService->employeeForUser($user);
 
-        if (!$employee) {
+        if (!$employee && !$user->hasAnyRole(['admin', 'super_admin'])) {
             return $this->forbiddenResponse('Only employees can access their HR dashboard.');
         }
 
+        if ($employee) {
+            return $this->successResponse(
+                $this->hrService->mySummary($employee),
+                'HR summary retrieved successfully.'
+            );
+        }
+
         return $this->successResponse(
-            $this->hrService->mySummary($employee),
+            $this->hrService->summary(),
             'HR summary retrieved successfully.'
         );
     }
 
     public function profile(): JsonResponse
     {
-        $employee = $this->hrService->employeeForUser(auth()->user());
+        $user = auth()->user();
+        $employee = $this->hrService->employeeForUser($user);
+
+        if (!$employee && $user->hasAnyRole(['admin', 'super_admin'])) {
+            return $this->successResponse(
+                (new EmployeeHrResource)->additional(['message' => 'No employee profile found for this admin user.']),
+                'HR profile retrieved successfully.'
+            );
+        }
 
         if (!$employee) {
             return $this->forbiddenResponse('Only employees can access their HR profile.');

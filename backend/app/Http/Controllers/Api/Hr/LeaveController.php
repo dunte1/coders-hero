@@ -89,7 +89,18 @@ class LeaveController extends Controller
 
     public function myLeaves(Request $request): JsonResponse
     {
-        $employee = $this->hrService->employeeForUser(auth()->user());
+        $user = auth()->user();
+        $employee = $this->hrService->employeeForUser($user);
+
+        if (!$employee && $user->hasAnyRole(['admin', 'super_admin'])) {
+            return $this->successResponse(
+                [
+                    'data' => [],
+                    'meta' => ['current_page' => 1, 'last_page' => 1, 'per_page' => 15, 'total' => 0, 'from' => null, 'to' => null],
+                ],
+                'Leave requests retrieved successfully.'
+            );
+        }
 
         if (!$employee) {
             return $this->forbiddenResponse('Only employees can access their own leave records.');
@@ -103,7 +114,15 @@ class LeaveController extends Controller
 
     public function myBalance(): JsonResponse
     {
-        $employee = $this->hrService->employeeForUser(auth()->user());
+        $user = auth()->user();
+        $employee = $this->hrService->employeeForUser($user);
+
+        if (!$employee && $user->hasAnyRole(['admin', 'super_admin'])) {
+            return $this->successResponse(
+                ['annual' => 0, 'sick' => 0, 'casual' => 0, 'earned' => 0, 'unpaid' => 0],
+                'Leave balance retrieved successfully.'
+            );
+        }
 
         if (!$employee) {
             return $this->forbiddenResponse('Only employees can access their leave balance.');
@@ -117,7 +136,12 @@ class LeaveController extends Controller
 
     public function myStore(StoreLeaveRequest $request): JsonResponse
     {
-        $employee = $this->hrService->employeeForUser(auth()->user());
+        $user = auth()->user();
+        $employee = $this->hrService->employeeForUser($user);
+
+        if (!$employee && $user->hasAnyRole(['admin', 'super_admin'])) {
+            return $this->forbiddenResponse('Admin users cannot submit leave requests for themselves.');
+        }
 
         if (!$employee) {
             return $this->forbiddenResponse('Only employees can submit leave requests.');
@@ -140,7 +164,12 @@ class LeaveController extends Controller
 
     public function myCancel(int $id): JsonResponse
     {
-        $employee = $this->hrService->employeeForUser(auth()->user());
+        $user = auth()->user();
+        $employee = $this->hrService->employeeForUser($user);
+
+        if (!$employee && $user->hasAnyRole(['admin', 'super_admin'])) {
+            return $this->forbiddenResponse('Admin users cannot cancel leave requests through this endpoint.');
+        }
 
         if (!$employee) {
             return $this->forbiddenResponse('Only employees can cancel their own leave requests.');

@@ -113,7 +113,18 @@ class PayrollController extends Controller
 
     public function myPayslips(Request $request): JsonResponse
     {
-        $employee = $this->hrService->employeeForUser(auth()->user());
+        $user = auth()->user();
+        $employee = $this->hrService->employeeForUser($user);
+
+        if (!$employee && $user->hasAnyRole(['admin', 'super_admin'])) {
+            return $this->successResponse(
+                [
+                    'data' => [],
+                    'meta' => ['current_page' => 1, 'last_page' => 1, 'per_page' => 15, 'total' => 0, 'from' => null, 'to' => null],
+                ],
+                'Payslips retrieved successfully.'
+            );
+        }
 
         if (!$employee) {
             return $this->forbiddenResponse('Only employees can access their own payslips.');
@@ -127,7 +138,12 @@ class PayrollController extends Controller
 
     public function myPayslip(int $id): JsonResponse
     {
-        $employee = $this->hrService->employeeForUser(auth()->user());
+        $user = auth()->user();
+        $employee = $this->hrService->employeeForUser($user);
+
+        if (!$employee && $user->hasAnyRole(['admin', 'super_admin'])) {
+            return $this->notFoundResponse('Payslip not found.');
+        }
 
         if (!$employee) {
             return $this->forbiddenResponse('Only employees can access their own payslips.');
@@ -147,7 +163,12 @@ class PayrollController extends Controller
 
     public function myPayslipPdf(int $id): StreamedResponse
     {
-        $employee = $this->hrService->employeeForUser(auth()->user());
+        $user = auth()->user();
+        $employee = $this->hrService->employeeForUser($user);
+
+        if (!$employee && $user->hasAnyRole(['admin', 'super_admin'])) {
+            abort(404, 'Payslip not found.');
+        }
 
         if (!$employee) {
             abort(403, 'Only employees can access their own payslips.');
