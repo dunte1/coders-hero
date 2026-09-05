@@ -55,6 +55,9 @@ return [
 
     'code_runner' => [
         'enabled' => env('CODE_RUNNER_ENABLED', false),
+        // 'piston' => reaches the isolated Piston API at CODE_RUNNER_URL.
+        // 'native' => executes locally via installed runtimes (php/python3/node/gcc/g++/ruby/perl/bash).
+        'driver' => env('CODE_RUNNER_DRIVER', 'piston'),
         'url' => env('CODE_RUNNER_URL'),
         'token' => env('CODE_RUNNER_TOKEN'),
         'timeout' => (int) env('CODE_RUNNER_TIMEOUT', 30),
@@ -62,9 +65,33 @@ return [
         'compile_timeout_ms' => (int) env('CODE_RUNNER_COMPILE_TIMEOUT_MS', 15000),
         'memory_limit_kb' => (int) env('CODE_RUNNER_MEMORY_LIMIT_KB', 256000),
         // Languages that can be executed by the isolated runner.
+        // Each entry: label (UI), entry (default file name), piston (runner language slug).
         'languages' => [
             'python' => ['label' => 'Python', 'entry' => 'main.py', 'piston' => 'python'],
             'javascript' => ['label' => 'JavaScript', 'entry' => 'main.js', 'piston' => 'javascript'],
+            'typescript' => ['label' => 'TypeScript', 'entry' => 'main.ts', 'piston' => 'typescript'],
+            'java' => ['label' => 'Java', 'entry' => 'Main.java', 'piston' => 'java'],
+            'cpp' => ['label' => 'C++', 'entry' => 'main.cpp', 'piston' => 'c++'],
+            'c' => ['label' => 'C', 'entry' => 'main.c', 'piston' => 'c'],
+            'csharp' => ['label' => 'C#', 'entry' => 'main.cs', 'piston' => 'csharp'],
+            'go' => ['label' => 'Go', 'entry' => 'main.go', 'piston' => 'go'],
+            'rust' => ['label' => 'Rust', 'entry' => 'main.rs', 'piston' => 'rust'],
+            'ruby' => ['label' => 'Ruby', 'entry' => 'main.rb', 'piston' => 'ruby'],
+            'php' => ['label' => 'PHP', 'entry' => 'main.php', 'piston' => 'php'],
+            'kotlin' => ['label' => 'Kotlin', 'entry' => 'Main.kt', 'piston' => 'kotlin'],
+            'swift' => ['label' => 'Swift', 'entry' => 'main.swift', 'piston' => 'swift'],
+            'dart' => ['label' => 'Dart', 'entry' => 'main.dart', 'piston' => 'dart'],
+            'bash' => ['label' => 'Bash', 'entry' => 'main.sh', 'piston' => 'bash'],
+            'lua' => ['label' => 'Lua', 'entry' => 'main.lua', 'piston' => 'lua'],
+            'perl' => ['label' => 'Perl', 'entry' => 'main.pl', 'piston' => 'perl'],
+            'r' => ['label' => 'R', 'entry' => 'main.r', 'piston' => 'r'],
+            'scala' => ['label' => 'Scala', 'entry' => 'main.scala', 'piston' => 'scala'],
+            'haskell' => ['label' => 'Haskell', 'entry' => 'main.hs', 'piston' => 'haskell'],
+            'elixir' => ['label' => 'Elixir', 'entry' => 'main.exs', 'piston' => 'elixir'],
+            'clojure' => ['label' => 'Clojure', 'entry' => 'main.clj', 'piston' => 'clojure'],
+            'fsharp' => ['label' => 'F#', 'entry' => 'main.fsx', 'piston' => 'fsharp'],
+            'nim' => ['label' => 'Nim', 'entry' => 'main.nim', 'piston' => 'nim'],
+            'zig' => ['label' => 'Zig', 'entry' => 'main.zig', 'piston' => 'zig'],
         ],
         // Web languages rendered client-side in a sandboxed iframe preview.
         'web_languages' => [

@@ -1020,6 +1020,7 @@ Route::post('/ai-tutor/conversations/{id}/messages', [AiTutorController::class, 
         Route::get('/ai/my-usage', [AiPlatformController::class, 'myUsage']);
 
         // Playground
+        Route::get('/playground/languages', [PlaygroundController::class, 'languages']);
         Route::post('/playground/run', [PlaygroundController::class, 'run']);
         Route::post('/playground/workspaces', [PlaygroundController::class, 'saveWorkspace']);
         Route::put('/playground/workspaces/{workspaceId}', [PlaygroundController::class, 'updateWorkspace']);
@@ -1373,6 +1374,7 @@ Route::put('/lessons/{lessonId}/video-progress', [VideoProgressController::class
     Route::middleware('auth:sanctum')->prefix('library')->group(function () {
         Route::post('/resources/{id}/borrow', [LibraryBorrowingController::class, 'store']);
         Route::get('/my/borrowings', [LibraryBorrowingController::class, 'my']);
+        Route::put('/my/borrowings/{borrowingId}/return', [LibraryBorrowingController::class, 'returnMyBorrowing']);
         Route::post('/resources/{id}/reserve', [LibraryReservationController::class, 'store']);
         Route::get('/my/reservations', [LibraryReservationController::class, 'my']);
         Route::put('/my/reservations/{reservationId}/cancel', [LibraryReservationController::class, 'cancel']);

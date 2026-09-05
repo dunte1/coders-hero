@@ -19,6 +19,7 @@ use App\Repositories\UserRepository;
 use App\Services\AnnouncementService;
 use App\Services\AuthService;
 use App\Services\CodeRunner\CodeRunnerContract;
+use App\Services\CodeRunner\NativeCodeRunner;
 use App\Services\CodeRunner\NullCodeRunner;
 use App\Services\CodeRunner\PistonCodeRunner;
 use App\Services\CourseService;
@@ -84,14 +85,28 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(StudentTimelineService::class);
 
         // Resolve the isolated code execution engine. User code is never executed
-        // in-process; a Piston-compatible sandbox is required for real execution.
+        // in-process; a Piston-compatible sandbox is used when available.
         $this->app->singleton(CodeRunnerContract::class, function ($app) {
             $config = $app['config']->get('services.code_runner');
 
             $enabled = (bool) ($config['enabled'] ?? false);
+            $driver = (string) ($config['driver'] ?? 'piston');
+
+            if (!$enabled) {
+                return new NullCodeRunner();
+            }
+
+            if ($driver === 'native') {
+                return new NativeCodeRunner(
+                    runTimeoutMs: $config['run_timeout_ms'] ?? 10000,
+                    compileTimeoutMs: $config['compile_timeout_ms'] ?? 15000,
+                    memoryLimitKb: $config['memory_limit_kb'] ?? 256000,
+                );
+            }
+
             $url = (string) ($config['url'] ?? '');
 
-            if (!$enabled || $url === '') {
+            if ($url === '') {
                 return new NullCodeRunner();
             }
 

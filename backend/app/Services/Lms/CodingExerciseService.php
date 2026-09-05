@@ -163,7 +163,7 @@ class CodingExerciseService
         ];
     }
 
-    protected function buildTestCaseFiles(string $language, string $code, ?string $input): array
+    protected function buildTestCaseFiles(string $language, string $code, mixed $input): array
     {
         $stdin = $input !== null ? json_encode($input) : '';
 
@@ -171,7 +171,8 @@ class CodingExerciseService
             return [
                 [
                     'name' => 'main.py',
-                    'content' => "import sys, json\n\ninput_str = sys.stdin.read().strip()\ntry:\n    args = json.loads(input_str)\n    from solution import solution\n    result = solution(*args) if isinstance(args, list) else solution(args)\n    print(json.dumps(result, default=str))\nexcept Exception as e:\n    print(json.dumps({'__error__': str(e)}, default=str))",
+                    'language' => 'python',
+                    'content' => "import sys, json, inspect\n\ninput_str = sys.stdin.read().strip()\n\ndef _discover(module):\n    for name, obj in inspect.getmembers(module, inspect.isfunction):\n        if not name.startswith('_') and obj.__module__ == module.__name__:\n            return obj\n    raise AttributeError('no entry function found')\n\ntry:\n    args = json.loads(input_str)\n    import solution as _s\n    fn = _discover(_s)\n    params = inspect.signature(fn).parameters\n    if any(p.kind == p.VAR_POSITIONAL for p in params.values()):\n        result = fn(*args) if isinstance(args, list) else fn(args)\n    else:\n        n = len([p for p in params.values() if p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD)])\n        result = fn(*args) if isinstance(args, list) and len(args) == n else fn(args)\n    print(json.dumps(result, default=str))\nexcept BaseException as e:\n    import traceback\n    print(json.dumps({'__error__': str(e)}, default=str))\n    sys.stderr.write(traceback.format_exc())",
                 ],
                 [
                     'name' => 'solution.py',
@@ -184,6 +185,7 @@ class CodingExerciseService
             return [
                 [
                     'name' => 'main.js',
+                    'language' => 'javascript',
                     'content' => "const fs = require('fs');\nconst input = fs.readFileSync(0, 'utf8').trim();\ntry {\n    const solution = require('./solution').solution;\n    const result = solution(JSON.parse(input));\n    console.log(JSON.stringify(result));\n} catch (e) {\n    console.log(JSON.stringify({__error__: String(e.message || e)}));\n}",
                 ],
                 [
@@ -193,7 +195,21 @@ class CodingExerciseService
             ];
         }
 
-        return [];
+        $languageConfig = config("services.code_runner.languages.{$language}", null);
+
+        if ($languageConfig === null) {
+            return [];
+        }
+
+        $entry = $languageConfig['entry'] ?? 'main.' . $language;
+
+        return [
+            [
+                'name' => $entry,
+                'content' => $code,
+                'language' => $languageConfig['piston'] ?? $language,
+            ],
+        ];
     }
 
     protected function matches(mixed $actual, mixed $expected): bool

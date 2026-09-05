@@ -85,8 +85,6 @@ class CodingPlaygroundService
             throw new CodeRunnerUnavailableException();
         }
 
-        $timeout = $timeout ?? $this->runner->timeout;
-
         try {
             $runResult = $this->runner->run($files, $stdin, $timeout);
         } catch (\Throwable $e) {
@@ -100,6 +98,11 @@ class CodingPlaygroundService
             'exit_code' => $runResult['exit_code'] ?? 1,
             'timed_out' => $runResult['timed_out'] ?? false,
         ];
+    }
+
+    public function getRunner(): CodeRunnerContract
+    {
+        return $this->runner;
     }
 
     public function getLanguageConfig(string $language): array

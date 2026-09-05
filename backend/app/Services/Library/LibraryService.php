@@ -178,6 +178,11 @@ class LibraryService
         ]);
     }
 
+    public function findBorrowing(int $borrowingId): ?LibraryBorrowing
+    {
+        return LibraryBorrowing::find($borrowingId);
+    }
+
     public function returnBorrowing(int $borrowingId): LibraryBorrowing
     {
         $borrowing = LibraryBorrowing::findOrFail($borrowingId);
