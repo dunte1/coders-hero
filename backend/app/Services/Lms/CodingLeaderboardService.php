@@ -25,7 +25,7 @@ class CodingLeaderboardService
             $leaderboard[$exerciseId] = [
                 'exercise_title' => CodingExercise::find($exerciseId)?->title ?? 'Unknown',
                 'solved_count' => $exerciseSubmissions->count(),
-                'users' => $exerciseSubmissions->sortByDesc('score')->values()->all()->map(fn ($s) => [
+                'users' => $exerciseSubmissions->sortByDesc('score')->values()->map(fn ($s) => [
                     'user_id' => $s->user_id,
                     'user_name' => $s->user?->name ?? 'Unknown',
                     'score' => $s->score,
