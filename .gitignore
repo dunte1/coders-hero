@@ -47,3 +47,4 @@ production/backend/storage/framework/views/*
 production/backend/bootstrap/cache/*
 production/coders-hero-frontend.zip
 production/coders-hero-backend.zip
+.github/workflows/
