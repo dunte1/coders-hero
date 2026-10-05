@@ -111,6 +111,24 @@ class NotificationSeeder extends Seeder
                 'body' => 'Hello {{applicant_name}}, we regret to inform you that your application ({{application_number}}) could not be approved at this time.',
                 'channels' => ['in_app', 'email'],
             ],
+            [
+                'event' => 'payment.confirmed',
+                'name' => 'Payment Confirmed',
+                'description' => 'Sends a branded receipt to the payer when a payment is received and confirmed.',
+                'category' => 'fees',
+                'subject' => 'Payment Confirmed - Receipt #{{receipt_no}}',
+                'body' => 'Hello {{user_name}}, your payment of KES {{amount}} has been received. Receipt: {{receipt_no}}. Method: {{method}}. Reference: {{reference}}.',
+                'channels' => ['in_app', 'email'],
+            ],
+            [
+                'event' => 'payment.admin_alert',
+                'name' => 'Payment Received (Admin Alert)',
+                'description' => 'Notifies admins when a payment is received from a student or parent.',
+                'category' => 'fees',
+                'subject' => 'Payment Received - KES {{amount}} from {{student_name}}',
+                'body' => 'Hello Admin, a payment of KES {{amount}} has been received from {{student_name}}. Receipt: {{receipt_no}}. Method: {{method}}.',
+                'channels' => ['in_app', 'email'],
+            ],
         ];
 
         foreach ($templates as $template) {

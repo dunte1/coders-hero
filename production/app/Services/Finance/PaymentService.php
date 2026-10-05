@@ -2,6 +2,8 @@
 
 namespace App\Services\Finance;
 
+use App\Jobs\NotifyAdminsPaymentReceivedJob;
+use App\Jobs\SendPaymentConfirmationJob;
 use App\Models\Fee;
 use App\Models\Invoice;
 use App\Models\Payment;
@@ -90,6 +92,9 @@ class PaymentService
 
             $invoice->recalculateFromPayments();
 
+            SendPaymentConfirmationJob::dispatch($payment, $user);
+            NotifyAdminsPaymentReceivedJob::dispatch($payment);
+
             return $payment;
         });
     }
@@ -130,6 +135,9 @@ class PaymentService
             if ((float) $fee->payments()->sum('amount') >= (float) $fee->amount) {
                 $fee->update(['status' => 'paid']);
             }
+
+            SendPaymentConfirmationJob::dispatch($payment, $user);
+            NotifyAdminsPaymentReceivedJob::dispatch($payment);
 
             return $payment;
         });

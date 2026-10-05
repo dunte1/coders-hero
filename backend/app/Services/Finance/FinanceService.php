@@ -91,49 +91,69 @@ class FinanceService
 
     public function outstanding(array $filters): LengthAwarePaginator
     {
-        $query = Student::query()
-            ->active()
-            ->select('students.*')
-            ->selectRaw('
-                COALESCE(SUM(CASE WHEN invoices.status IN (?, ?, ?) THEN invoices.amount ELSE 0 END), 0) as invoiced,
-                COALESCE(SUM(CASE WHEN invoices.status IN (?, ?, ?) THEN invoices.paid_amount ELSE 0 END), 0) as paid,
-                COALESCE(SUM(CASE WHEN invoices.status IN (?, ?, ?) THEN (invoices.amount - invoices.paid_amount) ELSE 0 END), 0) as balance,
-                COUNT(CASE WHEN invoices.status IN (?, ?, ?) THEN 1 END) as open_invoices
-            ', ['issued', 'partial', 'overdue', 'issued', 'partial', 'overdue', 'issued', 'partial', 'overdue', 'issued', 'partial', 'overdue'])
-            ->leftJoin('invoices', 'students.id', '=', 'invoices.student_id')
-            ->when(($filters['grade'] ?? null) && ($filters['grade'] !== 'all'), fn ($q, $v) => $q->where('students.grade', $v))
-            ->when(($filters['search'] ?? null), fn ($q, $v) => $q->where(function ($sq) use ($v) {
-                $sq->where('students.first_name', 'like', "%{$v}%")
-                    ->orWhere('students.last_name', 'like', "%{$v}%")
-                    ->orWhere('students.student_id', 'like', "%{$v}%");
-            }))
-            ->groupBy('students.id')
-            ->havingRaw('balance > 0')
-            ->orderByDesc('balance');
+        $statuses = ['issued', 'partial', 'overdue'];
 
-        $perPage = (int) ($filters['per_page'] ?? 15);
-        $page = (int) ($filters['page'] ?? 1);
+        // Get all students with open invoices
+        $openInvoices = Invoice::with('student')
+            ->whereIn('status', $statuses)
+            ->get()
+            ->groupBy('student_id');
 
-        $paginator = $query->paginate($perPage, ['*'], 'page', $page);
+        // Build results from students who have open invoices
+        $rows = collect();
+        foreach ($openInvoices as $studentId => $invoices) {
+            $student = $invoices->first()->student;
+            if (!$student || $student->status !== 'active') {
+                continue;
+            }
 
-        $mapped = $paginator->getCollection()->map(function ($student) {
-            return [
+            // Apply filters
+            if (($filters['grade'] ?? null) && $filters['grade'] !== 'all' && $student->grade !== $filters['grade']) {
+                continue;
+            }
+            if (($filters['search'] ?? null)) {
+                $search = $filters['search'];
+                $match = str_contains(strtolower($student->first_name), strtolower($search))
+                    || str_contains(strtolower($student->last_name), strtolower($search))
+                    || str_contains(strtolower($student->student_id), strtolower($search));
+                if (!$match) {
+                    continue;
+                }
+            }
+
+            $invoiced = round($invoices->sum(fn ($i) => (float) $i->amount), 2);
+            $paid = round($invoices->sum(fn ($i) => (float) $i->paid_amount), 2);
+            $balance = round($invoices->sum(fn ($i) => $i->balance), 2);
+
+            if ($balance <= 0) {
+                continue;
+            }
+
+            $rows->push([
                 'student' => [
                     'id' => $student->id,
                     'student_id' => $student->student_id,
                     'full_name' => $student->full_name,
                     'grade' => $student->grade,
                 ],
-                'open_invoices' => (int) $student->open_invoices,
-                'invoiced' => round((float) $student->invoiced, 2),
-                'paid' => round((float) $student->paid, 2),
-                'balance' => round((float) $student->balance, 2),
-            ];
-        });
+                'open_invoices' => $invoices->count(),
+                'invoiced' => $invoiced,
+                'paid' => $paid,
+                'balance' => $balance,
+            ]);
+        }
 
-        return new LengthAwarePaginator(
-            $mapped,
-            $paginator->total(),
+        $rows = $rows->sortByDesc('balance')->values();
+
+        $perPage = (int) ($filters['per_page'] ?? 15);
+        $page = (int) ($filters['page'] ?? 1);
+        $total = $rows->count();
+        $offset = ($page - 1) * $perPage;
+        $items = $rows->slice($offset, $perPage)->values();
+
+        return new Paginator(
+            $items,
+            $total,
             $perPage,
             $page,
             ['path' => request()->url(), 'query' => request()->query()]

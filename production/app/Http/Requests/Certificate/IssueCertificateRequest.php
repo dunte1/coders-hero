@@ -15,6 +15,8 @@ class IssueCertificateRequest extends FormRequest
     {
         return [
             'template_id' => ['nullable', 'integer', 'exists:certificate_templates,id'],
+            'badge_name' => ['nullable', 'string', 'max:255'],
+            'badge_color' => ['nullable', 'string', 'max:7'],
         ];
     }
 }

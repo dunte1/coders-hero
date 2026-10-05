@@ -19,10 +19,15 @@ class EnsureUserHasRole
             ], 401);
         }
 
-        if (!$user->hasAnyRole($roles)) {
+        $flatRoles = [];
+        foreach ($roles as $role) {
+            $flatRoles = array_merge($flatRoles, array_map('trim', explode('|', $role)));
+        }
+
+        if (!$user->hasAnyRole($flatRoles)) {
             \Log::warning('Role access denied', [
                 'user_id' => $user->id,
-                'required_roles' => $roles,
+                'required_roles' => $flatRoles,
                 'user_roles' => $user->getRoleNames()->toArray(),
                 'path' => request()->path(),
             ]);

@@ -23,10 +23,18 @@ class PlaygroundController extends Controller
     {
         $validated = $request->validated();
 
+        $languageConfig = $this->playgroundService->getLanguageConfig($validated['language']);
+        $entry = $languageConfig['entry'] ?? 'main.' . $validated['language'];
+        $pistonLanguage = $languageConfig['piston'] ?? $validated['language'];
+
         try {
             $result = $this->playgroundService->runCode(
                 $validated['language'],
-                [['name' => 'main.' . $validated['language'], 'content' => $validated['code']]],
+                [[
+                    'name' => $entry,
+                    'content' => $validated['code'],
+                    'language' => $pistonLanguage,
+                ]],
                 $validated['stdin'] ?? null,
             );
 
@@ -99,5 +107,31 @@ class PlaygroundController extends Controller
         $workspaces = $this->playgroundService->listWorkspaces(auth()->id());
 
         return $this->successResponse($workspaces);
+    }
+
+    public function languages(): JsonResponse
+    {
+        $runner = $this->playgroundService->getRunner();
+
+        $languages = collect(config('services.code_runner.languages', []))
+            ->filter(function (array $definition, string $slug) use ($runner) {
+                if ($runner instanceof \App\Services\CodeRunner\NativeCodeRunner) {
+                    return $runner->supports($slug);
+                }
+                if ($runner instanceof \App\Services\CodeRunner\NullCodeRunner) {
+                    return false;
+                }
+
+                return true;
+            })
+            ->map(fn (array $definition, string $slug) => [
+                'slug' => $slug,
+                'label' => $definition['label'] ?? $slug,
+                'entry' => $definition['entry'] ?? 'main.' . $slug,
+            ])
+            ->values()
+            ->all();
+
+        return $this->successResponse($languages);
     }
 }

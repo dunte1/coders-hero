@@ -75,4 +75,28 @@ class LibraryBorrowingController extends Controller
             'Resource returned.'
         );
     }
+
+    public function returnMyBorrowing(Request $request, int $borrowingId): JsonResponse
+    {
+        $borrowing = $this->libraryService->findBorrowing($borrowingId);
+
+        if (!$borrowing) {
+            return $this->notFoundResponse('Borrowing record not found.');
+        }
+
+        if ((int) $borrowing->user_id !== (int) $request->user()?->id) {
+            return $this->forbiddenResponse('You can only return your own borrowings.');
+        }
+
+        try {
+            $borrowing = $this->libraryService->returnBorrowing($borrowingId);
+        } catch (ModelNotFoundException) {
+            return $this->notFoundResponse('Borrowing record not found.');
+        }
+
+        return $this->successResponse(
+            new LibraryBorrowingResource($borrowing->load(['resource', 'user'])),
+            'Resource returned.'
+        );
+    }
 }

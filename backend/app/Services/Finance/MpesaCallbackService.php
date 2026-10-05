@@ -2,8 +2,11 @@
 
 namespace App\Services\Finance;
 
+use App\Jobs\NotifyAdminsPaymentReceivedJob;
+use App\Jobs\SendPaymentConfirmationJob;
 use App\Models\MpesaTransaction;
 use App\Models\Payment;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class MpesaCallbackService
@@ -81,6 +84,10 @@ class MpesaCallbackService
                 $transaction->save();
 
                 $this->reconcilePayable($transaction);
+
+                $recipient = $transaction->user_id ? User::find($transaction->user_id) : null;
+                SendPaymentConfirmationJob::dispatch($payment, $recipient);
+                NotifyAdminsPaymentReceivedJob::dispatch($payment);
             } else {
                 $transaction->payment_id = $existing->id;
                 $transaction->save();

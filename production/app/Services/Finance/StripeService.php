@@ -164,6 +164,9 @@ class StripeService
         $transaction->update(['payment_id' => $payment->id]);
 
         $invoice->recalculateFromPayments();
+
+        \App\Jobs\SendPaymentConfirmationJob::dispatch($payment, \App\Models\User::find($transaction->user_id));
+        \App\Jobs\NotifyAdminsPaymentReceivedJob::dispatch($payment);
     }
 
     private function verifyWebhookSignature(array $payload, string $sigHeader, string $secret): void

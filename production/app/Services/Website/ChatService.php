@@ -175,7 +175,7 @@ PROMPT;
         return $this->fallback();
     }
 
-    private function fallback(string $reply = null): array
+    private function fallback(?string $reply = null): array
     {
         $reply ??= "I'm sorry, I couldn't find an answer to that just yet. "
             . "Please try asking about our coding or robotics programs, pricing, or age groups, "

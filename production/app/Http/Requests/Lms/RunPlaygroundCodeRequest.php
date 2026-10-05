@@ -13,9 +13,11 @@ class RunPlaygroundCodeRequest extends FormRequest
 
     public function rules(): array
     {
+        $languages = array_keys(config('services.code_runner.languages', []));
+
         return [
             'code' => ['required', 'string'],
-            'language' => ['required', 'in:python,javascript'],
+            'language' => ['required', 'string', 'in:' . implode(',', $languages)],
             'stdin' => ['nullable', 'string'],
         ];
     }

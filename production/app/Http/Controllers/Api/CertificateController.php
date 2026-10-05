@@ -105,7 +105,9 @@ class CertificateController extends Controller
             $certificate = $this->certificateService->issue(
                 $enrollmentId,
                 $request->input('template_id'),
-                auth()->id()
+                auth()->id(),
+                $request->input('badge_name'),
+                $request->input('badge_color')
             );
         } catch (ModelNotFoundException) {
             return $this->notFoundResponse('Enrollment not found.');
@@ -122,11 +124,15 @@ class CertificateController extends Controller
         $request->validate([
             'course_id' => ['required', 'integer', 'exists:courses,id'],
             'template_id' => ['nullable', 'integer', 'exists:certificate_templates,id'],
+            'badge_name' => ['nullable', 'string', 'max:255'],
+            'badge_color' => ['nullable', 'string', 'max:7'],
         ]);
 
         $result = $this->certificateService->bulkGenerate(
             (int) $request->input('course_id'),
-            $request->input('template_id') ? (int) $request->input('template_id') : null
+            $request->input('template_id') ? (int) $request->input('template_id') : null,
+            $request->input('badge_name'),
+            $request->input('badge_color')
         );
 
         return $this->successResponse($result, 'Bulk certificate generation completed.');
