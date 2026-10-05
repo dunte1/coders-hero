@@ -64,11 +64,21 @@ class StripeController extends Controller
 
     /**
      * Stripe webhook endpoint. Public; no auth.
+     * Signature verification uses the raw request body.
      */
     public function webhook(Request $request): JsonResponse
     {
-        $payload = $request->all();
+        $raw = $request->getContent();
         $sigHeader = $request->header('Stripe-Signature', '');
+
+        if ($raw === '') {
+            return $this->errorResponse('Empty webhook payload.', 400);
+        }
+
+        $payload = json_decode($raw, true);
+        if (!is_array($payload)) {
+            return $this->errorResponse('Invalid webhook JSON.', 400);
+        }
 
         try {
             $this->stripeService->handleWebhook($payload, $sigHeader);
