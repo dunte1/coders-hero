@@ -48,6 +48,12 @@ class DocumentController extends Controller
 
         $file = $request->file('file');
 
+        try {
+            \App\Support\FileUploadGuard::assert($file, 'document', 10240);
+        } catch (\RuntimeException $e) {
+            return $this->errorResponse($e->getMessage(), 422);
+        }
+
         $path = $file->store('hr/documents', 'public');
 
         $document = EmployeeDocument::create([
